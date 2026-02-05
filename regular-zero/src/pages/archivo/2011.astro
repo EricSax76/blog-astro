@@ -1,0 +1,162 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import YearbookNav from "../../components/YearbookNav.astro";
+---
+
+<Layout title="Anuario 2011 | El Alma de las Flores">
+  <main class="max-w-4xl mx-auto px-6 py-12 md:py-20">
+    <div class="text-center mb-16 space-y-4">
+      <h1 class="font-serif text-5xl md:text-6xl font-bold text-deep-green">
+        Anuario 2011
+      </h1>
+      <p class="text-xl text-deep-green/60 italic font-serif">
+        Memorias, reflexiones y el camino recorrido.
+      </p>
+    </div>
+
+    <YearbookNav activeYear={2011} />
+
+    <div class="grid gap-12">
+      <!-- Article: Star of Bethlehem -->
+      <article
+        class="bg-white p-8 md:p-10 rounded-[2rem] shadow-lg shadow-sage/5 border border-sage/10"
+      >
+        <header class="mb-4">
+          <h2
+            class="font-serif text-2xl md:text-3xl font-bold text-deep-green mb-1"
+          >
+            Star of Bethlehem
+          </h2>
+          <p
+            class="text-xs text-deep-green/40 font-serif italic uppercase tracking-wider"
+          >
+            Diciembre 04, 2011
+          </p>
+        </header>
+        <div class="prose text-deep-green/80 leading-relaxed">
+          <p>
+            Para los que están muy angustiados en condiciones que, por un
+            tiempo, les causan gran infelicidad. El shock de una noticia grave,
+            la pérdida de un ser querido, el susto después de un accidente, etc.
+            Para quienes por un tiempo se niegan a ser consolados, este remedio
+            les trae alivio.
+          </p>
+        </div>
+      </article>
+
+      <!-- Grid for smaller articles -->
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Article: Rock Rose -->
+        <article
+          class="bg-white p-8 rounded-[2rem] shadow-lg shadow-sage/5 border border-sage/10"
+        >
+          <h2 class="font-serif text-2xl font-bold text-deep-green mb-2">
+            Rock Rose
+          </h2>
+          <p
+            class="text-xs text-deep-green/40 font-serif italic uppercase tracking-wider mb-4"
+          >
+            Noviembre 30, 2011
+          </p>
+          <p class="text-deep-green/80 leading-relaxed">
+            Es el remedio de emergencia para los casos en que parece ya no haber
+            esperanza. En accidentes o enfermedades repentinas, o cuando el
+            enfermo está muy asustado o aterrorizado.
+          </p>
+        </article>
+
+        <!-- Article: El temor y la incertidumbre -->
+        <article
+          class="bg-white p-8 rounded-[2rem] shadow-lg shadow-sage/5 border border-sage/10"
+        >
+          <h2
+            class="font-serif text-2xl font-bold text-deep-green leading-tight mb-2"
+          >
+            El Temor y la Incertidumbre
+          </h2>
+          <p
+            class="text-xs text-deep-green/40 font-serif italic uppercase tracking-wider mb-4"
+          >
+            Noviembre 21, 2011
+          </p>
+          <p class="text-deep-green/80 leading-relaxed">
+            Son dos de los grandes obstáculos en nuestro camino. El temor nos
+            paraliza y la incertidumbre nos confunde. Pero si aprendemos a
+            escuchar a nuestra alma, descubriremos que dentro de nosotros
+            tenemos todas las respuestas.
+          </p>
+        </article>
+      </div>
+
+      <!-- Article: La Duda -->
+      <article
+        class="bg-cream/40 p-8 md:p-12 rounded-[2.5rem] shadow-lg shadow-sage/5 border border-sage/10"
+      >
+        <header class="mb-4">
+          <h2
+            class="font-serif text-2xl md:text-3xl font-bold text-deep-green mb-1"
+          >
+            La Duda
+          </h2>
+          <p
+            class="text-xs text-deep-green/40 font-serif italic uppercase tracking-wider"
+          >
+            Noviembre 21, 2011
+          </p>
+        </header>
+        <div class="prose text-deep-green/80 leading-relaxed max-w-none">
+          <p>
+            Dudar es humano, pero vivir en la duda permanente es una tortura. No
+            saber qué camino tomar, qué decisión es la correcta...
+          </p>
+          <p>
+            <strong>Scleranthus</strong> y <strong>Cerato</strong> son dos flores
+            que nos ayudan a aclarar nuestra mente, a conectar con nuestra intuición
+            y a tomar decisiones con seguridad.
+          </p>
+        </div>
+      </article>
+
+      <!-- Grid for last articles -->
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Article: Scleranthus -->
+        <article
+          class="bg-white p-8 rounded-[2rem] shadow-lg shadow-sage/5 border border-sage/10"
+        >
+          <h2 class="font-serif text-2xl font-bold text-deep-green mb-2">
+            Scleranthus
+          </h2>
+          <p
+            class="text-xs text-deep-green/40 font-serif italic uppercase tracking-wider mb-4"
+          >
+            Noviembre 20, 2011
+          </p>
+          <p class="text-deep-green/80 leading-relaxed">
+            Para quienes sufren mucho por ser incapaces de decidir entre dos
+            cosas, inclinándose primero por una y luego por la otra. Son
+            personas calladas, que soportan solas su dificultad.
+          </p>
+        </article>
+
+        <!-- Article: Cerato -->
+        <article
+          class="bg-white p-8 rounded-[2rem] shadow-lg shadow-sage/5 border border-sage/10"
+        >
+          <h2 class="font-serif text-2xl font-bold text-deep-green mb-2">
+            Cerato
+          </h2>
+          <p
+            class="text-xs text-deep-green/40 font-serif italic uppercase tracking-wider mb-4"
+          >
+            Noviembre 20, 2011
+          </p>
+          <p class="text-deep-green/80 leading-relaxed">
+            Para aquellos que no tienen suficiente confianza en sí mismos para
+            tomar sus propias decisiones. Constantemente piden consejo a los
+            demás y a menudo son mal aconsejados.
+          </p>
+        </article>
+      </div>
+    </div>
+  </main>
+</Layout>

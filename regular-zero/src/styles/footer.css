@@ -1,0 +1,89 @@
+/* Estilo general del footer */
+footer {
+    inline-size: 100%;
+    background-color: #6b9080;
+    padding: 20px 10px;
+    text-align: center;
+    color: #fff;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-block-start: 50px;
+}
+
+/* Textos del footer */
+footer p, footer h3 {
+    margin: 10px 0;
+    color: #f1f1f1;
+}
+
+/* Estilo de los enlaces */
+footer a {
+    color: #f1f1f1;
+    text-decoration: none;
+    transition: color 0.3s ease-in-out;
+    font-weight: 500;
+}
+
+footer a:hover {
+    color: #d4d4d4;
+    text-decoration: underline;
+}
+
+/* Lista de elementos: Redes sociales y enlaces */
+footer ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Espaciado uniforme */
+    flex-wrap: wrap; /* Adaptable para pantallas pequeñas */
+}
+
+footer li {
+    display: inline-block;
+    margin: 6px 10px;
+}
+
+/* Íconos sociales */
+.icon {
+    inline-size: 50px;
+    block-size: 50px;
+    border-radius: 50%; /* Hace los iconos circulares */
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.icon:hover {
+    transform: scale(1.1); /* Aumenta ligeramente el tamaño */
+    opacity: 0.8;
+}
+
+/* Estilo específico para la última sección de enlaces */
+.last_footer {
+    margin-block-start: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    padding: 0;
+}
+
+
+/* Responsividad */
+@media (max-width: 768px) {
+    footer {
+        font-size: 0.9rem;
+        padding: 15px 5px;
+    }
+
+    .icon {
+        inline-size: 40px;
+        block-size: 40px;
+    }
+
+    .last_footer {
+        flex-direction: column;
+        gap: 10px;
+    }
+}

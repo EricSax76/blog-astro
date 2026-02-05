@@ -1,0 +1,21 @@
+---
+const years = [2026, 2017, 2016, 2015, 2014, 2013, 2012, 2011];
+const { activeYear } = Astro.props;
+---
+
+<nav class="flex flex-wrap justify-center gap-2 mb-12">
+  {
+    years.map((year) => (
+      <a
+        href={`/archivo/${year}`}
+        class={`px-4 py-2 rounded-full font-serif font-bold text-lg transition-all transform hover:-translate-y-0.5 ${
+          activeYear === year
+            ? "bg-sage text-white shadow-md"
+            : "bg-white text-deep-green border border-sage/20 hover:bg-sage/10 hover:border-sage/40"
+        }`}
+      >
+        {year}
+      </a>
+    ))
+  }
+</nav>

@@ -1,0 +1,214 @@
+---
+
+---
+
+<header
+  class="sticky top-0 z-50 w-full bg-cream/40 backdrop-blur-2xl shadow-sm transition-all duration-300 border-b border-sage/10 support-[backdrop-filter]:bg-cream/30"
+>
+  <div
+    class="max-w-7xl mx-auto px-6 md:px-12 h-20 flex items-center justify-between"
+  >
+    <!-- Logo -->
+    <a href="/" class="flex items-center gap-3 group relative z-50">
+      <div
+        class="w-10 h-10 rounded-full overflow-hidden border-2 border-sage/50 group-hover:border-deep-green transition-colors"
+      >
+        <img
+          src="/images/flor-logo.jpeg"
+          alt="Logo El Alma de las Flores"
+          class="w-full h-full object-cover"
+        />
+      </div>
+      <span class="font-serif text-xl font-bold text-deep-green tracking-wide">
+        El Alma de las Flores
+      </span>
+    </a>
+
+    <!-- Desktop Navigation -->
+    <nav class="hidden md:flex items-center gap-8">
+      <a
+        href="/flores-de-bach"
+        class="text-deep-green hover:text-sage font-medium text-sm lg:text-base transition-colors duration-200"
+      >
+        Flores de Bach
+      </a>
+      <a
+        id="desktop-recomendador"
+        href="/tratamientos"
+        class="hidden text-deep-green hover:text-sage font-medium text-sm lg:text-base transition-colors duration-200"
+      >
+        Recomendador
+      </a>
+      <a
+        href="/biografia"
+        class="text-deep-green hover:text-sage font-medium text-sm lg:text-base transition-colors duration-200"
+      >
+        Biografía
+      </a>
+
+      <!-- Dropdown for Content -->
+      <div class="relative group">
+        <button
+          class="flex items-center gap-1 text-deep-green hover:text-sage font-medium text-sm lg:text-base transition-colors duration-200 focus:outline-none"
+        >
+          Contenido
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 opacity-70 group-hover:rotate-180 transition-transform duration-200"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+        <div
+          class="absolute right-0 top-full pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0"
+        >
+          <div
+            class="bg-white rounded-xl shadow-xl border border-sage/20 p-2 min-w-[160px] flex flex-col gap-1"
+          >
+            {
+              [2026, 2017, 2016, 2015, 2014, 2013, 2012, 2011].map((year) => (
+                <a
+                  href={`/archivo/${year}`}
+                  class="block px-4 py-2 text-sm text-deep-green hover:bg-cream rounded-lg transition-colors"
+                >
+                  Archivo {year}
+                </a>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="auth-buttons"
+        class="hidden items-center gap-3 pl-4 border-l border-sage/30"
+      >
+        <a
+          href="/user/login"
+          class="text-deep-green hover:text-sage font-medium text-sm transition-colors"
+        >
+          Acceder
+        </a>
+        <a
+          href="/user/register"
+          class="px-5 py-2 rounded-full bg-sage/20 text-deep-green font-semibold text-sm hover:bg-sage/30 transition-all duration-200"
+        >
+          Regístrate
+        </a>
+      </div>
+    </nav>
+
+    <!-- Mobile Menu Button -->
+    <button
+      id="mobile-menu-btn"
+      class="md:hidden relative z-50 p-2 text-deep-green focus:outline-none"
+      aria-label="Menu"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-8 w-8"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16"></path>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mobile Overlay Menu -->
+  <div
+    id="mobile-menu"
+    class="fixed inset-0 bg-cream z-40 flex flex-col justify-center items-center opacity-0 pointer-events-none transition-all duration-300"
+  >
+    <nav class="flex flex-col items-center gap-6 text-xl">
+      <a href="/flores-de-bach" class="text-deep-green font-serif font-medium"
+        >Flores de Bach</a
+      >
+      <a
+        id="mobile-recomendador"
+        href="/tratamientos"
+        class="hidden text-deep-green font-serif font-medium">Recomendador</a
+      >
+      <a href="/biografia" class="text-deep-green font-serif font-medium"
+        >Biografía</a
+      >
+
+      <hr id="mobile-auth-hr" class="hidden w-20 border-sage/30" />
+      <a
+        id="mobile-login"
+        href="/user/login"
+        class="hidden text-deep-green font-medium">Acceder</a
+      >
+      <a
+        id="mobile-register"
+        href="/user/register"
+        class="hidden px-8 py-3 rounded-full bg-deep-green text-cream font-bold shadow-lg"
+        >Regístrate</a
+      >
+    </nav>
+  </div>
+</header>
+
+<script>
+  const menuBtn = document.getElementById("mobile-menu-btn");
+  const mobileMenu = document.getElementById("mobile-menu");
+  let isMenuOpen = false;
+
+  // Navigation elements for conditional visibility
+  const desktopRecomendador = document.getElementById("desktop-recomendador");
+  const mobileRecomendador = document.getElementById("mobile-recomendador");
+  const authButtons = document.getElementById("auth-buttons");
+  const mobileLogin = document.getElementById("mobile-login");
+  const mobileRegister = document.getElementById("mobile-register");
+  const mobileAuthHr = document.getElementById("mobile-auth-hr");
+
+  if (menuBtn && mobileMenu) {
+    menuBtn.addEventListener("click", () => {
+      isMenuOpen = !isMenuOpen;
+
+      if (isMenuOpen) {
+        mobileMenu.classList.remove("opacity-0", "pointer-events-none");
+        document.body.style.overflow = "hidden"; // Prevent scrolling
+        menuBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        `;
+      } else {
+        mobileMenu.classList.add("opacity-0", "pointer-events-none");
+        document.body.style.overflow = "";
+        menuBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        `;
+      }
+    });
+
+    // Close menu when clicking a link
+    mobileMenu.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        isMenuOpen = false;
+        mobileMenu.classList.add("opacity-0", "pointer-events-none");
+        document.body.style.overflow = "";
+        menuBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        `;
+      });
+    });
+  }
+</script>

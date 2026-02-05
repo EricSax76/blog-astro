@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #f3f0e6;
+  --color-deep-green: #2c5530;
+  --color-sage: #8fa382;
+  --color-earth: #a08060;
+
+  --font-serif: "Cormorant Garamond", serif;
+  --font-sans: "Red Hat Text", system-ui, sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+}

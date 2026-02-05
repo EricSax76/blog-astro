@@ -1,0 +1,144 @@
+---
+
+---
+
+<footer class="bg-deep-green text-cream py-16 mt-auto">
+  <div
+    class="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-3 gap-12"
+  >
+    <!-- Brand -->
+    <div class="space-y-4">
+      <h3 class="font-serif text-2xl font-bold tracking-wide text-cream">
+        El Alma de las Flores
+      </h3>
+      <p class="text-cream/80 text-sm max-w-xs leading-relaxed">
+        Un espacio dedicado al estudio, comprensión y difusión del sistema
+        floral del Dr. Edward Bach con una mirada integral.
+      </p>
+      <a
+        href="mailto:info@elalmadelasflores.com"
+        class="inline-block text-sage hover:text-white transition-colors font-medium"
+      >
+        info@elalmadelasflores.com
+      </a>
+    </div>
+
+    <!-- Social -->
+    <div class="space-y-4">
+      <h4 class="font-sans font-bold text-lg text-cream">Síguenos</h4>
+      <div class="flex gap-4">
+        <a
+          href="#"
+          class="w-10 h-10 rounded-full bg-cream/10 flex items-center justify-center hover:bg-cream/20 transition-all group"
+          aria-label="Instagram"
+        >
+          <img
+            src="/images/instagram.png"
+            alt=""
+            class="w-5 h-5 opacity-80 group-hover:opacity-100 invert brightness-0"
+          />
+        </a>
+        <a
+          href="#"
+          class="w-10 h-10 rounded-full bg-cream/10 flex items-center justify-center hover:bg-cream/20 transition-all group"
+          aria-label="YouTube"
+        >
+          <img
+            src="/images/youtube.png"
+            alt=""
+            class="w-5 h-5 opacity-80 group-hover:opacity-100 invert brightness-0"
+          />
+        </a>
+        <a
+          href="#"
+          class="w-10 h-10 rounded-full bg-cream/10 flex items-center justify-center hover:bg-cream/20 transition-all group"
+          aria-label="TikTok"
+        >
+          <img
+            src="/images/tiktok.png"
+            alt=""
+            class="w-5 h-5 opacity-80 group-hover:opacity-100 invert brightness-0"
+          />
+        </a>
+      </div>
+    </div>
+
+    <!-- Links -->
+    <div class="space-y-4">
+      <h4 class="font-sans font-bold text-lg text-cream">Enlaces</h4>
+      <nav class="flex flex-col gap-2">
+        <a
+          href="#"
+          class="text-cream/70 hover:text-white transition-colors text-sm"
+          >Mapa del sitio</a
+        >
+        <a
+          href="#"
+          class="text-cream/70 hover:text-white transition-colors text-sm"
+          >Términos y condiciones</a
+        >
+        <a
+          href="#"
+          class="text-cream/70 hover:text-white transition-colors text-sm"
+          >Política de privacidad</a
+        >
+      </nav>
+    </div>
+  </div>
+
+  <div
+    class="max-w-7xl mx-auto px-6 md:px-12 mt-12 pt-8 border-t border-cream/10 text-center text-cream/50 text-sm"
+  >
+    &copy; {new Date().getFullYear()} El Alma de las Flores. Todos los derechos reservados.
+  </div>
+
+  <!-- Back to Top Button -->
+  <button
+    id="backToTop"
+    class="fixed bottom-8 right-8 bg-sage text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center transform translate-y-20 opacity-0 transition-all duration-300 hover:bg-white hover:text-sage hover:-translate-y-1 focus:outline-none z-50 pointer-events-none"
+    aria-label="Volver arriba"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-6 w-6"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+    </svg>
+  </button>
+</footer>
+
+<script>
+  const backToTopButton = document.getElementById("backToTop");
+
+  if (backToTopButton) {
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 300) {
+        backToTopButton.classList.remove(
+          "translate-y-20",
+          "opacity-0",
+          "pointer-events-none",
+        );
+      } else {
+        backToTopButton.classList.add(
+          "translate-y-20",
+          "opacity-0",
+          "pointer-events-none",
+        );
+      }
+    });
+
+    backToTopButton.addEventListener("click", () => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    });
+  }
+</script>

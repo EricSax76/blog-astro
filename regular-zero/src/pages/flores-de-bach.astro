@@ -1,0 +1,330 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+// Data for flowers could be moved to a JSON/collection later, but keeping structure for now
+const flowers = [
+  {
+    id: 1,
+    name: "Agrimony",
+    botanical: "Agrimonia eupatoria",
+    desc: "Para personas que ocultan sus preocupaciones tras una fachada alegre. Ayuda a enfrentar emociones internas y ser más auténticos.",
+    img: "/images/bach-flowers/agrimony.jpeg",
+  },
+  {
+    id: 2,
+    name: "Aspen",
+    botanical: "Populus tremula",
+    desc: "Útil para temores vagos e inexplicables. Proporciona paz y seguridad frente a lo desconocido.",
+    img: "/images/bach-flowers/Aspen.jpeg",
+  },
+  {
+    id: 3,
+    name: "Beech",
+    botanical: "Fagus sylvatica",
+    desc: "Para personas críticas e intolerantes. Ayuda a desarrollar comprensión y empatía.",
+    img: "/images/bach-flowers/Beech.jpeg",
+  },
+  {
+    id: 4,
+    name: "Centaury",
+    botanical: "Centaurium erythraea",
+    desc: "Para personas complacientes que tienen dificultades para decir 'no'. Fomenta la asertividad y el establecimiento de límites.",
+    img: "/images/bach-flowers/Centaury.jpeg",
+  },
+  {
+    id: 5,
+    name: "Cerato",
+    botanical: "Ceratostigma willmottiana",
+    desc: "Para quienes dudan de su juicio. Ayuda a confiar en su sabiduría y decisiones.",
+    img: "/images/bach-flowers/Cerato.jpg",
+  },
+  {
+    id: 6,
+    name: "Cherry Plum",
+    botanical: "Prunus cerasifera",
+    desc: "Para el miedo a perder el control. Restaura la calma y el manejo emocional.",
+    img: "/images/bach-flowers/Cherry%20Plum.jpg",
+  },
+  {
+    id: 7,
+    name: "Chestnut Bud",
+    botanical: "Aesculus hippocastanum",
+    desc: "Ayuda a aprender de los errores y evitar patrones repetitivos.",
+    img: "/images/bach-flowers/Chestnut%20Bud.jpeg",
+  },
+  {
+    id: 8,
+    name: "Chicory",
+    botanical: "Cichorium intybus",
+    desc: "Fomenta un amor desinteresado, liberando el control y la necesidad de recibir afecto.",
+    img: "/images/bach-flowers/Chicory.jpeg",
+  },
+  {
+    id: 9,
+    name: "Clematis",
+    botanical: "Clematis vitalba",
+    desc: "Para personas soñadoras y desconectadas. Ayuda a centrarse en el presente.",
+    img: "/images/bach-flowers/Clematis.jpg",
+  },
+  {
+    id: 10,
+    name: "Crab Apple",
+    botanical: "Malus pumila",
+    desc: "Remedio de la limpieza. Ayuda a aceptar el cuerpo y la mente con compasión.",
+    img: "/images/bach-flowers/Crab%20Apple.jpg",
+  },
+  {
+    id: 11,
+    name: "Elm",
+    botanical: "Ulmus procera",
+    desc: "Restaura la confianza en personas abrumadas por responsabilidades.",
+    img: "/images/bach-flowers/Elm.jpeg",
+  },
+  {
+    id: 12,
+    name: "Gentian",
+    botanical: "Gentiana amarella",
+    desc: "Ayuda a superar el desaliento y fomenta una actitud positiva frente a contratiempos.",
+    img: "/images/bach-flowers/Gentian%20(Gentiana%20amarella).jpg",
+  },
+  {
+    id: 13,
+    name: "Gorse",
+    botanical: "Ulex europaeus",
+    desc: "Restaura la esperanza en situaciones difíciles y desesperanzadas.",
+    img: "/images/bach-flowers/Gorse%20(Ulex%20europaeus).jpeg",
+  },
+  {
+    id: 14,
+    name: "Heather",
+    botanical: "Calluna vulgaris",
+    desc: "Fomenta la autosuficiencia emocional y la capacidad de disfrutar la soledad.",
+    img: "/images/bach-flowers/Heather%20(Calluna%20vulgaris).jpg",
+  },
+  {
+    id: 15,
+    name: "Holly",
+    botanical: "Ilex aquifolium",
+    desc: "Ayuda a transformar emociones negativas como el odio y los celos en amor y comprensión.",
+    img: "/images/bach-flowers/Holly%20(Ilex%20aquifolium).webp",
+  },
+  {
+    id: 16,
+    name: "Honeysuckle",
+    botanical: "Lonicera caprifolium",
+    desc: "Libera el apego al pasado, permitiendo vivir en el presente.",
+    img: "/images/bach-flowers/Honeysuckle%20(Lonicera%20caprifolium).jpg",
+  },
+  {
+    id: 17,
+    name: "Hornbeam",
+    botanical: "Carpinus betulus",
+    desc: "Revitaliza la energía mental y ayuda a afrontar la rutina diaria.",
+    img: "/images/bach-flowers/Hornbeam%20(Carpinus%20betulus).webp",
+  },
+  {
+    id: 18,
+    name: "Impatiens",
+    botanical: "Impatiens glandulifera",
+    desc: "Fomenta la paciencia y la tolerancia hacia los demás.",
+    img: "/images/bach-flowers/Impatiens%20(Impatiens%20glandulifera).jpg",
+  },
+  {
+    id: 19,
+    name: "Larch",
+    botanical: "Larix decidua",
+    desc: "Restaura la autoconfianza y elimina el miedo al fracaso.",
+    img: "/images/bach-flowers/Larch%20(Larix%20decidua).jpg",
+  },
+  {
+    id: 20,
+    name: "Mimulus",
+    botanical: "Mimulus guttatus",
+    desc: "Ayuda a superar miedos concretos y conocidos con valentía.",
+    img: "/images/bach-flowers/Mimulus%20(Mimulus%20guttatus).jpg",
+  },
+  {
+    id: 21,
+    name: "Mustard",
+    botanical: "Sinapis arvensis",
+    desc: "Para episodios repentinos de tristeza sin causa aparente. Ayuda a restaurar la luz y la alegría.",
+    img: "/images/bach-flowers/Mustard%20(Sinapis%20arvensis).jpg",
+  },
+  {
+    id: 22,
+    name: "Oak",
+    botanical: "Quercus robur",
+    desc: "Para personas trabajadoras que ignoran su agotamiento. Fomenta el descanso y el equilibrio personal.",
+    img: "/images/bach-flowers/Oak%20(Quercus%20robur).png",
+  },
+  {
+    id: 23,
+    name: "Olive",
+    botanical: "Olea europaea",
+    desc: "Para agotamiento físico y mental extremo. Ayuda a restaurar la vitalidad y la energía.",
+    img: "/images/bach-flowers/Olive%20(Olea%20europaea).jpg",
+  },
+  {
+    id: 24,
+    name: "Pine",
+    botanical: "Pinus sylvestris",
+    desc: "Para personas con sentimientos de culpa y autocrítica. Promueve la autoaceptación y el perdón.",
+    img: "/images/bach-flowers/Pine%20(Pinus%20sylvestris).webp",
+  },
+  {
+    id: 25,
+    name: "Red Chestnut",
+    botanical: "Aesculus carnea",
+    desc: "Para preocupación excesiva por los demás. Fomenta la confianza y la relajación emocional.",
+    img: "/images/bach-flowers/Red%20Chestnut%20(Aesculus%20carnea).jpeg",
+  },
+  {
+    id: 26,
+    name: "Rock Rose",
+    botanical: "Helianthemum nummularium",
+    desc: "Para miedo extremo y pánico. Restaura el valor y la calma en momentos críticos.",
+    img: "/images/bach-flowers/Rock%20Rose%20(Helianthemum%20nummularium).jpg",
+  },
+  {
+    id: 27,
+    name: "Rock Water",
+    botanical: "Aqua petra",
+    desc: "Para autoexigencia excesiva. Ayuda a flexibilizar los ideales y disfrutar de la vida.",
+    img: "/images/bach-flowers/Rock%20Water%20(Aqua%20petra).jpg",
+  },
+  {
+    id: 28,
+    name: "Scleranthus",
+    botanical: "Scleranthus annuus",
+    desc: "Para indecisión entre dos opciones. Fomenta la claridad mental y la determinación.",
+    img: "/images/bach-flowers/Scleranthus%20(Scleranthus%20annuus).jpg",
+  },
+  {
+    id: 29,
+    name: "Star of Bethlehem",
+    botanical: "Ornithogalum umbellatum",
+    desc: "Para traumas y shocks emocionales. Aporta consuelo y facilita la sanación emocional.",
+    img: "/images/bach-flowers/Star%20of%20Bethlehem%20(Ornithogalum%20umbellatum).jpeg",
+  },
+  {
+    id: 30,
+    name: "Sweet Chestnut",
+    botanical: "Castanea sativa",
+    desc: "Para la desesperación extrema y la oscuridad emocional. Restaura la esperanza y el propósito.",
+    img: "/images/bach-flowers/Sweet%20Chestnut%20(Castanea%20sativa).jpg",
+  },
+  {
+    id: 31,
+    name: "Vervain",
+    botanical: "Verbena officinalis",
+    desc: "Para entusiasmo excesivo e intensidad. Promueve la calma y la flexibilidad.",
+    img: "/images/bach-flowers/Vervain%20(Verbena%20officinalis).jpg",
+  },
+  {
+    id: 32,
+    name: "Vine",
+    botanical: "Vitis vinifera",
+    desc: "Para personas dominantes o autoritarias. Fomenta el liderazgo empático y respetuoso.",
+    img: "/images/bach-flowers/Vine%20(Vitis%20vinifera).jpg",
+  },
+  {
+    id: 33,
+    name: "Walnut",
+    botanical: "Juglans regia",
+    desc: "Para protección emocional durante transiciones importantes. Ayuda a avanzar con confianza.",
+    img: "/images/bach-flowers/Walnut%20(Juglans%20regia).jpg",
+  },
+  {
+    id: 34,
+    name: "Water Violet",
+    botanical: "Hottonia palustris",
+    desc: "Para personas reservadas y solitarias. Fomenta la apertura y la conexión con los demás.",
+    img: "/images/bach-flowers/Water%20Violet%20(Hottonia%20palustris).jpeg",
+  },
+  {
+    id: 35,
+    name: "White Chestnut",
+    botanical: "Aesculus hippocastanum",
+    desc: "Para pensamientos persistentes y preocupaciones. Ayuda a calmar la mente y enfocar la atención.",
+    img: "/images/bach-flowers/White%20Chestnut%20(Aesculus%20hippocastanum).jpg",
+  },
+  {
+    id: 36,
+    name: "Wild Oat",
+    botanical: "Bromus ramosus",
+    desc: "Para la incertidumbre sobre el propósito de vida. Ayuda a encontrar claridad y dirección.",
+    img: "/images/bach-flowers/Wild%20Oat%20(Bromus%20ramosus).jpg",
+  },
+  {
+    id: 37,
+    name: "Wild Rose",
+    botanical: "Rosa canina",
+    desc: "Para apatía y resignación. Restaura la motivación y el interés por la vida.",
+    img: "/images/bach-flowers/Wild%20Rose%20(Rosa%20canina).jpg",
+  },
+  {
+    id: 38,
+    name: "Willow",
+    botanical: "Salix vitellina",
+    desc: "Libera el resentimiento y fomenta la gratitud y aceptación.",
+    img: "/images/bach-flowers/Willow%20(Salix%20vitellina).jpg",
+  },
+];
+---
+
+<Layout title="Glosario de las 38 Flores de Bach">
+  <div class="flex justify-center mb-8">
+    <img
+      src="/images/logo-principal.png"
+      class="h-24 md:h-32 object-contain hidden"
+      alt="Logo principal de El Alma de las Flores"
+    />
+  </div>
+
+  <header class="text-center mb-16 space-y-4">
+    <span class="text-sage font-bold tracking-widest uppercase text-sm"
+      >Catálogo Completo</span
+    >
+    <h1 class="font-serif text-4xl md:text-5xl font-bold text-deep-green">
+      Las 38 Flores de Bach
+    </h1>
+    <p class="max-w-2xl mx-auto text-deep-green/70 text-lg">
+      Explora las esencias florales descubiertas por Edward Bach, diseñadas para
+      armonizar tus emociones y restaurar el equilibrio interior.
+    </p>
+  </header>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    {
+      flowers.map((flor) => (
+        <article class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-sage/10 group">
+          <div class="h-64 overflow-hidden relative">
+            <div class="absolute inset-0 bg-deep-green/10 group-hover:bg-transparent transition-colors z-10" />
+            <img
+              src={flor.img}
+              alt={`Flor de Bach ${flor.name}`}
+              class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+              loading="lazy"
+            />
+          </div>
+          <div class="p-6 space-y-3 relative">
+            <div class="absolute -top-6 right-6 w-12 h-12 bg-cream rounded-full flex items-center justify-center shadow-md border border-sage/20 font-serif font-bold text-deep-green text-lg">
+              {flor.id}
+            </div>
+            <div>
+              <h2 class="font-serif text-2xl font-bold text-deep-green">
+                {flor.name}
+              </h2>
+              <p class="text-sm text-sage italic font-medium">
+                {flor.botanical}
+              </p>
+            </div>
+            <p class="text-deep-green/80 leading-relaxed text-sm">
+              {flor.desc}
+            </p>
+          </div>
+        </article>
+      ))
+    }
+  </div>
+</Layout>

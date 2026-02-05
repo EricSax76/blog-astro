@@ -1,0 +1,129 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import YearbookNav from "../../components/YearbookNav.astro";
+---
+
+<Layout title="Anuario 2013 | El Alma de las Flores">
+  <main class="max-w-4xl mx-auto px-6 py-12 md:py-20">
+    <div class="text-center mb-16 space-y-4">
+      <h1 class="font-serif text-5xl md:text-6xl font-bold text-deep-green">
+        Anuario 2013
+      </h1>
+      <p class="text-xl text-deep-green/60 italic font-serif">
+        Memorias, reflexiones y el camino recorrido.
+      </p>
+    </div>
+
+    <YearbookNav activeYear={2013} />
+
+    <div class="grid gap-12">
+      <!-- Article: Impatiens -->
+      <article
+        class="bg-white p-8 md:p-10 rounded-[2rem] shadow-lg shadow-sage/5 border border-sage/10"
+      >
+        <header class="mb-4">
+          <h2
+            class="font-serif text-2xl md:text-3xl font-bold text-deep-green mb-1"
+          >
+            El Alma de Impatiens
+          </h2>
+          <p
+            class="text-xs text-deep-green/40 font-serif italic uppercase tracking-wider"
+          >
+            Noviembre 02, 2013
+          </p>
+        </header>
+        <div class="prose text-deep-green/80 leading-relaxed">
+          <p>
+            El Tiempo. No me da la vida... siempre corriendo, el corazón
+            acelerado, las acciones precipitadas.... tengo tanto que hacer!! No
+            hay tiempo para el descanso.
+          </p>
+          <p>
+            Meditar? Sentarme en silencio y no hacer nada?? Qué perdida de
+            tiempo.... Y así paso mi vida, en un ajetreo continuo, en una lucha
+            contra el tiempo, sin darme cuenta que el tiempo es solo una ilusión
+            y que mi prisa es, en realidad, una huida de mi mismo.
+          </p>
+        </div>
+      </article>
+
+      <!-- Grid for smaller articles -->
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Article: Centaury -->
+        <article
+          class="bg-white p-8 rounded-[2rem] shadow-lg shadow-sage/5 border border-sage/10"
+        >
+          <h2 class="font-serif text-2xl font-bold text-deep-green mb-2">
+            El Alma de Centaury
+          </h2>
+          <p
+            class="text-xs text-deep-green/40 font-serif italic uppercase tracking-wider mb-4"
+          >
+            Noviembre 02, 2013
+          </p>
+          <p class="text-deep-green/80 leading-relaxed">
+            Tantas veces he dicho SI cuando quería decir NO.... Por miedo al
+            rechazo. Soy la cenicienta del cuento, siempre esperando que alguien
+            me rescate. Pero me he dado cuenta de que si yo no me valoro, nadie
+            lo hará. He de aprender a decir NO sin sentirme culpable.
+          </p>
+        </article>
+
+        <!-- Article: Clematide -->
+        <article
+          class="bg-white p-8 rounded-[2rem] shadow-lg shadow-sage/5 border border-sage/10"
+        >
+          <h2 class="font-serif text-2xl font-bold text-deep-green mb-2">
+            Clematide
+          </h2>
+          <p
+            class="text-xs text-deep-green/40 font-serif italic uppercase tracking-wider mb-4"
+          >
+            Noviembre 01, 2013
+          </p>
+          <p class="text-deep-green/80 leading-relaxed">
+            Soñador@s, despistad@s, siempre en las nubes. Su mirada está perdida
+            en el infinito, sus pensamientos vuelan lejos. El mundo material les
+            resulta pesado. Pero la vida está aquí, en la tierra. <strong
+              >Clematis</strong
+            > nos ayuda a bajar a la tierra, a poner los pies en el suelo.
+          </p>
+        </article>
+      </div>
+
+      <!-- Article: Y tu que haces -->
+      <article
+        class="bg-cream/40 p-8 md:p-12 rounded-[2.5rem] shadow-lg shadow-sage/5 border border-sage/10 text-center"
+      >
+        <header class="mb-8">
+          <h2
+            class="font-serif text-2xl md:text-3xl font-bold text-deep-green mb-1"
+          >
+            ¿Y tú qué haces?
+          </h2>
+          <p
+            class="text-xs text-deep-green/40 font-serif italic uppercase tracking-wider"
+          >
+            Octubre 27, 2013
+          </p>
+        </header>
+
+        <div
+          class="inline-block text-left bg-white p-8 rounded-2xl shadow-sm border border-sage/10 italic text-deep-green/80 leading-loose"
+        >
+          <p>— Y tú... ¿qué haces?</p>
+          <p>— Me dedico a perseguir la belleza.</p>
+          <p>— ¿Eres artista?</p>
+          <p>— No... soy mística.</p>
+          <p>— ¿Y dónde está la belleza?</p>
+          <p>
+            — Aquí... allí... en todas partes... en el brillo de una mirada, en
+            la sonrisa de un niño, en la flor que nace entre las piedras, en el
+            silencio de la noche... Solo hay que saber mirar.
+          </p>
+        </div>
+      </article>
+    </div>
+  </main>
+</Layout>

@@ -1,0 +1,124 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import YearbookNav from "../../components/YearbookNav.astro";
+---
+
+<Layout title="Anuario 2012 | El Alma de las Flores">
+  <main class="max-w-4xl mx-auto px-6 py-12 md:py-20">
+    <div class="text-center mb-16 space-y-4">
+      <h1 class="font-serif text-5xl md:text-6xl font-bold text-deep-green">
+        Anuario 2012
+      </h1>
+      <p class="text-xl text-deep-green/60 italic font-serif">
+        Memorias, reflexiones y el camino recorrido.
+      </p>
+    </div>
+
+    <YearbookNav activeYear={2012} />
+
+    <div class="grid gap-12">
+      <!-- Article: Novedades -->
+      <article
+        class="bg-white p-8 md:p-10 rounded-[2rem] shadow-lg shadow-sage/5 border border-sage/10"
+      >
+        <header class="mb-4">
+          <h2
+            class="font-serif text-2xl md:text-3xl font-bold text-deep-green mb-1"
+          >
+            Novedades
+          </h2>
+          <p
+            class="text-xs text-deep-green/40 font-serif italic uppercase tracking-wider"
+          >
+            Junio 30, 2012
+          </p>
+        </header>
+        <div class="prose text-deep-green/80 leading-relaxed">
+          <p>
+            Ya han pasado unos meses desde la última entrada en el blog. Han
+            sido meses de mucho trabajo, de cambios, de nuevas experiencias.
+          </p>
+          <p>
+            He estado investigando sobre nuevas esencias florales, sobre la
+            relación entre las emociones y las enfermedades físicas, sobre la
+            importancia de la alimentación en nuestro bienestar... Gracias por
+            estar ahí.
+          </p>
+        </div>
+      </article>
+
+      <!-- Article: Miedo al miedo -->
+      <article
+        class="bg-white p-8 md:p-10 rounded-[2rem] shadow-lg shadow-sage/5 border border-sage/10"
+      >
+        <header class="mb-4">
+          <h2
+            class="font-serif text-2xl md:text-3xl font-bold text-deep-green mb-1"
+          >
+            Miedo al Miedo
+          </h2>
+          <p
+            class="text-xs text-deep-green/40 font-serif italic uppercase tracking-wider"
+          >
+            Febrero 19, 2012
+          </p>
+        </header>
+        <div class="prose text-deep-green/80 leading-relaxed">
+          <p>
+            El miedo es una emoción natural, necesaria para la supervivencia.
+            Pero cuando el miedo se convierte en algo patológico, cuando nos
+            paraliza, entonces se convierte en nuestro peor enemigo.
+          </p>
+          <p>
+            El miedo al miedo es ese estado de ansiedad anticipatoria. Las
+            Flores de Bach nos ayudan a romper ese círculo, a recuperar la calma
+            y la confianza, a enfrentarnos a nuestros miedos con coraje y
+            serenidad.
+          </p>
+        </div>
+      </article>
+
+      <!-- Grid for smaller articles -->
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Article: Miedo a perder el control -->
+        <article
+          class="bg-white p-8 rounded-[2rem] shadow-lg shadow-sage/5 border border-sage/10"
+        >
+          <h2 class="font-serif text-2xl font-bold text-deep-green mb-2">
+            Miedo a perder el control
+          </h2>
+          <p
+            class="text-xs text-deep-green/40 font-serif italic uppercase tracking-wider mb-4"
+          >
+            Enero 22, 2012
+          </p>
+          <p class="text-deep-green/80 leading-relaxed">
+            Hay personas que necesitan tenerlo todo bajo control. Viven en un
+            estado de tensión constante. Tienen miedo a volverse locos, a hacer
+            daño a alguien. <strong>Cherry Plum</strong> es la flor para ayuda a soltar
+            el control, a fluir con la vida, a confiar.
+          </p>
+        </article>
+
+        <!-- Article: Mimulus -->
+        <article
+          class="bg-white p-8 rounded-[2rem] shadow-lg shadow-sage/5 border border-sage/10"
+        >
+          <h2 class="font-serif text-2xl font-bold text-deep-green mb-2">
+            Mimulus
+          </h2>
+          <p
+            class="text-xs text-deep-green/40 font-serif italic uppercase tracking-wider mb-4"
+          >
+            Enero 21, 2012
+          </p>
+          <p class="text-deep-green/80 leading-relaxed">
+            Miedo a las cosas conocidas: a la enfermedad, al dolor, a la
+            pobreza, a estar solo. <strong>Mimulus</strong> nos da el coraje para
+            enfrentarnos a nuestros miedos, para superarlos y vivir con libertad.
+          </p>
+        </article>
+      </div>
+    </div>
+  </main>
+</Layout>

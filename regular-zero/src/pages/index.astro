@@ -1,0 +1,152 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Inicio | El Alma de las Flores">
+  <section class="text-center space-y-4">
+    <h1 class="font-serif text-4xl md:text-5xl font-bold text-deep-green">
+      El Alma de las Flores
+    </h1>
+    <p class="text-deep-green/70 text-lg">
+      Bienvenido. Aquí empieza el recorrido por el sistema floral del Dr. Bach.
+    </p>
+  </section>
+
+  <section
+    class="mt-16 bg-white/80 border border-sage/20 rounded-[2.5rem] shadow-xl shadow-sage/5 p-8 md:p-12"
+  >
+    <div class="flex flex-col lg:flex-row gap-10">
+      <div class="flex-1 space-y-6">
+        <div class="space-y-3">
+          <p
+            class="text-xs uppercase tracking-[0.3em] text-deep-green/60 font-semibold"
+          >
+            Espacio de Blog
+          </p>
+          <h2 class="font-serif text-3xl md:text-4xl font-bold text-deep-green">
+            Escribe tu próximo post
+          </h2>
+          <p class="text-deep-green/70 text-lg">
+            Usa este espacio para redactar y preparar tus entradas del año 2026.
+            Puedes adjuntar una foto destacada y luego publicar en el archivo
+            anual.
+          </p>
+        </div>
+
+        <form id="blog-form" class="space-y-5" aria-describedby="blog-help">
+          <label class="block space-y-2">
+            <span
+              class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+            >
+              Título
+            </span>
+            <input
+              id="blog-title"
+              type="text"
+              name="title"
+              placeholder="Ej: Flores que inspiran calma"
+              class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-base text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40"
+            />
+          </label>
+
+          <label class="block space-y-2">
+            <span
+              class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+            >
+              Contenido
+            </span>
+            <textarea
+              id="blog-content"
+              name="content"
+              rows="6"
+              placeholder="Comparte la historia, reflexión o enseñanza del día..."
+              class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-base text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40"
+            ></textarea>
+          </label>
+
+          <label class="block space-y-2">
+            <span
+              class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+            >
+              Foto destacada
+            </span>
+            <input
+              id="blog-image-input"
+              type="file"
+              name="image"
+              accept="image/*"
+              class="block w-full text-sm text-deep-green file:mr-4 file:rounded-full file:border-0 file:bg-sage/20 file:px-4 file:py-2 file:font-semibold file:text-deep-green hover:file:bg-sage/30"
+            />
+          </label>
+
+          <div
+            class="rounded-2xl border border-sage/20 bg-cream/50 p-4 space-y-3"
+          >
+            <p
+              class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+            >
+              Vista previa
+            </p>
+            <img
+              id="blog-image-preview"
+              class="hidden h-48 w-full rounded-2xl object-cover"
+              alt="Vista previa de la imagen seleccionada"
+            />
+            <p id="blog-image-placeholder" class="text-sm text-deep-green/60">
+              Selecciona una imagen para verla aquí.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap gap-3">
+            <button
+              type="button"
+              id="blog-publish-button"
+              class="rounded-full bg-deep-green px-6 py-3 text-cream font-semibold shadow-lg shadow-sage/20 transition-transform hover:-translate-y-0.5"
+            >
+              Publicar
+            </button>
+            <button
+              type="button"
+              id="blog-go-2026"
+              class="rounded-full border border-sage/40 px-6 py-3 font-semibold text-deep-green hover:bg-sage/10 transition-colors"
+            >
+              Ir al 2026
+            </button>
+          </div>
+
+          <p id="blog-help" class="text-sm text-deep-green/60">
+            Este formulario guarda el post en tu navegador y lo muestra en el
+            archivo 2026.
+          </p>
+        </form>
+      </div>
+
+      <aside
+        class="w-full lg:w-72 rounded-4xl border border-sage/20 bg-cream/70 p-6 space-y-5 h-fit"
+      >
+        <h3 class="font-serif text-2xl font-bold text-deep-green">
+          Archivo 2026
+        </h3>
+        <p class="text-deep-green/70 text-sm">
+          Aquí irán los posts publicados durante el año 2026. Puedes crear una
+          entrada nueva cada vez que tengas un texto y una imagen listos.
+        </p>
+        <ol
+          class="list-decimal list-inside text-sm text-deep-green/70 space-y-2"
+        >
+          <li>Redacta tu texto en el formulario.</li>
+          <li>Elige la foto que acompañará la entrada.</li>
+          <li>Publica el contenido en la página del archivo.</li>
+        </ol>
+        <a
+          href="/archivo/2026"
+          class="inline-flex w-full items-center justify-center rounded-full bg-sage px-5 py-3 text-white font-semibold shadow-md hover:bg-sage/90 transition-colors"
+        >
+          Abrir archivo 2026
+        </a>
+      </aside>
+    </div>
+  </section>
+</Layout>
+
+<script src="../scripts/blog-logic.ts"></script>
