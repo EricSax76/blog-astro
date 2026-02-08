@@ -1,0 +1,87 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+import { flowers } from "../data/flowers";
+---
+
+<Layout title="Glosario de las 38 Flores de Bach">
+  <div class="flex justify-center mb-8">
+    <img
+      src="/images/logo-principal.png"
+      class="h-24 md:h-32 object-contain hidden"
+      alt="Logo principal de El Alma de las Flores"
+    />
+  </div>
+
+  <header class="text-center mb-16 space-y-4">
+    <span class="text-sage font-bold tracking-widest uppercase text-sm"
+      >Catálogo Completo</span
+    >
+    <h1 class="font-serif text-4xl md:text-5xl font-bold text-deep-green">
+      Las 38 Flores de Bach
+    </h1>
+    <p class="max-w-2xl mx-auto text-deep-green/70 text-lg">
+      Explora las esencias florales descubiertas por Edward Bach, diseñadas para
+      armonizar tus emociones y restaurar el equilibrio interior.
+    </p>
+  </header>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    {
+      flowers.map((flor) => (
+        <a href={`/flores-de-bach/${flor.slug}`} class="group block">
+          <article class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-sage/10 h-full flex flex-col">
+            <div class="h-64 overflow-hidden relative">
+              <div class="absolute inset-0 bg-deep-green/10 group-hover:bg-transparent transition-colors z-10" />
+              <img
+                src={flor.img}
+                alt={`Flor de Bach ${flor.name}`}
+                class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                loading="lazy"
+                transition:name={`flower-image-${flor.slug}`}
+              />
+            </div>
+            <div class="p-6 space-y-3 relative flex-1 flex flex-col">
+              <div class="absolute -top-6 right-6 w-12 h-12 bg-cream rounded-full flex items-center justify-center shadow-md border border-sage/20 font-serif font-bold text-deep-green text-lg z-20">
+                {flor.id}
+              </div>
+              <div>
+                <h2
+                  class="font-serif text-2xl font-bold text-deep-green group-hover:text-sage transition-colors"
+                  transition:name={`flower-name-${flor.slug}`}
+                >
+                  {flor.name}
+                </h2>
+                <p class="text-sm text-sage italic font-medium">
+                  {flor.botanical}
+                </p>
+              </div>
+              <p class="text-deep-green/80 leading-relaxed text-sm flex-1">
+                {flor.desc}
+              </p>
+              <div class="pt-4 mt-auto">
+                <span class="inline-flex items-center text-sm font-bold text-sage group-hover:text-deep-green transition-colors">
+                  Ver detalles
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4 ml-1 transform group-hover:translate-x-1 transition-transform"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M14 5l7 7m0 0l-7 7m7-7H3"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </article>
+        </a>
+      ))
+    }
+  </div>
+</Layout>

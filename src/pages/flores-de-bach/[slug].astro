@@ -1,0 +1,136 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { flowers } from "../../data/flowers";
+
+export const prerender = true;
+
+export function getStaticPaths() {
+  return flowers.map((flower) => ({
+    params: { slug: flower.slug },
+    props: { flower },
+  }));
+}
+
+const { flower } = Astro.props;
+---
+
+<Layout title={`${flower.name} - Flores de Bach`}>
+  <div class="max-w-4xl mx-auto">
+    {/* Navigation Breadcrumb */}
+    <nav class="flex mb-8 text-sm text-sage font-medium">
+      <a href="/" class="hover:text-deep-green transition-colors">Inicio</a>
+      <span class="mx-2">/</span>
+      <a href="/flores-de-bach" class="hover:text-deep-green transition-colors"
+        >Flores de Bach</a
+      >
+      <span class="mx-2">/</span>
+      <span class="text-deep-green">{flower.name}</span>
+    </nav>
+
+    {/* Hero Section */}
+    <div class="grid md:grid-cols-2 gap-12 items-start mb-16">
+      <div
+        class="relative group rounded-2xl overflow-hidden shadow-lg border border-sage/10"
+      >
+        <div
+          class="absolute inset-0 bg-deep-green/5 group-hover:bg-transparent transition-colors z-10"
+        >
+        </div>
+        <img
+          src={flower.img}
+          alt={`Flor de Bach ${flower.name}`}
+          class="w-full h-96 object-cover transform group-hover:scale-105 transition-transform duration-700"
+          transition:name={`flower-image-${flower.slug}`}
+        />
+        <div
+          class="absolute -bottom-6 -right-6 w-24 h-24 bg-cream rounded-full flex items-center justify-center shadow-xl border-4 border-white font-serif font-bold text-deep-green text-3xl z-20"
+        >
+          {flower.id}
+        </div>
+      </div>
+
+      <div class="space-y-6 pt-4">
+        <div>
+          <h1
+            class="font-serif text-5xl md:text-6xl font-bold text-deep-green mb-2"
+            transition:name={`flower-name-${flower.slug}`}
+          >
+            {flower.name}
+          </h1>
+          <p class="text-xl text-sage italic font-medium">
+            {flower.botanical}
+          </p>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-sage/10">
+          <h3 class="font-serif text-xl font-bold text-deep-green mb-3">
+            Descripción General
+          </h3>
+          <p class="text-deep-green/80 leading-relaxed text-lg">
+            {flower.desc}
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6">
+          <div class="bg-red-50 p-6 rounded-xl border border-red-100">
+            <h3 class="font-serif text-xl font-bold text-red-800 mb-2">
+              Estado Emocional (Negativo)
+            </h3>
+            <p class="text-red-900/80 text-lg">{flower.emotionalState}</p>
+          </div>
+
+          <div class="bg-green-50 p-6 rounded-xl border border-green-100">
+            <h3 class="font-serif text-xl font-bold text-green-800 mb-2">
+              Transformación Positiva
+            </h3>
+            <p class="text-green-900/80 text-lg">{flower.positiveState}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Detailed Info Sections */}
+    <div class="space-y-12">
+      <div
+        class="bg-white p-8 rounded-2xl shadow-sm border border-sage/10 relative overflow-hidden"
+      >
+        <div class="absolute top-0 left-0 w-2 h-full bg-sage"></div>
+        <h2
+          class="font-serif text-3xl font-bold text-deep-green mb-6 pb-4 border-b border-sage/20"
+        >
+          Afirmación Positiva
+        </h2>
+        <blockquote
+          class="text-2xl md:text-3xl font-serif italic text-sage text-center py-8"
+        >
+          "{flower.affirmation}"
+        </blockquote>
+      </div>
+    </div>
+
+    {/* Navigation Footer */}
+    <div
+      class="mt-16 pt-8 border-t border-sage/20 flex justify-between items-center"
+    >
+      <a
+        href="/flores-de-bach"
+        class="inline-flex items-center text-sage hover:text-deep-green font-medium transition-colors"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 mr-2"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Volver al catálogo
+      </a>
+    </div>
+  </div>
+</Layout>
