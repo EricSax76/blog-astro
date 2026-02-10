@@ -1,0 +1,38 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function isValidImageUpload() {
+      return request.resource != null
+        && request.resource.size < 10 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    // Imagenes publicadas del blog:
+    // path esperado: blog/posts/{uid}/{archivo}
+    // lectura publica, escritura solo por el propietario autenticado.
+    match /blog/posts/{uid}/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if isOwner(uid) && isValidImageUpload();
+      allow delete: if isOwner(uid);
+    }
+
+    // Archivos privados por usuario:
+    // path esperado: users/{uid}/{archivo}
+    match /users/{uid}/{allPaths=**} {
+      allow read, write: if isOwner(uid);
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

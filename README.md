@@ -41,6 +41,42 @@ All commands are run from the root of the project, from a terminal:
 | `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
 | `npm run astro -- --help` | Get help using the Astro CLI                     |
 
+## Firebase auth (entrada)
+
+La portada (`/`) incluye registro e inicio de sesión con Firebase Authentication.
+Al registrar/iniciar sesión se crea/actualiza el perfil en Firestore (`users/{uid}`) y el acceso de escritura se realiza en `/publicar`.
+
+1. Copia `.env.example` a `.env`.
+2. Completa los valores `PUBLIC_FIREBASE_*` desde **Firebase Console > Project settings > Your apps > SDK setup and configuration**.
+3. Asegúrate de tener habilitado **Authentication > Sign-in method > Email/Password**.
+
+## Firebase Storage (reglas)
+
+- Reglas en `storage.rules`.
+- Ruta pública para imágenes del blog: `blog/posts/{uid}/{archivo}`.
+- Solo el `uid` propietario puede crear/actualizar/eliminar su archivo.
+- Límite de subida: 10 MB y tipo `image/*`.
+- El editor `/publicar` sube aquí las imágenes destacadas.
+
+Deploy de reglas:
+
+```bash
+firebase deploy --only storage
+```
+
+## Firestore (rules + indexes)
+
+- Reglas en `firebase.rules`.
+- Índices en `firestore.indexes.json`.
+- El editor `/publicar` guarda posts en la colección `posts`.
+- La página `/archivo/2026` lee posts desde Firestore (query por `year` y `createdAt`).
+
+Deploy de Firestore:
+
+```bash
+firebase deploy --only firestore
+```
+
 ## 👀 Want to learn more?
 
 Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).

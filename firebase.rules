@@ -1,0 +1,36 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isPostOwner() {
+      return isSignedIn() && resource.data.authorUid == request.auth.uid;
+    }
+
+    function isCreatingOwnPost() {
+      return isSignedIn() && request.resource.data.authorUid == request.auth.uid;
+    }
+
+    // Lectura pública del blog. Escritura solo del autor dueño del post.
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if isCreatingOwnPost();
+      allow update: if isPostOwner()
+        && request.resource.data.authorUid == resource.data.authorUid;
+      allow delete: if isPostOwner();
+    }
+
+    // Documento privado por usuario.
+    match /users/{userId} {
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Deniega por defecto cualquier otra colección.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

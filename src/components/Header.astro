@@ -88,16 +88,24 @@
 
       <div
         id="auth-buttons"
-        class="hidden items-center gap-3 pl-4 border-l border-sage/30"
+        class="flex items-center gap-3 pl-4 border-l border-sage/30"
       >
         <a
-          href="/user/login"
+          href="/publicar"
+          class="text-deep-green hover:text-sage font-medium text-sm transition-colors"
+        >
+          Escribir
+        </a>
+        <a
+          id="desktop-login"
+          href="/#login"
           class="text-deep-green hover:text-sage font-medium text-sm transition-colors"
         >
           Acceder
         </a>
         <a
-          href="/user/register"
+          id="desktop-register"
+          href="/#registro"
           class="px-5 py-2 rounded-full bg-sage/20 text-deep-green font-semibold text-sm hover:bg-sage/30 transition-all duration-200"
         >
           Regístrate
@@ -145,16 +153,20 @@
         >Biografía</a
       >
 
-      <hr id="mobile-auth-hr" class="hidden w-20 border-sage/30" />
+      <hr id="mobile-auth-hr" class="w-20 border-sage/30" />
+      <a
+        href="/publicar"
+        class="text-deep-green font-medium">Escribir</a
+      >
       <a
         id="mobile-login"
-        href="/user/login"
-        class="hidden text-deep-green font-medium">Acceder</a
+        href="/#login"
+        class="text-deep-green font-medium">Acceder</a
       >
       <a
         id="mobile-register"
-        href="/user/register"
-        class="hidden px-8 py-3 rounded-full bg-deep-green text-cream font-bold shadow-lg"
+        href="/#registro"
+        class="px-8 py-3 rounded-full bg-deep-green text-cream font-bold shadow-lg"
         >Regístrate</a
       >
     </nav>
@@ -170,9 +182,75 @@
   const desktopRecomendador = document.getElementById("desktop-recomendador");
   const mobileRecomendador = document.getElementById("mobile-recomendador");
   const authButtons = document.getElementById("auth-buttons");
+  const desktopLogin = document.getElementById("desktop-login");
+  const desktopRegister = document.getElementById("desktop-register");
   const mobileLogin = document.getElementById("mobile-login");
   const mobileRegister = document.getElementById("mobile-register");
   const mobileAuthHr = document.getElementById("mobile-auth-hr");
+  const AUTH_STATE_STORAGE_KEY = "blog-auth-state";
+
+  const readStoredAuthState = () => {
+    try {
+      const raw = localStorage.getItem(AUTH_STATE_STORAGE_KEY);
+      if (!raw) return false;
+      const parsed = JSON.parse(raw);
+      return parsed?.isAuthenticated === true;
+    } catch {
+      return false;
+    }
+  };
+
+  const persistAuthState = (state) => {
+    if (!state || typeof state !== "object") return;
+    try {
+      localStorage.setItem(
+        AUTH_STATE_STORAGE_KEY,
+        JSON.stringify({
+          isAuthenticated: state.isAuthenticated === true,
+          email: typeof state.email === "string" ? state.email : null,
+        })
+      );
+    } catch {}
+  };
+
+  const applyAuthUiState = (isAuthenticated) => {
+    const hideGuestActions = isAuthenticated === true;
+    [desktopLogin, desktopRegister, mobileLogin, mobileRegister].forEach(
+      (element) => {
+        element?.classList.toggle("hidden", hideGuestActions);
+      }
+    );
+    mobileAuthHr?.classList.toggle("hidden", hideGuestActions);
+  };
+
+  const resolveInitialAuthState = () => {
+    const runtimeState = window.__BLOG_AUTH_STATE__;
+    if (
+      runtimeState &&
+      typeof runtimeState === "object" &&
+      runtimeState.isAuthenticated === true
+    ) {
+      return true;
+    }
+
+    return readStoredAuthState();
+  };
+
+  applyAuthUiState(resolveInitialAuthState());
+
+  window.addEventListener("blog-auth-changed", (event) => {
+    if (!(event instanceof CustomEvent)) return;
+    const detail = event.detail;
+    const isAuthenticated =
+      detail && typeof detail === "object" && detail.isAuthenticated === true;
+    persistAuthState(detail);
+    applyAuthUiState(isAuthenticated);
+  });
+
+  window.addEventListener("storage", (event) => {
+    if (event.key !== AUTH_STATE_STORAGE_KEY) return;
+    applyAuthUiState(readStoredAuthState());
+  });
 
   if (menuBtn && mobileMenu) {
     menuBtn.addEventListener("click", () => {

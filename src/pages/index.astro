@@ -1,152 +1,207 @@
 ---
 import Layout from "../layouts/Layout.astro";
+
+const firebaseConfig = {
+  apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY ?? "",
+  authDomain: import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN ?? "",
+  projectId: import.meta.env.PUBLIC_FIREBASE_PROJECT_ID ?? "",
+  storageBucket: import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET ?? "",
+  messagingSenderId: import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? "",
+  appId: import.meta.env.PUBLIC_FIREBASE_APP_ID ?? "",
+};
 ---
 
-<Layout title="Inicio | El Alma de las Flores">
+<Layout title="Entrada al Blog | El Alma de las Flores">
   <section class="text-center space-y-4">
+    <p class="text-xs uppercase tracking-[0.3em] text-deep-green/60 font-semibold">
+      Portal de autores
+    </p>
     <h1 class="font-serif text-4xl md:text-5xl font-bold text-deep-green">
-      El Alma de las Flores
+      Bienvenido a El Alma de las Flores
     </h1>
-    <p class="text-deep-green/70 text-lg">
-      Bienvenido. Aquí empieza el recorrido por el sistema floral del Dr. Bach.
+    <p class="text-deep-green/70 text-lg max-w-3xl mx-auto">
+      Regístrate o inicia sesión para publicar nuevas entradas del blog y mantener
+      actualizado el anuario 2026.
     </p>
   </section>
 
-  <section
-    class="mt-16 bg-white/80 border border-sage/20 rounded-[2.5rem] shadow-xl shadow-sage/5 p-8 md:p-12"
-  >
-    <div class="flex flex-col lg:flex-row gap-10">
-      <div class="flex-1 space-y-6">
-        <div class="space-y-3">
-          <p
-            class="text-xs uppercase tracking-[0.3em] text-deep-green/60 font-semibold"
-          >
-            Espacio de Blog
-          </p>
-          <h2 class="font-serif text-3xl md:text-4xl font-bold text-deep-green">
-            Escribe tu próximo post
-          </h2>
-          <p class="text-deep-green/70 text-lg">
-            Usa este espacio para redactar y preparar tus entradas del año 2026.
-            Puedes adjuntar una foto destacada y luego publicar en el archivo
-            anual.
-          </p>
-        </div>
+  <section class="mt-12 max-w-2xl mx-auto">
+    <article
+      class="bg-white/85 border border-sage/20 rounded-[2.2rem] shadow-xl shadow-sage/5 p-7 md:p-10 space-y-6"
+    >
+      <header class="space-y-3">
+        <h2 class="font-serif text-3xl md:text-4xl font-bold text-deep-green">
+          Acceso de usuario
+        </h2>
+        <p class="text-deep-green/70">
+          Al registrarte se crea tu cuenta en Authentication y tu perfil en la
+          base de datos (<code>users/&#123;uid&#125;</code>).
+        </p>
+      </header>
 
-        <form id="blog-form" class="space-y-5" aria-describedby="blog-help">
-          <label class="block space-y-2">
-            <span
-              class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
-            >
-              Título
-            </span>
-            <input
-              id="blog-title"
-              type="text"
-              name="title"
-              placeholder="Ej: Flores que inspiran calma"
-              class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-base text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40"
-            />
-          </label>
+      <p
+        id="auth-config-warning"
+        class="hidden rounded-2xl border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm text-amber-800"
+      >
+        Falta configurar Firebase en variables `PUBLIC_FIREBASE_*` para usar el acceso.
+      </p>
 
-          <label class="block space-y-2">
-            <span
-              class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
-            >
-              Contenido
-            </span>
-            <textarea
-              id="blog-content"
-              name="content"
-              rows="6"
-              placeholder="Comparte la historia, reflexión o enseñanza del día..."
-              class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-base text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40"
-            ></textarea>
-          </label>
+      <p
+        id="auth-message"
+        class="hidden rounded-2xl border px-4 py-3 text-sm"
+        role="status"
+        aria-live="polite"
+      ></p>
 
-          <label class="block space-y-2">
-            <span
-              class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
-            >
-              Foto destacada
-            </span>
-            <input
-              id="blog-image-input"
-              type="file"
-              name="image"
-              accept="image/*"
-              class="block w-full text-sm text-deep-green file:mr-4 file:rounded-full file:border-0 file:bg-sage/20 file:px-4 file:py-2 file:font-semibold file:text-deep-green hover:file:bg-sage/30"
-            />
-          </label>
+      <div id="auth-guest" class="space-y-8">
+        <section id="registro" class="space-y-4">
+          <h3 class="font-serif text-2xl font-semibold text-deep-green">
+            Crear cuenta
+          </h3>
+          <form id="register-form" class="space-y-4">
+            <label class="block space-y-2">
+              <span class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold">
+                Nombre
+              </span>
+              <input
+                type="text"
+                name="name"
+                autocomplete="name"
+                placeholder="Tu nombre"
+                class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40"
+              />
+            </label>
 
-          <div
-            class="rounded-2xl border border-sage/20 bg-cream/50 p-4 space-y-3"
-          >
-            <p
-              class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
-            >
-              Vista previa
-            </p>
-            <img
-              id="blog-image-preview"
-              class="hidden h-48 w-full rounded-2xl object-cover"
-              alt="Vista previa de la imagen seleccionada"
-            />
-            <p id="blog-image-placeholder" class="text-sm text-deep-green/60">
-              Selecciona una imagen para verla aquí.
-            </p>
-          </div>
+            <label class="block space-y-2">
+              <span class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold">
+                Correo
+              </span>
+              <input
+                type="email"
+                name="email"
+                autocomplete="email"
+                required
+                placeholder="nombre@correo.com"
+                class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40"
+              />
+            </label>
 
-          <div class="flex flex-wrap gap-3">
+            <label class="block space-y-2">
+              <span class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold">
+                Contraseña
+              </span>
+              <input
+                type="password"
+                name="password"
+                autocomplete="new-password"
+                minlength="6"
+                required
+                placeholder="Mínimo 6 caracteres"
+                class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40"
+              />
+            </label>
+
+            <label class="block space-y-2">
+              <span class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold">
+                Confirmar contraseña
+              </span>
+              <input
+                type="password"
+                name="confirmPassword"
+                autocomplete="new-password"
+                minlength="6"
+                required
+                placeholder="Repite la contraseña"
+                class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40"
+              />
+            </label>
+
             <button
-              type="button"
-              id="blog-publish-button"
-              class="rounded-full bg-deep-green px-6 py-3 text-cream font-semibold shadow-lg shadow-sage/20 transition-transform hover:-translate-y-0.5"
+              type="submit"
+              class="w-full rounded-full bg-deep-green px-6 py-3 text-cream font-semibold shadow-lg shadow-sage/20 hover:bg-deep-green/90 transition-colors"
             >
-              Publicar
+              Registrarme
             </button>
-            <button
-              type="button"
-              id="blog-go-2026"
-              class="rounded-full border border-sage/40 px-6 py-3 font-semibold text-deep-green hover:bg-sage/10 transition-colors"
-            >
-              Ir al 2026
-            </button>
-          </div>
+          </form>
+        </section>
 
-          <p id="blog-help" class="text-sm text-deep-green/60">
-            Este formulario guarda el post en tu navegador y lo muestra en el
-            archivo 2026.
-          </p>
-        </form>
+        <div class="h-px bg-sage/20"></div>
+
+        <section id="login" class="space-y-4">
+          <h3 class="font-serif text-2xl font-semibold text-deep-green">
+            Iniciar sesión
+          </h3>
+          <form id="login-form" class="space-y-4">
+            <label class="block space-y-2">
+              <span class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold">
+                Correo
+              </span>
+              <input
+                type="email"
+                name="email"
+                autocomplete="email"
+                required
+                placeholder="nombre@correo.com"
+                class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40"
+              />
+            </label>
+
+            <label class="block space-y-2">
+              <span class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold">
+                Contraseña
+              </span>
+              <input
+                type="password"
+                name="password"
+                autocomplete="current-password"
+                required
+                placeholder="Tu contraseña"
+                class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40"
+              />
+            </label>
+
+            <button
+              type="submit"
+              class="w-full rounded-full border border-sage/40 px-6 py-3 text-deep-green font-semibold hover:bg-sage/10 transition-colors"
+            >
+              Entrar al panel
+            </button>
+          </form>
+        </section>
       </div>
 
-      <aside
-        class="w-full lg:w-72 rounded-4xl border border-sage/20 bg-cream/70 p-6 space-y-5 h-fit"
+      <section
+        id="auth-user"
+        class="hidden rounded-3xl border border-sage/30 bg-cream/70 p-6 space-y-4"
       >
-        <h3 class="font-serif text-2xl font-bold text-deep-green">
-          Archivo 2026
-        </h3>
-        <p class="text-deep-green/70 text-sm">
-          Aquí irán los posts publicados durante el año 2026. Puedes crear una
-          entrada nueva cada vez que tengas un texto y una imagen listos.
+        <p class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold">
+          Sesión activa
         </p>
-        <ol
-          class="list-decimal list-inside text-sm text-deep-green/70 space-y-2"
-        >
-          <li>Redacta tu texto en el formulario.</li>
-          <li>Elige la foto que acompañará la entrada.</li>
-          <li>Publica el contenido en la página del archivo.</li>
-        </ol>
-        <a
-          href="/archivo/2026"
-          class="inline-flex w-full items-center justify-center rounded-full bg-sage px-5 py-3 text-white font-semibold shadow-md hover:bg-sage/90 transition-colors"
-        >
-          Abrir archivo 2026
-        </a>
-      </aside>
-    </div>
+        <p class="text-deep-green/80">
+          Conectado como <strong id="auth-user-email"></strong>
+        </p>
+        <div class="flex flex-wrap gap-3">
+          <a
+            href="/publicar"
+            class="rounded-full bg-deep-green px-5 py-2 text-sm font-semibold text-cream hover:bg-deep-green/90 transition-colors"
+          >
+            Ir a escribir
+          </a>
+          <button
+            id="logout-button"
+            type="button"
+            class="rounded-full border border-sage/40 px-5 py-2 text-sm font-semibold text-deep-green hover:bg-sage/10 transition-colors"
+          >
+            Cerrar sesión
+          </button>
+        </div>
+      </section>
+    </article>
   </section>
 </Layout>
 
-<script src="../scripts/blog-logic.ts"></script>
+<script is:inline define:vars={{ firebaseConfig }}>
+  window.__FIREBASE_CONFIG__ = firebaseConfig;
+  window.__BLOG_AUTH_STATE__ = { isAuthenticated: false, email: null };
+</script>
+<script src="../scripts/entry-auth.js"></script>

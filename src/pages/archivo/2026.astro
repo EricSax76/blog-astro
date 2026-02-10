@@ -1,29 +1,14 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import YearbookNav from "../../components/YearbookNav.astro";
-import posts from "../../data/posts.json";
 
-// Define the type for better TS support within the Astro component
-type BlogPost = {
-  id: number;
-  title: string;
-  content: string;
-  image: string;
-  createdAt: string;
-};
-
-// Explicitly cast the imported JSON to the proper type
-const blogPosts = posts as BlogPost[];
-
-const formatDate = (iso: string): string => {
-  if (!iso) return "";
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toLocaleDateString("es-ES", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
+const firebaseConfig = {
+  apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY ?? "",
+  authDomain: import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN ?? "",
+  projectId: import.meta.env.PUBLIC_FIREBASE_PROJECT_ID ?? "",
+  storageBucket: import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET ?? "",
+  messagingSenderId: import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? "",
+  appId: import.meta.env.PUBLIC_FIREBASE_APP_ID ?? "",
 };
 ---
 
@@ -41,70 +26,37 @@ const formatDate = (iso: string): string => {
     <YearbookNav activeYear={2026} />
 
     <div id="posts-grid" class="grid gap-12">
-      {
-        blogPosts.length === 0 ? (
-          <article
-            id="posts-placeholder"
-            class="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl shadow-sage/5 border border-sage/10"
-          >
-            <header class="mb-6 text-center">
-              <h2 class="font-serif text-3xl md:text-4xl font-bold text-deep-green">
-                Próximamente
-              </h2>
-              <p class="text-sm text-deep-green/60 italic font-serif">
-                Aquí aparecerán los posts publicados en 2026.
-              </p>
-            </header>
-
-            <div class="prose prose-lg prose-headings:font-serif prose-headings:text-deep-green text-deep-green/80 leading-relaxed max-w-none">
-              <p>
-                Este espacio está listo para recibir tus nuevos textos,
-                reflexiones y fotografías. Cada entrada que publiques durante
-                2026 podrá vivir aquí, organizada dentro del archivo anual.
-              </p>
-              <p>
-                Cuando tengas un nuevo post, añade el contenido y la imagen
-                destacada para mantener el anuario actualizado.
-              </p>
-            </div>
-          </article>
-        ) : (
-          blogPosts.map((post) => (
-            <article class="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl shadow-sage/5 border border-sage/10">
-              <header class="mb-6 text-center">
-                <h2 class="font-serif text-3xl md:text-4xl font-bold text-deep-green">
-                  {post.title?.trim() || "Entrada sin título"}
-                </h2>
-                {post.createdAt && (
-                  <p class="text-sm text-deep-green/60 italic font-serif">
-                    {formatDate(post.createdAt)}
-                  </p>
-                )}
-              </header>
-
-              {post.image && (
-                <div class="mb-8 overflow-hidden rounded-2xl border border-sage/10 shadow-lg">
-                  <img
-                    src={post.image}
-                    alt={post.title?.trim() || "Imagen del post"}
-                    class="h-64 md:h-80 w-full object-cover"
-                  />
-                </div>
-              )}
-
-              <div class="prose prose-lg prose-headings:font-serif prose-headings:text-deep-green text-deep-green/80 leading-relaxed max-w-none">
-                {post.content?.trim() ? (
-                  post.content
-                    .split(/\n+/)
-                    .map((paragraph) => <p>{paragraph.trim()}</p>)
-                ) : (
-                  <p>Este post no tiene contenido escrito.</p>
-                )}
-              </div>
-            </article>
-          ))
-        )
-      }
+      <article
+        id="posts-loading"
+        class="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl shadow-sage/5 border border-sage/10"
+      >
+        <header class="mb-6 text-center">
+          <h2 class="font-serif text-3xl md:text-4xl font-bold text-deep-green">
+            Cargando entradas
+          </h2>
+          <p class="text-sm text-deep-green/60 italic font-serif">
+            Consultando publicaciones en Firebase...
+          </p>
+        </header>
+      </article>
+      <article
+        id="posts-error"
+        class="hidden bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl shadow-sage/5 border border-red-200"
+      >
+        <header class="mb-4 text-center">
+          <h2 class="font-serif text-3xl font-bold text-red-700">
+            No se pudieron cargar los posts
+          </h2>
+        </header>
+        <p class="text-red-700 text-sm text-center">
+          Revisa configuración, reglas de Firestore e índice requerido.
+        </p>
+      </article>
     </div>
   </main>
 </Layout>
+
+<script is:inline define:vars={{ firebaseConfig }}>
+  window.__FIREBASE_CONFIG__ = firebaseConfig;
+</script>
+<script src="../../scripts/archive-2026.ts"></script>
