@@ -1,4 +1,4 @@
-export {};
+import "./social-interactions.js";
 
 declare global {
   interface Window {
@@ -135,6 +135,13 @@ const createPostCard = (post: LoadedPost): HTMLElement => {
   }
 
   article.appendChild(content);
+
+  // Social Interactions
+  const social = document.createElement("blog-social-interactions");
+  social.dataset.postId = post.id;
+  social.dataset.postTitle = post.title;
+  article.appendChild(social);
+
   return article;
 };
 

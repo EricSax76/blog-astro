@@ -77,6 +77,39 @@ Deploy de Firestore:
 firebase deploy --only firestore
 ```
 
+## Migración legacy (2011-2017)
+
+Script para migrar contenido histórico (`src/pages/archivo/2011..2017`) a Firestore y subir imágenes asociadas a Storage:
+
+1. Revisa qué se va a migrar:
+
+```bash
+npm run migrate:legacy:dry
+```
+
+2. Ejecuta migración real:
+
+```bash
+npm run migrate:legacy
+```
+
+Opciones útiles:
+
+- `--overwrite`: sobrescribe documentos `posts/{postId}` ya existentes.
+- `--years=2011,2012`: migra años específicos.
+- `--service-account=./ruta/service-account.json`: usa credenciales explícitas.
+- `--bucket=<tu-storage-bucket>`: define bucket manualmente.
+- `--author-uid`, `--author-name`, `--author-email`: autor a guardar en posts legacy.
+
+Ejemplo:
+
+```bash
+node functions/scripts/migrate-legacy-content.mjs \
+  --years=2011,2012,2013,2014,2015,2016,2017 \
+  --service-account=./service-account.json \
+  --bucket=tu-proyecto.appspot.com
+```
+
 ## 👀 Want to learn more?
 
 Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).

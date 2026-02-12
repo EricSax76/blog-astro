@@ -1,27 +1,20 @@
 ---
 import Layout from "../layouts/Layout.astro";
-
-const firebaseConfig = {
-  apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY ?? "",
-  authDomain: import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN ?? "",
-  projectId: import.meta.env.PUBLIC_FIREBASE_PROJECT_ID ?? "",
-  storageBucket: import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET ?? "",
-  messagingSenderId: import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? "",
-  appId: import.meta.env.PUBLIC_FIREBASE_APP_ID ?? "",
-};
 ---
 
 <Layout title="Entrada al Blog | El Alma de las Flores">
   <section class="text-center space-y-4">
-    <p class="text-xs uppercase tracking-[0.3em] text-deep-green/60 font-semibold">
+    <p
+      class="text-xs uppercase tracking-[0.3em] text-deep-green/60 font-semibold"
+    >
       Portal de autores
     </p>
     <h1 class="font-serif text-4xl md:text-5xl font-bold text-deep-green">
       Bienvenido a El Alma de las Flores
     </h1>
     <p class="text-deep-green/70 text-lg max-w-3xl mx-auto">
-      Regístrate o inicia sesión para publicar nuevas entradas del blog y mantener
-      actualizado el anuario 2026.
+      Regístrate o inicia sesión para publicar nuevas entradas del blog y
+      mantener actualizado el anuario 2026.
     </p>
   </section>
 
@@ -43,7 +36,8 @@ const firebaseConfig = {
         id="auth-config-warning"
         class="hidden rounded-2xl border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm text-amber-800"
       >
-        Falta configurar Firebase en variables `PUBLIC_FIREBASE_*` para usar el acceso.
+        Falta configurar Firebase en variables `PUBLIC_FIREBASE_*` para usar el
+        acceso.
       </p>
 
       <p
@@ -51,7 +45,8 @@ const firebaseConfig = {
         class="hidden rounded-2xl border px-4 py-3 text-sm"
         role="status"
         aria-live="polite"
-      ></p>
+      >
+      </p>
 
       <div id="auth-guest" class="space-y-8">
         <section id="registro" class="space-y-4">
@@ -60,7 +55,9 @@ const firebaseConfig = {
           </h3>
           <form id="register-form" class="space-y-4">
             <label class="block space-y-2">
-              <span class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold">
+              <span
+                class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+              >
                 Nombre
               </span>
               <input
@@ -73,7 +70,9 @@ const firebaseConfig = {
             </label>
 
             <label class="block space-y-2">
-              <span class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold">
+              <span
+                class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+              >
                 Correo
               </span>
               <input
@@ -87,7 +86,9 @@ const firebaseConfig = {
             </label>
 
             <label class="block space-y-2">
-              <span class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold">
+              <span
+                class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+              >
                 Contraseña
               </span>
               <input
@@ -102,7 +103,9 @@ const firebaseConfig = {
             </label>
 
             <label class="block space-y-2">
-              <span class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold">
+              <span
+                class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+              >
                 Confirmar contraseña
               </span>
               <input
@@ -133,7 +136,9 @@ const firebaseConfig = {
           </h3>
           <form id="login-form" class="space-y-4">
             <label class="block space-y-2">
-              <span class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold">
+              <span
+                class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+              >
                 Correo
               </span>
               <input
@@ -147,7 +152,9 @@ const firebaseConfig = {
             </label>
 
             <label class="block space-y-2">
-              <span class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold">
+              <span
+                class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+              >
                 Contraseña
               </span>
               <input
@@ -174,7 +181,9 @@ const firebaseConfig = {
         id="auth-user"
         class="hidden rounded-3xl border border-sage/30 bg-cream/70 p-6 space-y-4"
       >
-        <p class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold">
+        <p
+          class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+        >
           Sesión activa
         </p>
         <p class="text-deep-green/80">
@@ -200,8 +209,4 @@ const firebaseConfig = {
   </section>
 </Layout>
 
-<script is:inline define:vars={{ firebaseConfig }}>
-  window.__FIREBASE_CONFIG__ = firebaseConfig;
-  window.__BLOG_AUTH_STATE__ = { isAuthenticated: false, email: null };
-</script>
 <script src="../scripts/entry-auth.js"></script>

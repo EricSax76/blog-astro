@@ -6,7 +6,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "migrate:legacy:dry": "node functions/scripts/migrate-legacy-content.mjs --dry-run",
+    "migrate:legacy": "node functions/scripts/migrate-legacy-content.mjs"
   },
   "dependencies": {
     "@astrojs/node": "^9.5.2",

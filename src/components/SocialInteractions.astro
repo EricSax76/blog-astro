@@ -1,0 +1,13 @@
+---
+interface Props {
+  postId: string;
+  postTitle: string;
+}
+
+const { postId, postTitle } = Astro.props;
+---
+
+<blog-social-interactions data-post-id={postId} data-post-title={postTitle}
+></blog-social-interactions>
+
+<script src="../scripts/social-interactions.js"></script>

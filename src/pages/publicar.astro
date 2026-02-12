@@ -1,27 +1,20 @@
 ---
 import Layout from "../layouts/Layout.astro";
-
-const firebaseConfig = {
-  apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY ?? "",
-  authDomain: import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN ?? "",
-  projectId: import.meta.env.PUBLIC_FIREBASE_PROJECT_ID ?? "",
-  storageBucket: import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET ?? "",
-  messagingSenderId: import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? "",
-  appId: import.meta.env.PUBLIC_FIREBASE_APP_ID ?? "",
-};
 ---
 
 <Layout title="Publicar | El Alma de las Flores">
   <section class="text-center space-y-4">
-    <p class="text-xs uppercase tracking-[0.3em] text-deep-green/60 font-semibold">
+    <p
+      class="text-xs uppercase tracking-[0.3em] text-deep-green/60 font-semibold"
+    >
       Panel de autor
     </p>
     <h1 class="font-serif text-4xl md:text-5xl font-bold text-deep-green">
       Publicar en el blog
     </h1>
     <p class="text-deep-green/70 text-lg max-w-3xl mx-auto">
-      Esta zona está protegida por sesión. Solo usuarios autenticados pueden crear
-      nuevas entradas.
+      Esta zona está protegida por sesión. Solo usuarios autenticados pueden
+      crear nuevas entradas.
     </p>
   </section>
 
@@ -40,7 +33,10 @@ const firebaseConfig = {
         id="publish-auth-state"
         class="rounded-2xl border border-sage/25 bg-cream/70 px-4 py-3 text-sm text-deep-green/80 flex flex-wrap items-center justify-between gap-3"
       >
-        <span>Sesión activa: <strong id="publish-auth-email">verificando...</strong></span>
+        <span
+          >Sesión activa: <strong id="publish-auth-email">verificando...</strong
+          ></span
+        >
         <button
           id="publish-logout-button"
           type="button"
@@ -54,13 +50,22 @@ const firebaseConfig = {
         id="publish-locked-message"
         class="rounded-2xl border border-sage/25 bg-cream/70 px-4 py-3 text-sm text-deep-green/80"
       >
-        Debes iniciar sesión para publicar. <a href="/#login" class="underline font-semibold">Ir a acceso</a>
+        Debes iniciar sesión para publicar. <a
+          href="/#login"
+          class="underline font-semibold">Ir a acceso</a
+        >
       </p>
     </div>
 
-    <form id="blog-form" class="space-y-5 opacity-60 transition-opacity" aria-describedby="blog-help">
+    <form
+      id="blog-form"
+      class="space-y-5 opacity-60 transition-opacity"
+      aria-describedby="blog-help"
+    >
       <label class="block space-y-2">
-        <span class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold">
+        <span
+          class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+        >
           Título
         </span>
         <input
@@ -75,7 +80,9 @@ const firebaseConfig = {
       </label>
 
       <label class="block space-y-2">
-        <span class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold">
+        <span
+          class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+        >
           Contenido
         </span>
         <textarea
@@ -90,7 +97,9 @@ const firebaseConfig = {
       </label>
 
       <label class="block space-y-2">
-        <span class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold">
+        <span
+          class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+        >
           Foto destacada
         </span>
         <input
@@ -105,7 +114,9 @@ const firebaseConfig = {
       </label>
 
       <div class="rounded-2xl border border-sage/20 bg-cream/50 p-4 space-y-3">
-        <p class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold">
+        <p
+          class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+        >
           Vista previa
         </p>
         <img
@@ -144,9 +155,5 @@ const firebaseConfig = {
   </section>
 </Layout>
 
-<script is:inline define:vars={{ firebaseConfig }}>
-  window.__FIREBASE_CONFIG__ = firebaseConfig;
-  window.__BLOG_AUTH_STATE__ = { isAuthenticated: false, email: null };
-</script>
 <script src="../scripts/publish-auth.js"></script>
 <script src="../scripts/blog-logic.ts"></script>

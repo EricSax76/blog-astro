@@ -17,6 +17,10 @@ pnpm-debug.log*
 .env
 .env.production
 
+# firebase credentials
+service-account.json
+*firebase-adminsdk-*.json
+
 # macOS-specific files
 .DS_Store
 

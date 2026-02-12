@@ -1,15 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import YearbookNav from "../../components/YearbookNav.astro";
-
-const firebaseConfig = {
-  apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY ?? "",
-  authDomain: import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN ?? "",
-  projectId: import.meta.env.PUBLIC_FIREBASE_PROJECT_ID ?? "",
-  storageBucket: import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET ?? "",
-  messagingSenderId: import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? "",
-  appId: import.meta.env.PUBLIC_FIREBASE_APP_ID ?? "",
-};
 ---
 
 <Layout title="Anuario 2026 | El Alma de las Flores">
@@ -56,7 +47,4 @@ const firebaseConfig = {
   </main>
 </Layout>
 
-<script is:inline define:vars={{ firebaseConfig }}>
-  window.__FIREBASE_CONFIG__ = firebaseConfig;
-</script>
 <script src="../../scripts/archive-2026.ts"></script>

@@ -1,36 +1,75 @@
 ---
 import "../styles/global.css";
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import mainScript from '../scripts/main.js?url';
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import mainScript from "../scripts/main.js?url";
 
 interface Props {
-	title: string;
+  title: string;
 }
 
 const { title } = Astro.props;
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="author" content="Eric Moscoso"/>
-		<meta name="description" content="Estudio integral del apasionante mundo de las Flores de Bach">
-		<meta name="keywords" content="Flores de Bach, terapia floral, Edward Bach, medicina natural">
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Red+Hat+Text:wght@300;400;500;600&display=swap" rel="stylesheet">
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<title>{title}</title>
-	</head>
-	<body class="bg-cream text-deep-green font-sans min-h-screen flex flex-col antialiased selection:bg-sage selection:text-white">
-		<Header />
-		<main class="flex-1 w-full max-w-7xl mx-auto px-6 py-12 md:px-8 lg:px-12">
-			<slot />
-		</main>
-		<Footer />
-		<script type="module" src={mainScript}></script>
-	</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Eric Moscoso" />
+    <meta
+      name="description"
+      content="Estudio integral del apasionante mundo de las Flores de Bach"
+    />
+    <meta
+      name="keywords"
+      content="Flores de Bach, terapia floral, Edward Bach, medicina natural"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Red+Hat+Text:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body
+    class="bg-cream text-deep-green font-sans min-h-screen flex flex-col antialiased selection:bg-sage selection:text-white"
+  >
+    <Header />
+    <main class="flex-1 w-full max-w-7xl mx-auto px-6 py-12 md:px-8 lg:px-12">
+      <slot />
+    </main>
+    <Footer />
+
+    <script
+      is:inline
+      define:vars={{
+        firebaseConfig: {
+          apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY ?? "",
+          authDomain: import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN ?? "",
+          projectId: import.meta.env.PUBLIC_FIREBASE_PROJECT_ID ?? "",
+          storageBucket: import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET ?? "",
+          messagingSenderId:
+            import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? "",
+          appId: import.meta.env.PUBLIC_FIREBASE_APP_ID ?? "",
+        },
+      }}
+    >
+      window.__FIREBASE_CONFIG__ = firebaseConfig;
+      // Initialize auth state if not present
+      if (!window.__BLOG_AUTH_STATE__) {
+        try {
+          const stored = localStorage.getItem("blog-auth-state");
+          window.__BLOG_AUTH_STATE__ = stored
+            ? JSON.parse(stored)
+            : { isAuthenticated: false, email: null };
+        } catch {
+          window.__BLOG_AUTH_STATE__ = { isAuthenticated: false, email: null };
+        }
+      }
+    </script>
+    <script type="module" src={mainScript}></script>
+  </body>
 </html>
