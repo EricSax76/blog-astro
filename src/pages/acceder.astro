@@ -1,0 +1,83 @@
+---
+import Layout from "../layouts/Layout.astro";
+import LoginForm from "../components/LoginForm.astro";
+---
+
+<Layout title="Acceder | El Alma de las Flores">
+  <section class="text-center space-y-4">
+    <p
+      class="text-xs uppercase tracking-[0.3em] text-deep-green/60 font-semibold"
+    >
+      Acceso de autores
+    </p>
+    <h1 class="font-serif text-4xl md:text-5xl font-bold text-deep-green">
+      Iniciar sesión
+    </h1>
+    <p class="text-deep-green/70 text-lg max-w-3xl mx-auto">
+      Entra con tu cuenta para publicar y administrar contenido del blog.
+    </p>
+  </section>
+
+  <section class="mt-12 max-w-2xl mx-auto">
+    <article
+      class="bg-white/85 border border-sage/20 rounded-[2.2rem] shadow-xl shadow-sage/5 p-7 md:p-10 space-y-6"
+    >
+      <p
+        id="auth-config-warning"
+        class="hidden rounded-2xl border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm text-amber-800"
+      >
+        Falta configurar Firebase en variables `PUBLIC_FIREBASE_*` para usar el
+        acceso.
+      </p>
+
+      <p
+        id="auth-message"
+        class="hidden rounded-2xl border px-4 py-3 text-sm"
+        role="status"
+        aria-live="polite"
+      >
+      </p>
+
+      <div id="auth-guest" class="space-y-6">
+        <LoginForm />
+        <p class="text-sm text-deep-green/70 text-center">
+          ¿Aún no tienes cuenta? <a
+            href="/registrate"
+            class="font-semibold underline">Regístrate</a
+          >
+        </p>
+      </div>
+
+      <section
+        id="auth-user"
+        class="hidden rounded-3xl border border-sage/30 bg-cream/70 p-6 space-y-4"
+      >
+        <p
+          class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+        >
+          Sesión activa
+        </p>
+        <p class="text-deep-green/80">
+          Conectado como <strong id="auth-user-email"></strong>
+        </p>
+        <div class="flex flex-wrap gap-3">
+          <a
+            href="/publicar"
+            class="rounded-full bg-deep-green px-5 py-2 text-sm font-semibold text-cream hover:bg-deep-green/90 transition-colors"
+          >
+            Ir a escribir
+          </a>
+          <button
+            id="logout-button"
+            type="button"
+            class="rounded-full border border-sage/40 px-5 py-2 text-sm font-semibold text-deep-green hover:bg-sage/10 transition-colors"
+          >
+            Cerrar sesión
+          </button>
+        </div>
+      </section>
+    </article>
+  </section>
+</Layout>
+
+<script src="../scripts/entry-auth.js"></script>

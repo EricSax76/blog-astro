@@ -98,14 +98,14 @@
         </a>
         <a
           id="desktop-login"
-          href="/#login"
+          href="/acceder"
           class="text-deep-green hover:text-sage font-medium text-sm transition-colors"
         >
           Acceder
         </a>
         <a
           id="desktop-register"
-          href="/#registro"
+          href="/registrate"
           class="px-5 py-2 rounded-full bg-sage/20 text-deep-green font-semibold text-sm hover:bg-sage/30 transition-all duration-200"
         >
           Regístrate
@@ -160,12 +160,12 @@
       >
       <a
         id="mobile-login"
-        href="/#login"
+        href="/acceder"
         class="text-deep-green font-medium">Acceder</a
       >
       <a
         id="mobile-register"
-        href="/#registro"
+        href="/registrate"
         class="px-8 py-3 rounded-full bg-deep-green text-cream font-bold shadow-lg"
         >Regístrate</a
       >
@@ -200,7 +200,12 @@
     }
   };
 
-  const persistAuthState = (state) => {
+  const persistAuthState = (
+    state:
+      | { isAuthenticated?: boolean; email?: string | null | undefined }
+      | null
+      | undefined
+  ) => {
     if (!state || typeof state !== "object") return;
     try {
       localStorage.setItem(
@@ -213,7 +218,7 @@
     } catch {}
   };
 
-  const applyAuthUiState = (isAuthenticated) => {
+  const applyAuthUiState = (isAuthenticated: boolean) => {
     const hideGuestActions = isAuthenticated === true;
     [desktopLogin, desktopRegister, mobileLogin, mobileRegister].forEach(
       (element) => {

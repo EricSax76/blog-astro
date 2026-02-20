@@ -1,0 +1,76 @@
+<section id="registro" class="space-y-4">
+  <h4 class="font-serif text-2xl font-semibold text-deep-green">Crear cuenta</h4>
+  <form id="register-form" class="space-y-4">
+    <label class="block space-y-2">
+      <span
+        class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+      >
+        Nombre
+      </span>
+      <input
+        type="text"
+        name="name"
+        autocomplete="name"
+        placeholder="Tu nombre"
+        class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40"
+      />
+    </label>
+
+    <label class="block space-y-2">
+      <span
+        class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+      >
+        Correo
+      </span>
+      <input
+        type="email"
+        name="email"
+        autocomplete="email"
+        required
+        placeholder="nombre@correo.com"
+        class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40"
+      />
+    </label>
+
+    <label class="block space-y-2">
+      <span
+        class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+      >
+        Contraseña
+      </span>
+      <input
+        type="password"
+        name="password"
+        autocomplete="new-password"
+        minlength="6"
+        required
+        placeholder="Mínimo 6 caracteres"
+        class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40"
+      />
+    </label>
+
+    <label class="block space-y-2">
+      <span
+        class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+      >
+        Confirmar contraseña
+      </span>
+      <input
+        type="password"
+        name="confirmPassword"
+        autocomplete="new-password"
+        minlength="6"
+        required
+        placeholder="Repite la contraseña"
+        class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40"
+      />
+    </label>
+
+    <button
+      type="submit"
+      class="w-full rounded-full bg-deep-green px-6 py-3 text-cream font-semibold shadow-lg shadow-sage/20 hover:bg-deep-green/90 transition-colors"
+    >
+      Registrarme
+    </button>
+  </form>
+</section>
