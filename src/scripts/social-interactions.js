@@ -116,39 +116,41 @@ class BlogSocialInteractions extends HTMLElement {
     }
 
     try {
-      const [firebaseApp, firebaseAuth, firebaseFirestore] = await Promise.all([
+      const [firebaseApp, firebaseAuth, firebaseFirestore, firebaseFunctions] = await Promise.all([
         import("https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js"),
         import("https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js"),
         import("https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js"),
+        import("https://www.gstatic.com/firebasejs/11.0.2/firebase-functions.js"),
       ]);
 
       const { initializeApp, getApps, getApp } = firebaseApp;
       const { getAuth, onAuthStateChanged } = firebaseAuth;
       const { getFirestore } = firebaseFirestore;
+      const { getFunctions, httpsCallable } = firebaseFunctions;
 
       const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
       const auth = getAuth(app);
       const db = getFirestore(app);
+      const functions = getFunctions(app, "europe-west1");
 
-      this.setupLogic(auth, db, firebaseFirestore, onAuthStateChanged);
+      this.setupLogic(auth, db, firebaseFirestore, onAuthStateChanged, { httpsCallable, functions });
     } catch (e) {
       console.error("Error initializing social interactions:", e);
     }
   }
 
-  setupLogic(auth, db, firestoreOps, onAuthStateChanged) {
+  setupLogic(auth, db, firestoreOps, onAuthStateChanged, { httpsCallable, functions }) {
     const {
       collection,
       query,
       where,
       orderBy,
       onSnapshot,
-      addDoc,
-      setDoc,
-      deleteDoc,
-      doc,
-      serverTimestamp,
     } = firestoreOps;
+
+    const callAddComment = (data) => httpsCallable(functions, "addComment")(data);
+    const callToggleLike = (postId) => httpsCallable(functions, "toggleLike")({ postId });
+    const callDeleteComment = (commentId) => httpsCallable(functions, "deleteComment")({ commentId });
 
     const likeBtn = this.querySelector(".like-btn");
     const likeCountSpan = this.querySelector(".like-count");
@@ -203,20 +205,8 @@ class BlogSocialInteractions extends HTMLElement {
         alert("Debes iniciar sesión para dar me gusta.");
         return;
       }
-      const likeDocId = `${this.postId}_${currentUser.uid}`;
-      const likeRef = doc(db, "likes", likeDocId);
-      const isLiked = likeBtn.classList.contains("liked");
-
       try {
-        if (isLiked) {
-          await deleteDoc(likeRef);
-        } else {
-          await setDoc(likeRef, {
-            postId: this.postId,
-            userId: currentUser.uid,
-            createdAt: serverTimestamp(),
-          });
-        }
+        await callToggleLike(this.postId);
       } catch (e) {
         console.error("Error toggling like:", e);
       }
@@ -257,12 +247,8 @@ class BlogSocialInteractions extends HTMLElement {
           comment,
           false,
           currentUser,
-          db,
-          collection,
-          addDoc,
-          serverTimestamp,
-          doc,
-          deleteDoc
+          callAddComment,
+          callDeleteComment
         );
         commentsList.appendChild(commentEl);
 
@@ -275,12 +261,8 @@ class BlogSocialInteractions extends HTMLElement {
               reply,
               true,
               currentUser,
-              db,
-              collection,
-              addDoc,
-              serverTimestamp,
-              doc,
-              deleteDoc
+              callAddComment,
+              callDeleteComment
             );
             repliesContainer.appendChild(replyEl);
           });
@@ -304,14 +286,7 @@ class BlogSocialInteractions extends HTMLElement {
       btn.disabled = true;
 
       try {
-        await addDoc(collection(db, "comments"), {
-          postId: this.postId,
-          title: this.postTitle,
-          authorId: currentUser.uid,
-          authorName: currentUser.displayName || currentUser.email.split("@")[0],
-          content,
-          createdAt: serverTimestamp(),
-        });
+        await callAddComment({ postId: this.postId, title: this.postTitle, content });
         textarea.value = "";
       } catch (err) {
         console.error("Error posting comment:", err);
@@ -329,12 +304,8 @@ class BlogSocialInteractions extends HTMLElement {
     data,
     isReply,
     currentUser,
-    db,
-    collection,
-    addDoc,
-    serverTimestamp,
-    doc,
-    deleteDoc
+    callAddComment,
+    callDeleteComment
   ) {
     const el = document.createElement("div");
     el.className = "comment-item p-4 bg-white/60 rounded-xl border border-sage/10";
@@ -384,7 +355,7 @@ class BlogSocialInteractions extends HTMLElement {
       deleteBtn.addEventListener("click", async () => {
         if (!confirm("¿Seguro que quieres borrar este comentario?")) return;
         try {
-          await deleteDoc(doc(db, "comments", data.id));
+          await callDeleteComment(data.id);
         } catch (e) {
           console.error("Error deleting comment:", e);
           alert("No se pudo borrar el comentario.");
@@ -445,15 +416,11 @@ class BlogSocialInteractions extends HTMLElement {
         btn.disabled = true;
 
         try {
-          await addDoc(collection(db, "comments"), {
+          await callAddComment({
             postId: this.postId,
             title: this.postTitle,
-            authorId: currentUser.uid,
-            authorName:
-              currentUser.displayName || currentUser.email.split("@")[0],
             content,
             parentId: data.id,
-            createdAt: serverTimestamp(),
           });
           replyForm.reset();
           replyContainer.classList.add("hidden");

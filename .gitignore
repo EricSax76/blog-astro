@@ -20,6 +20,7 @@ pnpm-debug.log*
 # firebase credentials
 service-account.json
 *firebase-adminsdk-*.json
+el-alma-de-las-flores-blog-*.json
 
 # macOS-specific files
 .DS_Store

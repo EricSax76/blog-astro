@@ -59,20 +59,12 @@ type FirebaseClients = {
   auth: {
     currentUser: { uid: string; email: string | null; displayName?: string | null } | null;
   };
-  db: any;
   storage: any;
-  collection: (...args: any[]) => any;
-  addDoc: (...args: any[]) => Promise<any>;
-  serverTimestamp: () => any;
   ref: (...args: any[]) => any;
   uploadBytes: (...args: any[]) => Promise<any>;
   getDownloadURL: (...args: any[]) => Promise<string>;
-  getApp: (...args: any[]) => any;
-  getApps: (...args: any[]) => any[];
-  initializeApp: (...args: any[]) => any;
-  getAuth: (...args: any[]) => any;
-  getFirestore: (...args: any[]) => any;
-  getStorage: (...args: any[]) => any;
+  functions: any;
+  httpsCallable: (...args: any[]) => any;
 };
 
 const getFirebaseClients = async (): Promise<FirebaseClients> => {
@@ -80,38 +72,31 @@ const getFirebaseClients = async (): Promise<FirebaseClients> => {
     throw new Error("Falta configuración Firebase (`PUBLIC_FIREBASE_*`).");
   }
 
-  const [firebaseApp, firebaseAuth, firebaseFirestore, firebaseStorage] =
+  const [firebaseApp, firebaseAuth, firebaseStorage, firebaseFunctions] =
     await Promise.all([
       import("https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js"),
       import("https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js"),
-      import("https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js"),
       import("https://www.gstatic.com/firebasejs/11.0.2/firebase-storage.js"),
+      // @ts-ignore — CDN module, tipos no disponibles en tsconfig
+      import("https://www.gstatic.com/firebasejs/11.0.2/firebase-functions.js"),
     ]);
 
   const { getApp, getApps, initializeApp } = firebaseApp;
   const { getAuth } = firebaseAuth;
-  const { getFirestore, collection, addDoc, serverTimestamp } = firebaseFirestore;
   const { getStorage, ref, uploadBytes, getDownloadURL } = firebaseStorage;
+  const { getFunctions, httpsCallable } = firebaseFunctions;
 
   const config = window.__FIREBASE_CONFIG__ as Record<string, string>;
   const app = getApps().length > 0 ? getApp() : initializeApp(config);
 
   return {
     auth: getAuth(app) as FirebaseClients["auth"],
-    db: getFirestore(app),
     storage: getStorage(app),
-    collection,
-    addDoc,
-    serverTimestamp,
     ref,
     uploadBytes,
     getDownloadURL,
-    getApp,
-    getApps,
-    initializeApp,
-    getAuth,
-    getFirestore,
-    getStorage,
+    functions: getFunctions(app, "europe-west1"),
+    httpsCallable,
   };
 };
 
@@ -215,23 +200,8 @@ const publishPost = async (): Promise<void> => {
       imageUrl = await uploadImageToStorage(clients, user.uid, file);
     }
 
-    const authorNameFromProfile =
-      typeof user.displayName === "string" ? user.displayName.trim() : "";
-    const authorNameFromEmail = (user.email ?? "").trim().split("@")[0] ?? "";
-    const authorName = authorNameFromProfile || authorNameFromEmail || "Autor";
-
-    await clients.addDoc(clients.collection(clients.db, "posts"), {
-      title,
-      content,
-      imageUrl,
-      authorUid: user.uid,
-      authorEmail: user.email ?? "",
-      authorName,
-      year: 2026,
-      createdAt: clients.serverTimestamp(),
-      createdAtMs: Date.now(),
-      updatedAt: clients.serverTimestamp(),
-    });
+    const publishPost = clients.httpsCallable(clients.functions, "publishPost");
+    await publishPost({ title, content, imageUrl, year: 2026 });
 
     if (titleInput) titleInput.value = "";
     if (contentInput) contentInput.value = "";

@@ -5,6 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://el-alma-de-las-flores-blog.web.app',
   output: 'server',
   adapter: node({
     mode: 'standalone',

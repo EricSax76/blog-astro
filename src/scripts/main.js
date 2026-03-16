@@ -14,59 +14,7 @@ if (header) {
     window.addEventListener('scroll', handleScroll, { passive: true });
 }
 
-    // Legacy navigation code commented out to prevent conflicts with new React/Tailwind logic
-    /*
-    if (primaryNav && navToggle && primaryMenu) {
-        const setMenuState = (isOpen) => {
-            const isDesktop = window.innerWidth >= 768;
-            const shouldOpen = isDesktop ? true : isOpen;
-
-            primaryNav.classList.toggle('is-open', shouldOpen && !isDesktop);
-            navToggle.setAttribute('aria-expanded', String(shouldOpen && !isDesktop));
-            navToggle.setAttribute('aria-label', shouldOpen && !isDesktop ? 'Cerrar menú de navegación' : 'Abrir menú de navegación');
-            primaryMenu.setAttribute('aria-hidden', String(isDesktop ? false : !shouldOpen));
-            primaryMenu.setAttribute('data-visible', String(shouldOpen));
-        };
-
-        const closeNav = () => setMenuState(false);
-        const toggleNav = () => {
-            if (window.innerWidth >= 768) return;
-            setMenuState(!primaryNav.classList.contains('is-open'));
-        };
-
-        navToggle.addEventListener('click', toggleNav);
-
-        window.addEventListener('resize', () => {
-            const isDesktop = window.innerWidth >= 768;
-            if (isDesktop) {
-                primaryNav.classList.remove('is-open');
-                setMenuState(false);
-            } else {
-                closeNav();
-            }
-        });
-
-        primaryNav.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') {
-                closeNav();
-                navToggle.focus();
-            }
-        });
-
-        primaryMenu.querySelectorAll('a').forEach((link) => {
-            link.addEventListener('click', () => {
-                const parentListItem = link.parentElement;
-                const isDropdownToggle = parentListItem?.classList.contains('has-dropdown');
-
-                if (window.innerWidth < 768 && !isDropdownToggle) {
-                    closeNav();
-                }
-            });
-        });
-
-        setMenuState(false);
-    }
-    */
+    
 
 const dropdownParents = document.querySelectorAll('.has-dropdown');
 

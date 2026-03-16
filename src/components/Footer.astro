@@ -65,22 +65,27 @@
 
     <!-- Links -->
     <div class="space-y-4 md:justify-self-end md:text-right">
-      <h4 class="font-sans font-bold text-lg text-cream">Enlaces</h4>
+      <h4 class="font-sans font-bold text-lg text-cream">Legal</h4>
       <nav class="flex flex-col gap-2 md:items-end">
         <a
-          href="#"
+          href="/aviso-legal"
           class="text-cream/70 hover:text-white transition-colors text-sm"
-          >Mapa del sitio</a
+          >Aviso legal</a
         >
         <a
-          href="#"
-          class="text-cream/70 hover:text-white transition-colors text-sm"
-          >Términos y condiciones</a
-        >
-        <a
-          href="#"
+          href="/privacidad"
           class="text-cream/70 hover:text-white transition-colors text-sm"
           >Política de privacidad</a
+        >
+        <a
+          href="/cookies"
+          class="text-cream/70 hover:text-white transition-colors text-sm"
+          >Política de cookies</a
+        >
+        <button
+          id="footer-cookie-preferences"
+          class="text-cream/70 hover:text-white transition-colors text-sm md:text-right text-left"
+          >Preferencias de cookies</button
         >
       </nav>
     </div>
@@ -115,6 +120,10 @@
 </footer>
 
 <script>
+  document.getElementById("footer-cookie-preferences")?.addEventListener("click", () => {
+    window.dispatchEvent(new CustomEvent("open-cookie-banner"));
+  });
+
   const backToTopButton = document.getElementById("backToTop");
 
   if (backToTopButton) {

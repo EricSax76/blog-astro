@@ -68,37 +68,22 @@ if (typeof window !== "undefined") {
     Promise.all([
       import("https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js"),
       import("https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js"),
-      import("https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js"),
+      import("https://www.gstatic.com/firebasejs/11.0.2/firebase-functions.js"),
     ])
-      .then(([firebaseApp, firebaseAuth, firebaseFirestore]) => {
+      .then(([firebaseApp, firebaseAuth, firebaseFunctions]) => {
         const { initializeApp, getApp, getApps } = firebaseApp;
         const { getAuth, onAuthStateChanged, signOut } = firebaseAuth;
-        const { getFirestore, doc, getDoc, setDoc, serverTimestamp } =
-          firebaseFirestore;
+        const { getFunctions, httpsCallable } = firebaseFunctions;
 
         const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        const functions = getFunctions(app, "europe-west1");
 
-        const ensureUserProfile = async (user) => {
-          const userRef = doc(db, "users", user.uid);
-          const snapshot = await getDoc(userRef);
-
-          const payload = {
-            uid: user.uid,
-            email: user.email ?? "",
+        const callUpsertUserProfile = async (user) => {
+          if (!user?.uid) return;
+          await httpsCallable(functions, "upsertUserProfile")({
             displayName: user.displayName ?? "",
-            role: "autor",
-            updatedAt: serverTimestamp(),
-            lastSeenAt: serverTimestamp(),
-          };
-
-          if (!snapshot.exists()) {
-            payload.createdAt = serverTimestamp();
-            payload.lastLoginAt = serverTimestamp();
-          }
-
-          await setDoc(userRef, payload, { merge: true });
+          });
         };
 
         if (logoutButton instanceof HTMLButtonElement) {
@@ -118,7 +103,7 @@ if (typeof window !== "undefined") {
 
           const resolvedEmail = user.email || user.displayName || "";
 
-          ensureUserProfile(user)
+          callUpsertUserProfile(user)
             .then(() => {
               setAuthState(true, resolvedEmail);
             })
@@ -127,7 +112,7 @@ if (typeof window !== "undefined") {
               setAuthState(false);
               if (lockedMessage) {
                 lockedMessage.innerHTML =
-                  'Tu sesión está activa, pero no se pudo validar tu perfil en Firestore. Revisa reglas/DB y vuelve a intentar. <a href="/#login" class="underline font-semibold">Volver</a>';
+                  'Tu sesión está activa, pero no se pudo validar tu perfil. Vuelve a intentar. <a href="/#login" class="underline font-semibold">Volver</a>';
               }
             });
         });

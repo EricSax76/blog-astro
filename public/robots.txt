@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Disallow: /publicar
+Disallow: /acceder
+Disallow: /registrate
+
+Sitemap: https://el-alma-de-las-flores-blog.web.app/sitemap.xml

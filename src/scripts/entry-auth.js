@@ -47,9 +47,6 @@ if (typeof window !== "undefined") {
     return code ? `${code}: ${message}` : message;
   };
 
-  const FIRESTORE_HELP =
-    "Revisa Firestore (crear base de datos) y despliega reglas con `firebase deploy --only firestore`.";
-
   const readValue = (form, fieldName) => {
     if (!(form instanceof HTMLFormElement)) return "";
     const value = new FormData(form).get(fieldName);
@@ -115,9 +112,9 @@ if (typeof window !== "undefined") {
     Promise.all([
       import("https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js"),
       import("https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js"),
-      import("https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js"),
+      import("https://www.gstatic.com/firebasejs/11.0.2/firebase-functions.js"),
     ])
-      .then(([firebaseApp, firebaseAuth, firebaseFirestore]) => {
+      .then(([firebaseApp, firebaseAuth, firebaseFunctions]) => {
         const { initializeApp, getApp, getApps } = firebaseApp;
         const {
           getAuth,
@@ -127,27 +124,17 @@ if (typeof window !== "undefined") {
           onAuthStateChanged,
           updateProfile,
         } = firebaseAuth;
-        const { getFirestore, doc, setDoc, serverTimestamp } = firebaseFirestore;
+        const { getFunctions, httpsCallable } = firebaseFunctions;
 
         const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        const functions = getFunctions(app, "europe-west1");
 
-        const upsertUserProfile = async (user, extraData = {}) => {
+        const callUpsertUserProfile = async (user) => {
           if (!user?.uid) return;
-
-          await setDoc(
-            doc(db, "users", user.uid),
-            {
-              uid: user.uid,
-              email: user.email ?? "",
-              displayName: user.displayName ?? "",
-              role: "autor",
-              updatedAt: serverTimestamp(),
-              ...extraData,
-            },
-            { merge: true }
-          );
+          await httpsCallable(functions, "upsertUserProfile")({
+            displayName: user.displayName ?? "",
+          });
         };
 
         if (registerForm instanceof HTMLFormElement) {
@@ -186,14 +173,11 @@ if (typeof window !== "undefined") {
               }
 
               try {
-                await upsertUserProfile(userCredential.user, {
-                  createdAt: serverTimestamp(),
-                  lastLoginAt: serverTimestamp(),
-                });
+                await callUpsertUserProfile(userCredential.user);
               } catch (profileError) {
                 console.error("[firebase/register-profile] failed", profileError);
                 setMessage(
-                  `La cuenta se creó en Authentication, pero no se pudo crear tu perfil en Firestore. ${formatError(profileError)}. ${FIRESTORE_HELP}`
+                  `La cuenta se creó en Authentication, pero no se pudo crear tu perfil. ${formatError(profileError)}.`
                 );
                 return;
               }
@@ -231,13 +215,11 @@ if (typeof window !== "undefined") {
               );
 
               try {
-                await upsertUserProfile(userCredential.user, {
-                  lastLoginAt: serverTimestamp(),
-                });
+                await callUpsertUserProfile(userCredential.user);
               } catch (profileError) {
                 console.error("[firebase/login-profile] failed", profileError);
                 setMessage(
-                  `Iniciaste sesión, pero no se pudo sincronizar tu perfil en Firestore. ${formatError(profileError)}. ${FIRESTORE_HELP}`
+                  `Iniciaste sesión, pero no se pudo sincronizar tu perfil. ${formatError(profileError)}.`
                 );
                 return;
               }
@@ -276,7 +258,7 @@ if (typeof window !== "undefined") {
           const resolvedEmail = user.email || user.displayName || "";
           setAuthState(true, resolvedEmail);
 
-          upsertUserProfile(user, { lastSeenAt: serverTimestamp() }).catch((error) => {
+          callUpsertUserProfile(user).catch((error) => {
             console.error("[firebase/profile-upsert] failed", error);
           });
         });

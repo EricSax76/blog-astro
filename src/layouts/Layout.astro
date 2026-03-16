@@ -2,13 +2,27 @@
 import "../styles/global.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import CookieBanner from "../components/CookieBanner.astro";
 import mainScript from "../scripts/main.js?url";
 
 interface Props {
   title: string;
+  description?: string;
+  image?: string;
+  type?: "website" | "article";
+  noindex?: boolean;
 }
 
-const { title } = Astro.props;
+const {
+  title,
+  description = "Estudio integral del apasionante mundo de las Flores de Bach: fichas, historia y comunidad.",
+  image = "/images/flor-logo.jpeg",
+  type = "website",
+  noindex = false,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).href;
+const ogImage = new URL(image, Astro.site ?? Astro.url.origin).href;
 ---
 
 <!doctype html>
@@ -17,14 +31,28 @@ const { title } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="author" content="Eric Moscoso" />
-    <meta
-      name="description"
-      content="Estudio integral del apasionante mundo de las Flores de Bach"
-    />
-    <meta
-      name="keywords"
-      content="Flores de Bach, terapia floral, Edward Bach, medicina natural"
-    />
+    <meta name="description" content={description} />
+    <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow"} />
+    <meta name="theme-color" content="#2d4a3e" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:site_name" content="El Alma de las Flores" />
+    <meta property="og:locale" content="es_ES" />
+
+    <!-- Twitter / X Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Canonical -->
+    <link rel="canonical" href={canonicalURL} />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -32,6 +60,7 @@ const { title } = Astro.props;
       rel="stylesheet"
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap.xml" />
     <title>{title}</title>
   </head>
   <body
@@ -42,6 +71,7 @@ const { title } = Astro.props;
       <slot />
     </main>
     <Footer />
+    <CookieBanner />
 
     <script
       is:inline

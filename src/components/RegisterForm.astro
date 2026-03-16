@@ -66,6 +66,70 @@
       />
     </label>
 
+    <!-- Consentimiento RGPD -->
+    <div class="space-y-3 pt-2 border-t border-sage/20">
+      <label class="flex items-start gap-3 cursor-pointer group">
+        <input
+          type="checkbox"
+          name="consent-privacy"
+          id="consent-privacy"
+          required
+          class="mt-0.5 w-4 h-4 rounded accent-sage shrink-0 cursor-pointer"
+        />
+        <span class="text-xs text-deep-green/70 leading-relaxed">
+          He leído y acepto la
+          <a
+            href="/privacidad"
+            target="_blank"
+            class="text-sage hover:underline font-medium"
+          >Política de Privacidad</a>
+          y el
+          <a
+            href="/aviso-legal"
+            target="_blank"
+            class="text-sage hover:underline font-medium"
+          >Aviso Legal</a>.
+          El tratamiento de mis datos se realizará conforme al RGPD y la LOPDGDD.
+          <span class="text-deep-green font-semibold"> *</span>
+        </span>
+      </label>
+
+      <label class="flex items-start gap-3 cursor-pointer group">
+        <input
+          type="checkbox"
+          name="consent-age"
+          id="consent-age"
+          required
+          class="mt-0.5 w-4 h-4 rounded accent-sage shrink-0 cursor-pointer"
+        />
+        <span class="text-xs text-deep-green/70 leading-relaxed">
+          Confirmo que soy mayor de 14 años o cuento con el consentimiento de mis
+          padres o tutores legales (art. 7 LOPDGDD).
+          <span class="text-deep-green font-semibold"> *</span>
+        </span>
+      </label>
+
+      <label class="flex items-start gap-3 cursor-pointer group">
+        <input
+          type="checkbox"
+          name="consent-communications"
+          id="consent-communications"
+          class="mt-0.5 w-4 h-4 rounded accent-sage shrink-0 cursor-pointer"
+        />
+        <span class="text-xs text-deep-green/70 leading-relaxed">
+          Acepto recibir comunicaciones informativas sobre novedades del blog
+          <em>(opcional)</em>.
+        </span>
+      </label>
+
+      <p class="text-xs text-deep-green/40">
+        * Campos obligatorios. Puedes ejercer tus derechos RGPD en
+        <a href="mailto:info@elalmadelasflores.com" class="text-sage hover:underline">
+          info@elalmadelasflores.com
+        </a>.
+      </p>
+    </div>
+
     <button
       type="submit"
       class="w-full rounded-full bg-deep-green px-6 py-3 text-cream font-semibold shadow-lg shadow-sage/20 hover:bg-deep-green/90 transition-colors"
