@@ -8,13 +8,18 @@
         Correo
       </span>
       <input
+        id="login-email"
         type="email"
         name="email"
         autocomplete="email"
         required
+        aria-required="true"
+        aria-invalid="false"
+        aria-describedby="login-email-error"
         placeholder="nombre@correo.com"
-        class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40"
+        class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40 aria-[invalid=true]:border-red-400 aria-[invalid=true]:focus:ring-red-300"
       />
+      <p id="login-email-error" class="text-xs text-red-600 mt-1" aria-live="polite"></p>
     </label>
 
     <label class="block space-y-2">
@@ -24,13 +29,18 @@
         Contraseña
       </span>
       <input
+        id="login-password"
         type="password"
         name="password"
         autocomplete="current-password"
         required
+        aria-required="true"
+        aria-invalid="false"
+        aria-describedby="login-password-error"
         placeholder="Tu contraseña"
-        class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40"
+        class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40 aria-[invalid=true]:border-red-400 aria-[invalid=true]:focus:ring-red-300"
       />
+      <p id="login-password-error" class="text-xs text-red-600 mt-1" aria-live="polite"></p>
     </label>
 
     <button

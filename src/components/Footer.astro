@@ -100,7 +100,7 @@
   <!-- Back to Top Button -->
   <button
     id="backToTop"
-    class="fixed bottom-8 right-8 bg-sage text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center transform translate-y-20 opacity-0 transition-all duration-300 hover:bg-white hover:text-sage hover:-translate-y-1 focus:outline-none z-50 pointer-events-none"
+    class="fixed bottom-8 right-8 bg-sage text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center transform translate-y-20 opacity-0 transition-all duration-300 hover:bg-white hover:text-sage hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 z-50 pointer-events-none"
     aria-label="Volver arriba"
   >
     <svg
@@ -109,6 +109,8 @@
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
+      aria-hidden="true"
+      focusable="false"
     >
       <path
         stroke-linecap="round"

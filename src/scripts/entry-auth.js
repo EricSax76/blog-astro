@@ -3,14 +3,26 @@ if (typeof window !== "undefined") {
   const loginForm = document.getElementById("login-form");
   const logoutButton = document.getElementById("logout-button");
   const messageContainer = document.getElementById("auth-message");
+  const announcer = document.getElementById("auth-announcer");
   const configWarning = document.getElementById("auth-config-warning");
   const guestPanel = document.getElementById("auth-guest");
   const userPanel = document.getElementById("auth-user");
   const userEmail = document.getElementById("auth-user-email");
 
   const setMessage = (message, type = "error") => {
-    if (!messageContainer) return;
+    // 1. Anunciador silencioso: siempre en el DOM, nunca display:none.
+    //    Los lectores de pantalla lo leen porque estaba registrado al cargar la página.
+    if (announcer) {
+      announcer.textContent = "";
+      // El pequeño timeout fuerza a los AT a percibir el cambio como una
+      // mutación nueva, incluso si el mensaje anterior era idéntico.
+      requestAnimationFrame(() => {
+        announcer.textContent = message;
+      });
+    }
 
+    // 2. Contenedor visual (solo para usuarios videntes)
+    if (!messageContainer) return;
     messageContainer.textContent = message;
     messageContainer.classList.remove(
       "hidden",
@@ -34,23 +46,62 @@ if (typeof window !== "undefined") {
   };
 
   const clearMessage = () => {
+    if (announcer) announcer.textContent = "";
     if (!messageContainer) return;
     messageContainer.textContent = "";
     messageContainer.classList.add("hidden");
   };
 
+  // Mapeo de códigos Firebase a mensajes en español comprensibles por humanos.
+  // Nunca exponer códigos técnicos como "auth/wrong-password" al usuario.
+  const FIREBASE_ERROR_MESSAGES = {
+    "auth/invalid-email":          "El formato del correo no es válido.",
+    "auth/user-not-found":         "No existe una cuenta con ese correo.",
+    "auth/wrong-password":         "La contraseña no es correcta.",
+    "auth/invalid-credential":     "El correo o la contraseña no son correctos.",
+    "auth/email-already-in-use":   "Ya existe una cuenta con ese correo.",
+    "auth/weak-password":          "La contraseña debe tener al menos 6 caracteres.",
+    "auth/too-many-requests":      "Demasiados intentos fallidos. Espera unos minutos e inténtalo de nuevo.",
+    "auth/network-request-failed": "Error de conexión. Comprueba tu red e inténtalo de nuevo.",
+    "auth/user-disabled":          "Esta cuenta ha sido deshabilitada.",
+    "auth/operation-not-allowed":  "Este método de acceso no está habilitado.",
+  };
+
   const formatError = (error) => {
     if (!error) return "Error desconocido.";
     const code = typeof error.code === "string" ? error.code : null;
-    const message =
-      typeof error.message === "string" ? error.message : String(error);
-    return code ? `${code}: ${message}` : message;
+    return FIREBASE_ERROR_MESSAGES[code] ?? "Ha ocurrido un error inesperado. Inténtalo de nuevo.";
   };
 
   const readValue = (form, fieldName) => {
     if (!(form instanceof HTMLFormElement)) return "";
     const value = new FormData(form).get(fieldName);
     return String(value ?? "").trim();
+  };
+
+  // Marca un campo como inválido, escribe el error bajo él y mueve el foco.
+  const setFieldError = (inputId, message) => {
+    const input = document.getElementById(inputId);
+    const errorEl = document.getElementById(`${inputId}-error`);
+    if (input) {
+      input.setAttribute("aria-invalid", "true");
+      input.focus();
+    }
+    if (errorEl) errorEl.textContent = message;
+  };
+
+  // Limpia todos los estados de error de los campos de ambos formularios.
+  const clearFieldErrors = () => {
+    const inputIds = [
+      "login-email", "login-password",
+      "register-name", "register-email", "register-password", "register-confirm-password",
+    ];
+    inputIds.forEach((id) => {
+      const input = document.getElementById(id);
+      const errorEl = document.getElementById(`${id}-error`);
+      if (input) input.setAttribute("aria-invalid", "false");
+      if (errorEl) errorEl.textContent = "";
+    });
   };
 
   const blockSubmitsWithMessage = (message) => {
@@ -141,24 +192,30 @@ if (typeof window !== "undefined") {
           registerForm.addEventListener("submit", async (event) => {
             event.preventDefault();
             clearMessage();
+            clearFieldErrors();
 
             const name = readValue(registerForm, "name");
             const email = readValue(registerForm, "email");
             const password = readValue(registerForm, "password");
             const confirmPassword = readValue(registerForm, "confirmPassword");
 
-            if (!email || !password) {
-              setMessage("Completa correo y contraseña para registrarte.");
+            if (!email) {
+              setFieldError("register-email", "El correo es obligatorio.");
+              return;
+            }
+
+            if (!password) {
+              setFieldError("register-password", "La contraseña es obligatoria.");
               return;
             }
 
             if (password.length < 6) {
-              setMessage("La contraseña debe tener al menos 6 caracteres.");
+              setFieldError("register-password", "La contraseña debe tener al menos 6 caracteres.");
               return;
             }
 
             if (password !== confirmPassword) {
-              setMessage("La confirmación de contraseña no coincide.");
+              setFieldError("register-confirm-password", "Las contraseñas no coinciden.");
               return;
             }
 
@@ -183,13 +240,22 @@ if (typeof window !== "undefined") {
               }
 
               registerForm.reset();
+              clearFieldErrors();
               setMessage("Cuenta creada correctamente. Redirigiendo al editor...", "success");
+              // 1500ms: tiempo suficiente para que los lectores de pantalla lean el mensaje
               window.setTimeout(() => {
                 window.location.assign("/publicar");
-              }, 300);
+              }, 1500);
             } catch (error) {
               console.error("[firebase/register] failed", error);
-              setMessage(`No se pudo completar el registro. ${formatError(error)}`);
+              const code = typeof error?.code === "string" ? error.code : "";
+              if (code === "auth/email-already-in-use" || code === "auth/invalid-email") {
+                setFieldError("register-email", formatError(error));
+              } else if (code === "auth/weak-password") {
+                setFieldError("register-password", formatError(error));
+              } else {
+                setMessage(formatError(error));
+              }
             }
           });
         }
@@ -198,12 +264,18 @@ if (typeof window !== "undefined") {
           loginForm.addEventListener("submit", async (event) => {
             event.preventDefault();
             clearMessage();
+            clearFieldErrors();
 
             const email = readValue(loginForm, "email");
             const password = readValue(loginForm, "password");
 
-            if (!email || !password) {
-              setMessage("Completa correo y contraseña para iniciar sesión.");
+            if (!email) {
+              setFieldError("login-email", "El correo es obligatorio.");
+              return;
+            }
+
+            if (!password) {
+              setFieldError("login-password", "La contraseña es obligatoria.");
               return;
             }
 
@@ -225,13 +297,22 @@ if (typeof window !== "undefined") {
               }
 
               loginForm.reset();
+              clearFieldErrors();
               setMessage("Sesión iniciada. Redirigiendo al editor...", "success");
+              // 1500ms: tiempo suficiente para que los lectores de pantalla lean el mensaje
               window.setTimeout(() => {
                 window.location.assign("/publicar");
-              }, 300);
+              }, 1500);
             } catch (error) {
               console.error("[firebase/login] failed", error);
-              setMessage(`No fue posible iniciar sesión. ${formatError(error)}`);
+              const code = typeof error?.code === "string" ? error.code : "";
+              if (code === "auth/user-not-found" || code === "auth/invalid-email") {
+                setFieldError("login-email", formatError(error));
+              } else if (code === "auth/wrong-password" || code === "auth/invalid-credential") {
+                setFieldError("login-password", formatError(error));
+              } else {
+                setMessage(formatError(error));
+              }
             }
           });
         }

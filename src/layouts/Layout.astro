@@ -66,6 +66,15 @@ const ogImage = new URL(image, Astro.site ?? Astro.url.origin).href;
   <body
     class="bg-cream text-deep-green font-sans min-h-screen flex flex-col antialiased selection:bg-sage selection:text-white"
   >
+    <!-- Anunciador global de cambios de sesión para lectores de pantalla -->
+    <div
+      id="auth-status-announcer"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      class="sr-only"
+    ></div>
+
     <Header />
     <main class="flex-1 w-full max-w-7xl mx-auto px-6 py-12 md:px-8 lg:px-12">
       <slot />

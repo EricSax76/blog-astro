@@ -49,15 +49,21 @@
       <!-- Dropdown for Content -->
       <div class="relative group">
         <button
-          class="flex items-center gap-1 text-deep-green hover:text-sage font-medium text-sm lg:text-base transition-colors duration-200 focus:outline-none"
+          id="contenido-btn"
+          class="flex items-center gap-1 text-deep-green hover:text-sage font-medium text-sm lg:text-base transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 rounded"
+          aria-haspopup="menu"
+          aria-expanded="false"
+          aria-controls="contenido-dropdown"
         >
           Contenido
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4 opacity-70 group-hover:rotate-180 transition-transform duration-200"
+            class="h-4 w-4 opacity-70 group-hover:rotate-180 aria-expanded:rotate-180 transition-transform duration-200"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
+            aria-hidden="true"
+            focusable="false"
           >
             <path
               stroke-linecap="round"
@@ -67,7 +73,10 @@
           </svg>
         </button>
         <div
-          class="absolute right-0 top-full pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0"
+          id="contenido-dropdown"
+          role="menu"
+          aria-labelledby="contenido-btn"
+          class="absolute right-0 top-full pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 group-focus-within:translate-y-0"
         >
           <div
             class="bg-white rounded-xl shadow-xl border border-sage/20 p-2 min-w-[160px] flex flex-col gap-1"
@@ -76,7 +85,9 @@
               [2026, 2017, 2016, 2015, 2014, 2013, 2012, 2011].map((year) => (
                 <a
                   href={`/archivo/${year}`}
-                  class="block px-4 py-2 text-sm text-deep-green hover:bg-cream rounded-lg transition-colors"
+                  role="menuitem"
+                  tabindex="-1"
+                  class="block px-4 py-2 text-sm text-deep-green hover:bg-cream rounded-lg transition-colors focus:outline-none focus-visible:bg-cream focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sage"
                 >
                   Archivo {year}
                 </a>
@@ -116,8 +127,10 @@
     <!-- Mobile Menu Button -->
     <button
       id="mobile-menu-btn"
-      class="md:hidden relative z-50 p-2 text-deep-green focus:outline-none"
-      aria-label="Menu"
+      class="md:hidden relative z-50 p-2 text-deep-green focus:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2 rounded-lg"
+      aria-label="Abrir menú de navegación"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -125,6 +138,8 @@
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
+        aria-hidden="true"
+        focusable="false"
       >
         <path
           stroke-linecap="round"
@@ -138,6 +153,9 @@
   <!-- Mobile Overlay Menu -->
   <div
     id="mobile-menu"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Menú de navegación"
     class="fixed inset-0 bg-cream z-40 flex flex-col justify-center items-center opacity-0 pointer-events-none transition-all duration-300"
   >
     <nav class="flex flex-col items-center gap-6 text-xl">
@@ -226,6 +244,19 @@
       }
     );
     mobileAuthHr?.classList.toggle("hidden", hideGuestActions);
+
+    // Anunciar el cambio de sesión a lectores de pantalla
+    const announcer = document.getElementById("auth-status-announcer");
+    if (announcer) {
+      announcer.textContent = "";
+      requestAnimationFrame(() => {
+        announcer.textContent = isAuthenticated
+          ? "Sesión iniciada."
+          : "Sesión cerrada.";
+        // Limpiar tras la lectura para que el mismo mensaje pueda repetirse
+        setTimeout(() => { announcer.textContent = ""; }, 4000);
+      });
+    }
   };
 
   const resolveInitialAuthState = () => {
@@ -257,41 +288,117 @@
     applyAuthUiState(readStoredAuthState());
   });
 
-  if (menuBtn && mobileMenu) {
-    menuBtn.addEventListener("click", () => {
-      isMenuOpen = !isMenuOpen;
+  const SVG_CLOSE = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>`;
+  const SVG_HAMBURGER = `<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>`;
 
-      if (isMenuOpen) {
-        mobileMenu.classList.remove("opacity-0", "pointer-events-none");
-        document.body.style.overflow = "hidden"; // Prevent scrolling
-        menuBtn.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        `;
-      } else {
-        mobileMenu.classList.add("opacity-0", "pointer-events-none");
-        document.body.style.overflow = "";
-        menuBtn.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        `;
+  if (menuBtn && mobileMenu) {
+    const openMenu = () => {
+      isMenuOpen = true;
+      mobileMenu.classList.remove("opacity-0", "pointer-events-none");
+      document.body.style.overflow = "hidden";
+      menuBtn.setAttribute("aria-expanded", "true");
+      menuBtn.setAttribute("aria-label", "Cerrar menú de navegación");
+      menuBtn.innerHTML = SVG_CLOSE;
+      // Mover el foco al primer enlace del menú
+      const firstLink = mobileMenu.querySelector<HTMLElement>("a, button");
+      firstLink?.focus();
+    };
+
+    const closeMenu = () => {
+      isMenuOpen = false;
+      mobileMenu.classList.add("opacity-0", "pointer-events-none");
+      document.body.style.overflow = "";
+      menuBtn.setAttribute("aria-expanded", "false");
+      menuBtn.setAttribute("aria-label", "Abrir menú de navegación");
+      menuBtn.innerHTML = SVG_HAMBURGER;
+      // Restaurar foco al botón que abrió el menú
+      menuBtn.focus();
+    };
+
+    menuBtn.addEventListener("click", () => {
+      isMenuOpen ? closeMenu() : openMenu();
+    });
+
+    // Cerrar con Escape
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && isMenuOpen) closeMenu();
+    });
+
+    // Cerrar al hacer clic en un enlace
+    mobileMenu.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", closeMenu);
+    });
+  }
+
+  // --- Dropdown "Contenido" con navegación de teclado ---
+  const contenidoBtn = document.getElementById("contenido-btn") as HTMLButtonElement | null;
+  const contenidoDropdown = document.getElementById("contenido-dropdown") as HTMLElement | null;
+
+  if (contenidoBtn && contenidoDropdown) {
+    const getMenuItems = () =>
+      Array.from(contenidoDropdown.querySelectorAll<HTMLElement>('[role="menuitem"]'));
+
+    const openDropdown = () => {
+      contenidoBtn.setAttribute("aria-expanded", "true");
+      // Dar foco al primer item tras el repintado (el CSS lo hace visible)
+      requestAnimationFrame(() => getMenuItems()[0]?.focus());
+    };
+
+    const closeDropdown = (returnFocus = true) => {
+      contenidoBtn.setAttribute("aria-expanded", "false");
+      if (returnFocus) contenidoBtn.focus();
+    };
+
+    // Click en el botón abre/cierra con teclado
+    contenidoBtn.addEventListener("click", () => {
+      contenidoBtn.getAttribute("aria-expanded") === "true"
+        ? closeDropdown()
+        : openDropdown();
+    });
+
+    // Navegación con flechas, Escape y Tab dentro del dropdown
+    contenidoDropdown.addEventListener("keydown", (e) => {
+      const items = getMenuItems();
+      const idx = items.indexOf(document.activeElement as HTMLElement);
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        items[(idx + 1) % items.length]?.focus();
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        items[(idx - 1 + items.length) % items.length]?.focus();
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        items[0]?.focus();
+      } else if (e.key === "End") {
+        e.preventDefault();
+        items[items.length - 1]?.focus();
+      } else if (e.key === "Escape") {
+        closeDropdown();
+      } else if (e.key === "Tab") {
+        // Tab sale del menú de forma natural; solo actualizamos aria-expanded
+        closeDropdown(false);
       }
     });
 
-    // Close menu when clicking a link
-    mobileMenu.querySelectorAll("a").forEach((link) => {
-      link.addEventListener("click", () => {
-        isMenuOpen = false;
-        mobileMenu.classList.add("opacity-0", "pointer-events-none");
-        document.body.style.overflow = "";
-        menuBtn.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        `;
-      });
+    // Actualizar aria-expanded cuando el foco sale del dropdown y el botón
+    contenidoDropdown.addEventListener("focusout", (e) => {
+      const relatedTarget = e.relatedTarget as Node | null;
+      if (
+        !contenidoDropdown.contains(relatedTarget) &&
+        relatedTarget !== contenidoBtn
+      ) {
+        contenidoBtn.setAttribute("aria-expanded", "false");
+      }
     });
+
+    // Sincronizar aria-expanded con el hover del ratón
+    const dropdownWrapper = contenidoBtn.closest(".group");
+    dropdownWrapper?.addEventListener("mouseenter", () =>
+      contenidoBtn.setAttribute("aria-expanded", "true")
+    );
+    dropdownWrapper?.addEventListener("mouseleave", () =>
+      contenidoBtn.setAttribute("aria-expanded", "false")
+    );
   }
 </script>

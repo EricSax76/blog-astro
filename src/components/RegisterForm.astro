@@ -8,12 +8,16 @@
         Nombre
       </span>
       <input
+        id="register-name"
         type="text"
         name="name"
         autocomplete="name"
+        aria-invalid="false"
+        aria-describedby="register-name-error"
         placeholder="Tu nombre"
-        class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40"
+        class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40 aria-[invalid=true]:border-red-400 aria-[invalid=true]:focus:ring-red-300"
       />
+      <p id="register-name-error" class="text-xs text-red-600 mt-1" aria-live="polite"></p>
     </label>
 
     <label class="block space-y-2">
@@ -23,13 +27,18 @@
         Correo
       </span>
       <input
+        id="register-email"
         type="email"
         name="email"
         autocomplete="email"
         required
+        aria-required="true"
+        aria-invalid="false"
+        aria-describedby="register-email-error"
         placeholder="nombre@correo.com"
-        class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40"
+        class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40 aria-[invalid=true]:border-red-400 aria-[invalid=true]:focus:ring-red-300"
       />
+      <p id="register-email-error" class="text-xs text-red-600 mt-1" aria-live="polite"></p>
     </label>
 
     <label class="block space-y-2">
@@ -39,14 +48,19 @@
         Contraseña
       </span>
       <input
+        id="register-password"
         type="password"
         name="password"
         autocomplete="new-password"
         minlength="6"
         required
+        aria-required="true"
+        aria-invalid="false"
+        aria-describedby="register-password-error"
         placeholder="Mínimo 6 caracteres"
-        class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40"
+        class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40 aria-[invalid=true]:border-red-400 aria-[invalid=true]:focus:ring-red-300"
       />
+      <p id="register-password-error" class="text-xs text-red-600 mt-1" aria-live="polite"></p>
     </label>
 
     <label class="block space-y-2">
@@ -56,14 +70,19 @@
         Confirmar contraseña
       </span>
       <input
+        id="register-confirm-password"
         type="password"
         name="confirmPassword"
         autocomplete="new-password"
         minlength="6"
         required
+        aria-required="true"
+        aria-invalid="false"
+        aria-describedby="register-confirm-password-error"
         placeholder="Repite la contraseña"
-        class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40"
+        class="w-full rounded-2xl border border-sage/30 bg-cream/60 px-4 py-3 text-deep-green placeholder:text-deep-green/40 focus:outline-none focus:ring-2 focus:ring-sage/40 aria-[invalid=true]:border-red-400 aria-[invalid=true]:focus:ring-red-300"
       />
+      <p id="register-confirm-password-error" class="text-xs text-red-600 mt-1" aria-live="polite"></p>
     </label>
 
     <!-- Consentimiento RGPD -->
@@ -81,14 +100,16 @@
           <a
             href="/privacidad"
             target="_blank"
+            rel="noopener noreferrer"
             class="text-sage hover:underline font-medium"
-          >Política de Privacidad</a>
+          >Política de Privacidad<span class="sr-only"> (se abre en nueva pestaña)</span></a>
           y el
           <a
             href="/aviso-legal"
             target="_blank"
+            rel="noopener noreferrer"
             class="text-sage hover:underline font-medium"
-          >Aviso Legal</a>.
+          >Aviso Legal<span class="sr-only"> (se abre en nueva pestaña)</span></a>.
           El tratamiento de mis datos se realizará conforme al RGPD y la LOPDGDD.
           <span class="text-deep-green font-semibold"> *</span>
         </span>

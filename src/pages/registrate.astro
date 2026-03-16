@@ -30,11 +30,19 @@ import RegisterForm from "../components/RegisterForm.astro";
         acceso.
       </p>
 
+      <!-- Anunciador silencioso: siempre en el DOM para que los AT lo registren al cargar -->
+      <div
+        id="auth-announcer"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        class="sr-only"
+      ></div>
+
       <p
         id="auth-message"
         class="hidden rounded-2xl border px-4 py-3 text-sm"
-        role="status"
-        aria-live="polite"
+        aria-hidden="true"
       >
       </p>
 
