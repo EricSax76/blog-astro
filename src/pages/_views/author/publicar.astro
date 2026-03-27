@@ -1,0 +1,182 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+---
+
+<Layout title="Publicar | El Alma de las Flores">
+  <div class="relative isolate overflow-hidden">
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-[radial-gradient(circle_at_top_left,_rgba(165,196,171,0.24),_transparent_55%),radial-gradient(circle_at_top_right,_rgba(244,237,227,0.9),_transparent_45%)]"
+    ></div>
+
+    <section class="mx-auto max-w-5xl px-4 py-8 text-center sm:px-6 sm:py-10 lg:px-8">
+      <p
+        class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.32em] text-deep-green/60 shadow-sm backdrop-blur"
+      >
+        Panel de autor
+      </p>
+      <h1
+        class="mt-5 font-serif text-4xl font-bold tracking-tight text-deep-green sm:text-5xl lg:text-6xl"
+      >
+        Publicar en el blog
+      </h1>
+      <p class="mt-4 text-base leading-7 text-deep-green/72 sm:text-lg">
+       Porque tu palabra importa
+      
+      </p>
+    </section>
+
+    <section class="mx-auto max-w-4xl px-4 pb-12 sm:px-6 lg:px-8">
+      <div
+        class="rounded-[2rem] border border-sage/20 bg-white/90 p-5 shadow-2xl shadow-sage/8 backdrop-blur sm:p-7 lg:p-8"
+      >
+        <div
+          class="flex flex-col gap-4 border-b border-sage/15 pb-6 sm:flex-row sm:items-end sm:justify-between"
+        >
+          <div>
+            
+            <h2 class="mt-2 font-serif text-2xl font-semibold text-deep-green sm:text-3xl">
+              Nueva entrada 
+            </h2>
+            <p class="mt-2 max-w-2xl text-sm leading-6 text-deep-green/68 sm:text-base">
+              Completa título, contenido e imagen destacada
+            </p>
+          </div>
+
+          
+        </div>
+
+        <form
+          id="blog-form"
+          class="mt-6 space-y-6 opacity-60 transition-opacity"
+          aria-describedby="blog-help"
+        >
+          <div class="grid gap-6">
+            <label class="block space-y-2">
+              <div class="flex items-center justify-between gap-4">
+                <span
+                  class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+                >
+                  Título
+                </span>
+               
+              </div>
+              <input
+                id="blog-title"
+                data-publish-control
+                type="text"
+                name="title"
+                disabled
+                placeholder="Ej: Flores que inspiran calma"
+                class="min-h-[48px] w-full rounded-2xl border border-sage/30 bg-cream/65 px-4 py-3 text-base text-deep-green shadow-sm placeholder:text-deep-green/35 focus:border-sage/45 focus:outline-none focus:ring-2 focus:ring-sage/30 disabled:cursor-not-allowed disabled:opacity-50"
+              />
+             
+            </label>
+
+            <label class="block space-y-2">
+              <div class="flex items-center justify-between gap-4">
+                <span
+                  class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+                >
+                  Contenido
+                </span>
+               
+              </div>
+              <textarea
+                id="blog-content"
+                data-publish-control
+                name="content"
+                rows="10"
+                disabled
+                placeholder="Comparte la historia, reflexión o enseñanza del día..."
+                class="min-h-[220px] w-full resize-y rounded-2xl border border-sage/30 bg-cream/65 px-4 py-3 text-base leading-7 text-deep-green shadow-sm placeholder:text-deep-green/35 focus:border-sage/45 focus:outline-none focus:ring-2 focus:ring-sage/30 disabled:cursor-not-allowed disabled:opacity-50"
+              ></textarea>
+              
+            </label>
+
+            <label class="block space-y-2">
+              <div class="flex items-center justify-between gap-4">
+                <span
+                  class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+                >
+                  Foto destacada
+                </span>
+                <span class="text-xs text-deep-green/45">Formato recomendado: horizontal</span>
+              </div>
+              <input
+                id="blog-image-input"
+                data-publish-control
+                type="file"
+                name="image"
+                accept="image/*"
+                disabled
+                class="block w-full cursor-pointer rounded-2xl border border-dashed border-sage/35 bg-cream/55 px-4 py-3 text-sm text-deep-green file:mr-4 file:rounded-full file:border-0 file:bg-sage/20 file:px-4 file:py-2 file:font-semibold file:text-deep-green hover:file:bg-sage/30 disabled:cursor-not-allowed disabled:opacity-50"
+              />
+              
+            </label>
+          </div>
+
+          <div class="overflow-hidden rounded-[1.8rem] border border-sage/20 bg-cream/50 p-4 shadow-sm">
+            <div class="flex items-center justify-between gap-4">
+              <p
+                class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+              >
+                Vista previa
+              </p>
+             
+            </div>
+            <div class="mt-4 rounded-[1.5rem] border border-dashed border-sage/25 bg-white/70 p-3">
+              <img
+                id="blog-image-preview"
+                class="hidden aspect-[16/9] w-full rounded-[1.15rem] object-cover"
+                alt="Vista previa de la imagen seleccionada"
+              />
+              <p
+                id="blog-image-placeholder"
+                class="flex min-h-40 items-center justify-center rounded-[1.15rem] px-4 py-10 text-center text-sm leading-6 text-deep-green/60 sm:min-h-48"
+              >
+                Selecciona una imagen para verla aquí.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-3 pt-1 sm:flex-row sm:flex-wrap sm:items-center">
+            <button
+              type="button"
+              id="blog-publish-button"
+              data-publish-control
+              disabled
+              class="inline-flex w-full items-center justify-center rounded-full bg-deep-green px-6 py-3 text-cream font-semibold shadow-lg shadow-sage/20 transition-transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-sage/40 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+            >
+              Publicar
+            </button>
+            <button
+              type="button"
+              id="blog-go-2026"
+              class="inline-flex w-full items-center justify-center rounded-full border border-sage/40 px-6 py-3 font-semibold text-deep-green transition-colors hover:bg-sage/10 focus:outline-none focus:ring-2 focus:ring-sage/35 sm:w-auto"
+            >
+              Ir al 2026
+            </button>
+            <a
+              href="/mis-publicaciones"
+              class="inline-flex w-full items-center justify-center rounded-full border border-sage/40 px-6 py-3 font-semibold text-deep-green transition-colors hover:bg-sage/10 focus:outline-none focus:ring-2 focus:ring-sage/35 sm:w-auto"
+            >
+              Mis publicaciones
+            </a>
+          </div>
+
+          <p
+            id="blog-help"
+            class="rounded-2xl border border-sage/20 bg-sage/5 px-4 py-3 text-sm leading-6 text-deep-green/70"
+          >
+            Deseosos de leerte pronto. Si tienes dudas, revisa el flujo recomendado o contáctanos.
+            
+          </p>
+        </form>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<script src="../../../scripts/auth/guards/publish.js"></script>
+<script src="../../../scripts/posts/publish/editor.ts"></script>

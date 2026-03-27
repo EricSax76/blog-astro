@@ -1,0 +1,118 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+---
+
+<Layout title="Mis publicaciones | El Alma de las Flores" noindex={true}>
+  <div class="relative isolate overflow-hidden">
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-[radial-gradient(circle_at_top_left,_rgba(165,196,171,0.24),_transparent_55%),radial-gradient(circle_at_top_right,_rgba(244,237,227,0.9),_transparent_45%)]"
+    ></div>
+
+    <section class="mx-auto max-w-5xl px-4 py-8 text-center sm:px-6 sm:py-10 lg:px-8">
+      <p
+        class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.32em] text-deep-green/60 shadow-sm backdrop-blur"
+      >
+        Sesión autenticada
+      </p>
+      <h1
+        class="mt-5 font-serif text-4xl font-bold tracking-tight text-deep-green sm:text-5xl lg:text-6xl"
+      >
+        Mis publicaciones
+      </h1>
+      <p class="mt-4 text-base leading-7 text-deep-green/72 sm:text-lg">
+        Accede directamente a tus entradas sin salir del panel de autor.
+      </p>
+    </section>
+
+    <section class="mx-auto max-w-5xl px-4 pb-12 sm:px-6 lg:px-8">
+      <article
+        class="rounded-[2rem] border border-sage/20 bg-white/90 p-5 shadow-2xl shadow-sage/8 backdrop-blur sm:p-7 lg:p-8"
+      >
+        <div
+          class="flex flex-col gap-3 border-b border-sage/15 pb-6 sm:flex-row sm:items-end sm:justify-between"
+        >
+          <div>
+            <h2 class="font-serif text-2xl font-semibold text-deep-green sm:text-3xl">
+              Panel de entradas propias
+            </h2>
+            <p class="mt-2 max-w-2xl text-sm leading-6 text-deep-green/68 sm:text-base">
+              Solo se muestran las publicaciones creadas con tu cuenta.
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <a
+              href="/publicar"
+              class="inline-flex items-center justify-center rounded-full border border-sage/35 px-4 py-2 text-sm font-semibold text-deep-green transition-colors hover:bg-sage/10"
+            >
+              Nueva publicación
+            </a>
+            <a
+              href="/archivo/2026"
+              class="inline-flex items-center justify-center rounded-full border border-sage/35 px-4 py-2 text-sm font-semibold text-deep-green transition-colors hover:bg-sage/10"
+            >
+              Ver anuario
+            </a>
+          </div>
+        </div>
+
+        <p
+          id="my-posts-config-warning"
+          class="mt-6 hidden rounded-2xl border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm text-amber-800"
+        >
+          Falta configurar Firebase en variables <code>PUBLIC_FIREBASE_*</code>.
+        </p>
+
+        <article
+          id="my-posts-auth-required"
+          class="mt-6 hidden rounded-3xl border border-sage/20 bg-cream/45 p-6 text-center"
+        >
+          <h3 class="font-serif text-2xl font-semibold text-deep-green">Inicia sesión para continuar</h3>
+          <p class="mt-3 text-sm leading-6 text-deep-green/70">
+            Esta sección está disponible solo para autores autenticados.
+          </p>
+          <a
+            href="/acceder"
+            class="mt-5 inline-flex items-center justify-center rounded-full bg-deep-green px-5 py-2.5 text-sm font-semibold text-cream shadow-lg shadow-sage/20 transition-transform hover:-translate-y-0.5"
+          >
+            Ir a acceso
+          </a>
+        </article>
+
+        <article
+          id="my-posts-loading"
+          class="mt-6 rounded-3xl border border-sage/20 bg-cream/45 p-6 text-center"
+        >
+          <h3 class="font-serif text-2xl font-semibold text-deep-green">Cargando tus publicaciones</h3>
+          <p class="mt-3 text-sm leading-6 text-deep-green/70">
+            Consultando tu historial en Firestore...
+          </p>
+        </article>
+
+        <article
+          id="my-posts-error"
+          class="mt-6 hidden rounded-3xl border border-red-200 bg-red-50/80 p-6 text-center"
+        >
+          <h3 class="font-serif text-2xl font-semibold text-red-700">No se pudieron cargar tus publicaciones</h3>
+          <p id="my-posts-error-text" class="mt-3 text-sm leading-6 text-red-700/90">
+            Vuelve a intentarlo en unos minutos.
+          </p>
+        </article>
+
+        <article
+          id="my-posts-empty"
+          class="mt-6 hidden rounded-3xl border border-sage/20 bg-cream/45 p-6 text-center"
+        >
+          <h3 class="font-serif text-2xl font-semibold text-deep-green">Todavía no has publicado</h3>
+          <p class="mt-3 text-sm leading-6 text-deep-green/70">
+            Crea tu primera entrada y aparecerá aquí automáticamente.
+          </p>
+        </article>
+
+        <div id="my-posts-grid" class="mt-6 grid gap-8"></div>
+      </article>
+    </section>
+  </div>
+</Layout>
+
+<script src="../../../scripts/posts/my-posts/index.ts"></script>

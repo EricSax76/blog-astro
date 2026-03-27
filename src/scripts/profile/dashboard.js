@@ -1,6 +1,6 @@
-import { observeAuth } from '../lib/firebase/auth';
-import { getMyAccountContext } from '../lib/firebase/profiles';
-import { redirectToLogin } from '../lib/auth/navigation';
+import { observeAuth } from '../../lib/firebase/auth';
+import { getMyAccountContext } from '../../lib/firebase/profiles';
+import { redirectToLogin } from '../../lib/auth/navigation';
 
 // Toggle sidebar on mobile
 const sidebarToggle = document.getElementById('sidebar-toggle');

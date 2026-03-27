@@ -1,4 +1,4 @@
-import "./social-interactions.js";
+import "../social/interactions.js";
 
 declare global {
   interface Window {

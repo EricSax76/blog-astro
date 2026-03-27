@@ -1,6 +1,6 @@
 if (typeof window !== 'undefined') {
-	import('../lib/firebase/auth').then(({ loginAndResolveContext }) => {
-		import('../lib/auth/navigation').then(({ redirectToDashboard }) => {
+	import('../../lib/firebase/auth').then(({ loginAndResolveContext }) => {
+		import('../../lib/auth/navigation').then(({ redirectToDashboard }) => {
 			const loginForm = document.getElementById('login-form');
 			const messageContainer = document.getElementById('msg');
 

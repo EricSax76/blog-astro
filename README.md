@@ -70,6 +70,7 @@ firebase deploy --only storage
 - Índices en `firestore.indexes.json`.
 - El editor `/publicar` guarda posts en la colección `posts`.
 - La página `/archivo/2026` lee posts desde Firestore (query por `year` y `createdAt`).
+- La página `/mis-publicaciones` (sesión autenticada) lee solo posts del autor actual (`authorUid` y `createdAt`).
 
 Deploy de Firestore:
 

@@ -1,6 +1,6 @@
-import { observeAuth, logout } from '../lib/firebase/auth';
-import { getMyAccountContext, getMyUserProfile } from '../lib/firebase/profiles';
-import { redirectToLogin } from '../lib/auth/navigation';
+import { observeAuth, logout } from '../../lib/firebase/auth';
+import { getMyAccountContext, getMyUserProfile } from '../../lib/firebase/profiles';
+import { redirectToLogin } from '../../lib/auth/navigation';
 
 if (typeof window !== 'undefined') {
 const profileContainer = document.getElementById('profile');

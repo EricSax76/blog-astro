@@ -1,4 +1,4 @@
-import { registerUser } from '../lib/firebase/auth';
+import { registerUser } from '../../lib/firebase/auth';
 
 if (typeof window !== 'undefined') {
 const registerForm = document.getElementById('register-form');

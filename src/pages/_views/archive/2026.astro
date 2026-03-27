@@ -1,0 +1,50 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import YearbookNav from "../../../components/archive/YearbookNav.astro";
+---
+
+<Layout title="Anuario 2026 | El Alma de las Flores">
+  <main class="max-w-4xl mx-auto px-6 py-12 md:py-20">
+    <div class="text-center mb-16 space-y-4">
+      <h1 class="font-serif text-5xl md:text-6xl font-bold text-deep-green">
+        Anuario 2026
+      </h1>
+      <p class="text-xl text-deep-green/60 italic font-serif">
+        Un espacio para las nuevas entradas del año.
+      </p>
+    </div>
+
+    <YearbookNav activeYear={2026} />
+
+    <div id="posts-grid" class="grid gap-12">
+      <article
+        id="posts-loading"
+        class="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl shadow-sage/5 border border-sage/10"
+      >
+        <header class="mb-6 text-center">
+          <h2 class="font-serif text-3xl md:text-4xl font-bold text-deep-green">
+            Cargando entradas
+          </h2>
+          <p class="text-sm text-deep-green/60 italic font-serif">
+            Consultando publicaciones en Firebase...
+          </p>
+        </header>
+      </article>
+      <article
+        id="posts-error"
+        class="hidden bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl shadow-sage/5 border border-red-200"
+      >
+        <header class="mb-4 text-center">
+          <h2 class="font-serif text-3xl font-bold text-red-700">
+            No se pudieron cargar los posts
+          </h2>
+        </header>
+        <p class="text-red-700 text-sm text-center">
+          Revisa configuración, reglas de Firestore e índice requerido.
+        </p>
+      </article>
+    </div>
+  </main>
+</Layout>
+
+<script src="../../../scripts/posts/archive/yearbook-2026.ts"></script>

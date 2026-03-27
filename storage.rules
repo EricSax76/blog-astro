@@ -16,6 +16,12 @@ service firebase.storage {
         && request.resource.contentType.matches('image/.*');
     }
 
+    function isValidAvatarUpload() {
+      return request.resource != null
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
     // Imagenes publicadas del blog:
     // path esperado: blog/posts/{uid}/{archivo}
     // lectura publica, escritura solo por el propietario autenticado.
@@ -25,10 +31,19 @@ service firebase.storage {
       allow delete: if isOwner(uid);
     }
 
-    // Archivos privados por usuario:
-    // path esperado: users/{uid}/{archivo}
+    // Avatar de perfil por usuario:
+    // path esperado: users/{uid}/avatar/{archivo}
+    match /users/{uid}/avatar/{allPaths=**} {
+      allow read: if isOwner(uid);
+      allow create, update: if isOwner(uid) && isValidAvatarUpload();
+      allow delete: if isOwner(uid);
+    }
+
+    // Resto de archivos privados por usuario:
+    // por defecto solo lectura del propietario, escritura denegada.
     match /users/{uid}/{allPaths=**} {
-      allow read, write: if isOwner(uid);
+      allow read: if isOwner(uid);
+      allow write: if false;
     }
 
     match /{allPaths=**} {

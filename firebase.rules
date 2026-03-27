@@ -6,6 +6,33 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function isOwnUser(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidDisplayName() {
+      return !request.resource.data.keys().hasAny(["displayName"])
+        || (request.resource.data.displayName is string
+          && request.resource.data.displayName.size() <= 50);
+    }
+
+    function isValidPhotoURL() {
+      return !request.resource.data.keys().hasAny(["photoURL"])
+        || (request.resource.data.photoURL is string
+          && request.resource.data.photoURL.size() <= 2048);
+    }
+
+    function isAllowedUserProfilePatch() {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          "displayName",
+          "photoURL",
+          "updatedAt",
+          "lastSeenAt"
+        ])
+        && isValidDisplayName()
+        && isValidPhotoURL();
+    }
+
     function isPostOwner() {
       return isSignedIn() && resource.data.authorUid == request.auth.uid;
     }
@@ -23,9 +50,14 @@ service cloud.firestore {
       allow delete: if isPostOwner();
     }
 
-    // Documento privado por usuario.
+    // Perfil privado por usuario:
+    // - lectura: solo el propio usuario
+    // - actualización: solo campos de perfil editables por cliente
+    // - creación/borrado: solo backend (Cloud Functions admin)
     match /users/{userId} {
-      allow read, write: if isSignedIn() && request.auth.uid == userId;
+      allow read: if isOwnUser(userId);
+      allow update: if isOwnUser(userId) && isAllowedUserProfilePatch();
+      allow create, delete: if false;
     }
 
     // Social Interactions: Likes

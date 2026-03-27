@@ -27,10 +27,17 @@ if (typeof window !== "undefined") {
     }
   };
 
-  const setAuthState = (isAuthenticated, email = "") => {
+  const setAuthState = (
+    isAuthenticated,
+    email = "",
+    photoURL = "",
+    displayName = ""
+  ) => {
     window.__BLOG_AUTH_STATE__ = {
       isAuthenticated,
       email: email || null,
+      photoURL: photoURL || null,
+      displayName: displayName || null,
     };
     try {
       localStorage.setItem("blog-auth-state", JSON.stringify(window.__BLOG_AUTH_STATE__));
@@ -105,7 +112,12 @@ if (typeof window !== "undefined") {
 
           callUpsertUserProfile(user)
             .then(() => {
-              setAuthState(true, resolvedEmail);
+              setAuthState(
+                true,
+                resolvedEmail,
+                user.photoURL || "",
+                user.displayName || ""
+              );
             })
             .catch((error) => {
               console.error("[publish/profile-sync] failed", error);
