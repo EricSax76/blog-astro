@@ -1,0 +1,47 @@
+---
+import type { HomeContentSection } from "../../data/home-page";
+
+interface Props {
+  sections: HomeContentSection[];
+}
+
+const { sections } = Astro.props;
+---
+
+<section class="mt-20">
+  <div class="text-center max-w-3xl mx-auto space-y-4">
+    <p class="text-xs uppercase tracking-[0.3em] text-deep-green/60 font-semibold">
+      Mapa del contenido
+    </p>
+    <h2 class="font-serif text-4xl md:text-5xl font-bold text-deep-green">
+      Todo el blog, organizado por rutas claras
+    </h2>
+    <p class="text-deep-green/70 text-lg">
+      Esta landing resume las páginas clave para leer, estudiar y publicar sin
+      perder contexto.
+    </p>
+  </div>
+
+  <div class="mt-10 grid md:grid-cols-2 xl:grid-cols-4 gap-6">
+    {
+      sections.map((section) => (
+        <article class="bg-white/85 border border-sage/20 rounded-3xl p-6 shadow-sm shadow-sage/5 flex flex-col gap-4">
+          <p class="text-xs uppercase tracking-[0.2em] text-sage font-semibold">
+            {section.subtitle}
+          </p>
+          <h3 class="font-serif text-2xl font-bold text-deep-green">{section.title}</h3>
+          <p class="text-sm text-deep-green/75 leading-relaxed flex-1">
+            {section.description}
+          </p>
+          <a
+            href={section.href}
+            class="inline-flex items-center text-sm font-semibold text-sage hover:text-deep-green transition-colors"
+          >
+            {section.cta}
+            <span class="ml-1" aria-hidden="true">→</span>
+          </a>
+        </article>
+      ))
+    }
+  </div>
+</section>

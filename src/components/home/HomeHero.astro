@@ -1,0 +1,49 @@
+---
+interface Props {
+  newestArchiveYear: number;
+}
+
+const { newestArchiveYear } = Astro.props;
+---
+
+<section
+  class="relative overflow-hidden rounded-[2.8rem] bg-transparent border-0 shadow-none px-7 py-12 md:px-12 md:py-16"
+>
+  <div
+    class="absolute inset-0 bg-cover bg-center opacity-60"
+    style="background-image: url('/images/bach-flowers/agrimony.jpeg');"
+    aria-hidden="true"
+  ></div>
+  <div class="absolute inset-0 bg-cream/65" aria-hidden="true"></div>
+
+  <div class="relative z-10 max-w-4xl mx-auto text-center space-y-6">
+    <h1 class="font-serif text-4xl md:text-6xl font-bold text-deep-green leading-tight">
+      El Alma de las Flores
+    </h1>
+    <p class="text-lg text-deep-green/75 max-w-2xl mx-auto leading-relaxed">
+      Un punto de entrada para explorar las 38 flores de Bach, comprender su
+      origen histórico y seguir las publicaciones de la comunidad.
+    </p>
+
+    <div class="flex flex-wrap justify-center gap-3">
+      <a
+        href="/flores-de-bach"
+        class="rounded-full bg-deep-green text-cream px-6 py-3 font-semibold hover:bg-deep-green/90 transition-colors"
+      >
+        Explorar flores
+      </a>
+      <a
+        href={`/archivo/${newestArchiveYear}`}
+        class="rounded-full border border-sage/40 text-deep-green px-6 py-3 font-semibold hover:bg-sage/10 transition-colors"
+      >
+        Leer anuario {newestArchiveYear}
+      </a>
+      <a
+        href="/publicar"
+        class="rounded-full border border-sage/40 text-deep-green px-6 py-3 font-semibold hover:bg-sage/10 transition-colors"
+      >
+        Acceso autores
+      </a>
+    </div>
+  </div>
+</section>

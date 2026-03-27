@@ -1,0 +1,53 @@
+---
+import type { HomeFeaturedFlower } from "../../data/home-page";
+
+interface Props {
+  featuredFlowers: HomeFeaturedFlower[];
+}
+
+const { featuredFlowers } = Astro.props;
+---
+
+<section class="mt-20">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div class="space-y-2">
+      <p class="text-xs uppercase tracking-[0.3em] text-deep-green/60 font-semibold">
+        Muestra del catálogo
+      </p>
+      <h2 class="font-serif text-3xl md:text-4xl font-bold text-deep-green">
+        Primeras flores para empezar a explorar
+      </h2>
+    </div>
+    <a
+      href="/flores-de-bach"
+      class="rounded-full border border-sage/30 px-5 py-2 text-sm font-semibold text-deep-green hover:bg-sage/10 transition-colors"
+    >
+      Ver las 38 flores
+    </a>
+  </div>
+
+  <div class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {
+      featuredFlowers.map((flower) => (
+        <a href={`/flores-de-bach/${flower.slug}`} class="group block">
+          <article class="h-full overflow-hidden rounded-3xl border border-sage/15 bg-white shadow-sm hover:-translate-y-1 hover:shadow-xl hover:shadow-sage/10 transition-all duration-300">
+            <img
+              src={flower.img}
+              alt={`Flor de Bach ${flower.name}`}
+              class="h-44 w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              loading="lazy"
+            />
+            <div class="p-5 space-y-2">
+              <p class="text-xs uppercase tracking-[0.2em] text-sage font-semibold">
+                Esencia {flower.id}
+              </p>
+              <h3 class="font-serif text-2xl font-bold text-deep-green">{flower.name}</h3>
+              <p class="text-xs italic text-deep-green/60">{flower.botanical}</p>
+              <p class="text-sm text-deep-green/75 leading-relaxed">{flower.summary}</p>
+            </div>
+          </article>
+        </a>
+      ))
+    }
+  </div>
+</section>

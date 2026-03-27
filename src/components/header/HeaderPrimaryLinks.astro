@@ -1,0 +1,27 @@
+---
+import { PRIMARY_LINKS } from "./config";
+
+interface Props {
+  mobile?: boolean;
+}
+
+const { mobile = false } = Astro.props;
+const linkClass = mobile
+  ? "text-deep-green font-serif font-medium"
+  : "text-deep-green hover:text-sage font-medium text-sm lg:text-base transition-colors duration-200";
+const recommenderId = mobile ? "mobile-recomendador" : "desktop-recomendador";
+---
+
+<a href={PRIMARY_LINKS.flowers.href} class={linkClass}>
+  {PRIMARY_LINKS.flowers.label}
+</a>
+<a
+  id={recommenderId}
+  href={PRIMARY_LINKS.recommender.href}
+  class={`hidden ${linkClass}`}
+>
+  {PRIMARY_LINKS.recommender.label}
+</a>
+<a href={PRIMARY_LINKS.biography.href} class={linkClass}>
+  {PRIMARY_LINKS.biography.label}
+</a>

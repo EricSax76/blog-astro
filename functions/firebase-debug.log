@@ -1,0 +1,88 @@
+[debug] [2026-03-20T11:38:51.110Z] ----------------------------------------------------------------------
+[debug] [2026-03-20T11:38:51.112Z] Command:       /opt/homebrew/Cellar/node/25.1.0/bin/node /opt/homebrew/bin/firebase functions:shell
+[debug] [2026-03-20T11:38:51.112Z] CLI Version:   15.10.0
+[debug] [2026-03-20T11:38:51.112Z] Platform:      darwin
+[debug] [2026-03-20T11:38:51.112Z] Node Version:  v25.1.0
+[debug] [2026-03-20T11:38:51.112Z] Time:          Fri Mar 20 2026 12:38:51 GMT+0100 (Central European Standard Time)
+[debug] [2026-03-20T11:38:51.112Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-03-20T11:38:52.087Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-03-20T11:38:52.087Z] > authorizing via signed-in user (ericmoscosoleon76@gmail.com)
+[debug] [2026-03-20T11:38:52.087Z] [iam] checking project el-alma-de-las-flores-blog for permissions ["firebase.projects.get"]
+[debug] [2026-03-20T11:38:52.088Z] Checked if tokens are valid: false, expires at: 1773989271697
+[debug] [2026-03-20T11:38:52.088Z] Checked if tokens are valid: false, expires at: 1773989271697
+[debug] [2026-03-20T11:38:52.088Z] > refreshing access token with scopes: []
+[debug] [2026-03-20T11:38:52.089Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-03-20T11:38:52.089Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-03-20T11:38:52.303Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-03-20T11:38:52.303Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-03-20T11:38:52.324Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/el-alma-de-las-flores-blog:testIamPermissions [none]
+[debug] [2026-03-20T11:38:52.324Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/el-alma-de-las-flores-blog:testIamPermissions  x-goog-user-project=el-alma-de-las-flores-blog
+[debug] [2026-03-20T11:38:52.324Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/el-alma-de-las-flores-blog:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2026-03-20T11:38:52.733Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/el-alma-de-las-flores-blog:testIamPermissions 403
+[debug] [2026-03-20T11:38:52.734Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/el-alma-de-las-flores-blog:testIamPermissions {"error":{"code":403,"message":"Caller does not have required permission to use project el-alma-de-las-flores-blog. Grant the caller the roles/serviceusage.serviceUsageConsumer role, or a custom role with the serviceusage.services.use permission, by visiting https://console.developers.google.com/iam-admin/iam?project=el-alma-de-las-flores-blog and then retry. Propagation of the new permission may take a few minutes.","status":"PERMISSION_DENIED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"USER_PROJECT_DENIED","domain":"googleapis.com","metadata":{"consoleUrl":"https://console.developers.google.com/iam-admin/iam?project=el-alma-de-las-flores-blog","service":"cloudresourcemanager.googleapis.com","containerInfo":"el-alma-de-las-flores-blog","consumer":"projects/el-alma-de-las-flores-blog"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"Caller does not have required permission to use project el-alma-de-las-flores-blog. Grant the caller the roles/serviceusage.serviceUsageConsumer role, or a custom role with the serviceusage.services.use permission, by visiting https://console.developers.google.com/iam-admin/iam?project=el-alma-de-las-flores-blog and then retry. Propagation of the new permission may take a few minutes."},{"@type":"type.googleapis.com/google.rpc.Help","links":[{"description":"Google developer console IAM admin","url":"https://console.developers.google.com/iam-admin/iam?project=el-alma-de-las-flores-blog"}]}]}}
+[debug] [2026-03-20T11:38:52.734Z] [iam] error while checking permissions, command may fail: Request to https://cloudresourcemanager.googleapis.com/v1/projects/el-alma-de-las-flores-blog:testIamPermissions had HTTP Error: 403, Caller does not have required permission to use project el-alma-de-las-flores-blog. Grant the caller the roles/serviceusage.serviceUsageConsumer role, or a custom role with the serviceusage.services.use permission, by visiting https://console.developers.google.com/iam-admin/iam?project=el-alma-de-las-flores-blog and then retry. Propagation of the new permission may take a few minutes.
+[debug] [2026-03-20T11:38:52.785Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[warn] ⚠  functions: Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful! {"metadata":{"emulator":{"name":"functions"},"message":"Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful!"}}
+[debug] [2026-03-20T11:38:54.179Z] Checked if tokens are valid: true, expires at: 1774010331303
+[debug] [2026-03-20T11:38:54.179Z] Checked if tokens are valid: true, expires at: 1774010331303
+[debug] [2026-03-20T11:38:54.179Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/el-alma-de-las-flores-blog/adminSdkConfig [none]
+[debug] [2026-03-20T11:38:54.545Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/el-alma-de-las-flores-blog/adminSdkConfig 403
+[debug] [2026-03-20T11:38:54.545Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/el-alma-de-las-flores-blog/adminSdkConfig {"error":{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED"}}
+[debug] [2026-03-20T11:38:54.545Z] Failed to get Admin SDK config for el-alma-de-las-flores-blog, falling back to cache Failed to get Admin SDK for Firebase project el-alma-de-las-flores-blog. Please make sure the project exists and your account has permission to access it. {"name":"FirebaseError","children":[],"exit":2,"message":"Failed to get Admin SDK for Firebase project el-alma-de-las-flores-blog. Please make sure the project exists and your account has permission to access it.","original":{"name":"FirebaseError","children":[],"context":{"body":{"error":{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED"}},"response":{"statusCode":403}},"exit":1,"message":"Request to https://firebase.googleapis.com/v1beta1/projects/el-alma-de-las-flores-blog/adminSdkConfig had HTTP Error: 403, The caller does not have permission","status":403},"status":500}
+[warn] ⚠  functions: Unable to fetch project Admin SDK configuration, Admin SDK behavior in Cloud Functions emulator may be incorrect. {"metadata":{"emulator":{"name":"functions"},"message":"Unable to fetch project Admin SDK configuration, Admin SDK behavior in Cloud Functions emulator may be incorrect."}}
+[debug] [2026-03-20T11:38:54.549Z] [functions] Watching "/Users/ericmoscoso/blog astro/functions" for Cloud Functions...
+[debug] [2026-03-20T11:38:54.552Z] Validating nodejs source
+[warn] ⚠  functions: package.json indicates an outdated version of firebase-functions. Please upgrade using npm install --save firebase-functions@latest in your functions directory. 
+[debug] [2026-03-20T11:38:55.178Z] > [functions] package.json contents: {
+  "name": "functions",
+  "scripts": {
+    "lint": "eslint --ext .js,.ts .",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "20"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^8.9.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.25.4",
+    "firebase-functions-test": "^3.4.1",
+    "typescript": "^5.7.3"
+  },
+  "private": true
+}
+[debug] [2026-03-20T11:38:55.178Z] Building nodejs source
+[debug] [2026-03-20T11:38:55.179Z] Failed to find version of module node: reached end of search path /Users/ericmoscoso/blog astro/functions/node_modules
+[warn] ⚠  functions: Your requested "node" version "20" doesn't match your global version "25". Using node@25 from host. 
+[debug] [2026-03-20T11:38:55.181Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-03-20T11:38:55.212Z] Found firebase-functions binary at '/Users/ericmoscoso/blog astro/functions/node_modules/.bin/firebase-functions'
+[info] Serving at port 8660
+
+[debug] [2026-03-20T11:38:55.583Z] Got response from /__/functions.yaml {"endpoints":{"deleteUserData":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":10,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"callableTrigger":{},"entryPoint":"deleteUserData"},"exportUserData":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":10,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"callableTrigger":{},"entryPoint":"exportUserData"},"cleanupOnUserDeleted":{"platform":"gcfv1","availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"serviceAccountEmail":null,"vpc":null,"region":["us-central1"],"eventTrigger":{"eventType":"providers/firebase.auth/eventTypes/user.delete","eventFilters":{"resource":"projects/el-alma-de-las-flores-blog"},"retry":false},"labels":{},"entryPoint":"cleanupOnUserDeleted"},"registerUser":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":10,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"callableTrigger":{},"entryPoint":"registerUser"},"upsertUserProfile":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":10,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"callableTrigger":{},"entryPoint":"upsertUserProfile"},"publishPost":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":10,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"callableTrigger":{},"entryPoint":"publishPost"},"addComment":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":10,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"callableTrigger":{},"entryPoint":"addComment"},"deleteComment":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":10,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"callableTrigger":{},"entryPoint":"deleteComment"},"toggleLike":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":10,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"callableTrigger":{},"entryPoint":"toggleLike"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[debug] [2026-03-20T11:38:59.613Z] [functions] Loaded functions definitions from source: deleteUserData, exportUserData, registerUser, upsertUserProfile, publishPost, addComment, deleteComment, toggleLike, cleanupOnUserDeleted.
+[debug] [2026-03-20T11:38:59.613Z] [functions[europe-west1-deleteUserData]] http function initialized (http://127.0.0.1:5001/el-alma-de-las-flores-blog/europe-west1/deleteUserData).
+[debug] [2026-03-20T11:38:59.614Z] [functions[europe-west1-exportUserData]] http function initialized (http://127.0.0.1:5001/el-alma-de-las-flores-blog/europe-west1/exportUserData).
+[debug] [2026-03-20T11:38:59.614Z] [functions[europe-west1-registerUser]] http function initialized (http://127.0.0.1:5001/el-alma-de-las-flores-blog/europe-west1/registerUser).
+[debug] [2026-03-20T11:38:59.614Z] [functions[europe-west1-upsertUserProfile]] http function initialized (http://127.0.0.1:5001/el-alma-de-las-flores-blog/europe-west1/upsertUserProfile).
+[debug] [2026-03-20T11:38:59.614Z] [functions[europe-west1-publishPost]] http function initialized (http://127.0.0.1:5001/el-alma-de-las-flores-blog/europe-west1/publishPost).
+[debug] [2026-03-20T11:38:59.614Z] [functions[europe-west1-addComment]] http function initialized (http://127.0.0.1:5001/el-alma-de-las-flores-blog/europe-west1/addComment).
+[debug] [2026-03-20T11:38:59.614Z] [functions[europe-west1-deleteComment]] http function initialized (http://127.0.0.1:5001/el-alma-de-las-flores-blog/europe-west1/deleteComment).
+[debug] [2026-03-20T11:38:59.614Z] [functions[europe-west1-toggleLike]] http function initialized (http://127.0.0.1:5001/el-alma-de-las-flores-blog/europe-west1/toggleLike).
+[debug] [2026-03-20T11:38:59.614Z] addAuthTrigger {"eventTrigger":{"eventType":"providers/firebase.auth/eventTypes/user.delete","resource":"projects/el-alma-de-las-flores-blog"}}
+[debug] [2026-03-20T11:38:59.614Z] [functions[us-central1-cleanupOnUserDeleted]] auth function initialized.
+[info] i  functions: Loaded functions: deleteUserData, exportUserData, registerUser, upsertUserProfile, publishPost, addComment, deleteComment, toggleLike, cleanupOnUserDeleted 
+[warn] ⚠  functions: The following emulators are not running, calls to these services will affect production: firestore, database, pubsub, storage, eventarc, tasks 

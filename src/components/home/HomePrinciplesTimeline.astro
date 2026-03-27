@@ -1,0 +1,58 @@
+---
+import type { HomeTimelineItem } from "../../data/home-page";
+
+interface Props {
+  principles: readonly string[];
+  timeline: HomeTimelineItem[];
+}
+
+const { principles, timeline } = Astro.props;
+---
+
+<section class="mt-20 grid lg:grid-cols-[1fr_1.1fr] gap-8 items-start">
+  <article class="bg-white border border-sage/20 rounded-[2rem] p-7 md:p-9 space-y-5">
+    <p class="text-xs uppercase tracking-[0.3em] text-deep-green/60 font-semibold">
+      Fundamentos
+    </p>
+    <h2 class="font-serif text-3xl md:text-4xl font-bold text-deep-green">
+      Principios que guían el proyecto
+    </h2>
+    <p class="text-deep-green/75 leading-relaxed">
+      El enfoque editorial parte de la investigación de Edward Bach: simplicidad,
+      individualidad y autocuración como base para comprender estados
+      emocionales.
+    </p>
+    <ul class="space-y-3 text-sm text-deep-green/80">
+      {
+        principles.map((principle) => (
+          <li class="rounded-xl bg-cream/70 border border-sage/15 px-4 py-3">
+            {principle}
+          </li>
+        ))
+      }
+    </ul>
+    <a
+      href="/biografia#bio-timeline"
+      class="inline-flex items-center rounded-full border border-sage/30 px-5 py-2 text-sm font-semibold text-deep-green hover:bg-sage/10 transition-colors"
+    >
+      Ver línea de tiempo completa
+    </a>
+  </article>
+
+  <article class="bg-deep-green text-cream rounded-[2rem] p-7 md:p-9">
+    <p class="text-xs uppercase tracking-[0.3em] text-cream/70 font-semibold mb-5">
+      Cronología esencial
+    </p>
+    <div class="space-y-4">
+      {
+        timeline.map((item) => (
+          <div class="rounded-2xl border border-cream/20 bg-cream/5 p-4">
+            <p class="font-serif text-2xl font-bold">{item.year}</p>
+            <p class="font-semibold mt-1">{item.title}</p>
+            <p class="text-sm text-cream/80 mt-1 leading-relaxed">{item.text}</p>
+          </div>
+        ))
+      }
+    </div>
+  </article>
+</section>
