@@ -147,8 +147,13 @@ candidato siguiente una vez estabilizado el resto.
   puesta en marcha, comandos, despliegue de reglas/funciones, nota de credenciales y migración.
 - **G14.** ✅ RESUELTO (2026-06-16) — Añadido `.env.example` con las 6 claves `PUBLIC_FIREBASE_*`
   y nota de que el prefijo `PUBLIC_` las expone al cliente (no meter secretos de servidor).
-- **G15.** ⏳ PENDIENTE — `tsconfig` excluye `functions` (OK, tienen su propio tsconfig). Falta
-  `astro check`/lint en el front. (No bloqueante; el build verifica tipos de `.astro`/scripts.)
+- **G15.** ✅ HECHO (2026-06-16) — Añadido `@astrojs/check`; scripts `check` (`astro check`)
+  y `build` ahora gateado (`astro check && astro build`), así el deploy falla si hay errores
+  de tipo. CI en `.github/workflows/ci.yml`: `npm ci` + `npm run check` + build en push a
+  `main` y en cada PR (Node 20). Corregidos los hallazgos: error real ts(2345) en
+  `auth.ts` (`isAuthenticated` no booleano) y vars muertas en `app-init.js`. Quedan 6 hints
+  `frameborder` deprecado en iframes de archivo (no bloqueantes). No se añadió ESLint/Prettier
+  (decisión de alcance: solo type-check).
 - **G16.** ✅ HECHO (2026-06-16) — Contador denormalizado `likeCount` en el post.
   `toggleLike` actualiza like-doc + `posts/{id}.likeCount` con `increment(±1)` en una
   transacción atómica; `publishPost` siembra `likeCount: 0`. Lectura en `interactions.js`:

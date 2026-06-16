@@ -318,7 +318,7 @@ export const initHeaderAuth = (): void => {
 
     const detail = event.detail as AuthState;
     const isAuthenticated =
-      detail && typeof detail === "object" && detail.isAuthenticated === true;
+      !!detail && typeof detail === "object" && detail.isAuthenticated === true;
     const email =
       detail && typeof detail === "object" && typeof detail.email === "string"
         ? detail.email

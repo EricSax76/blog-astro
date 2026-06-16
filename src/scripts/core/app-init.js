@@ -1,8 +1,5 @@
 if (typeof window !== 'undefined') {
 const header = document.querySelector('.site-header');
-const primaryNav = document.querySelector('.primary-nav');
-const navToggle = document.querySelector('.nav-toggle');
-const primaryMenu = document.querySelector('#primary-menu');
 
 if (header) {
     const handleScroll = () => {
