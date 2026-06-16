@@ -321,18 +321,30 @@ class BlogSocialInteractions extends HTMLElement {
         date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     }
 
-    el.innerHTML = `
-      <div class="flex justify-between items-start mb-2">
-        <span class="author-name font-bold text-sm text-deep-green">${
-          data.authorName || "Anónimo"
-        }</span>
-        <span class="comment-date text-xs text-sage">${dateStr}</span>
-      </div>
-      <p class="comment-body text-sm text-deep-green/90 leading-relaxed whitespace-pre-wrap">${
-        data.content
-      }</p>
-    `;
-      
+    // Cabecera (autor + fecha). Sin interpolar texto de usuario en innerHTML:
+    // el contenido es texto libre → usar textContent para evitar XSS almacenado.
+    const headerEl = document.createElement("div");
+    headerEl.className = "flex justify-between items-start mb-2";
+
+    const authorEl = document.createElement("span");
+    authorEl.className = "author-name font-bold text-sm text-deep-green";
+    authorEl.textContent = data.authorName || "Anónimo";
+
+    const dateEl = document.createElement("span");
+    dateEl.className = "comment-date text-xs text-sage";
+    dateEl.textContent = dateStr;
+
+    headerEl.appendChild(authorEl);
+    headerEl.appendChild(dateEl);
+
+    const bodyEl = document.createElement("p");
+    bodyEl.className =
+      "comment-body text-sm text-deep-green/90 leading-relaxed whitespace-pre-wrap";
+    bodyEl.textContent = data.content || "";
+
+    el.appendChild(headerEl);
+    el.appendChild(bodyEl);
+
     // Actions
     const actionsDiv = document.createElement("div");
     actionsDiv.className = "mt-3 flex gap-4 text-xs font-semibold items-center";

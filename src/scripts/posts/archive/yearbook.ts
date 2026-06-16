@@ -17,6 +17,13 @@ const postsGrid = document.getElementById("posts-grid");
 const loadingCard = document.getElementById("posts-loading");
 const errorCard = document.getElementById("posts-error");
 
+// El año a consultar lo fija la página vía data-year; fallback al año actual.
+const ARCHIVE_YEAR = (() => {
+  const raw = postsGrid?.dataset.year;
+  const parsed = raw ? Number.parseInt(raw, 10) : NaN;
+  return Number.isFinite(parsed) ? parsed : new Date().getFullYear();
+})();
+
 const requiredConfigKeys = ["apiKey", "authDomain", "projectId", "appId"] as const;
 
 const hasValidFirebaseConfig = (): boolean => {
@@ -57,7 +64,7 @@ const createEmptyCard = (): HTMLElement => {
   title.textContent = "Próximamente";
   const subtitle = document.createElement("p");
   subtitle.className = "text-sm text-deep-green/60 italic font-serif";
-  subtitle.textContent = "Aquí aparecerán los posts publicados en 2026.";
+  subtitle.textContent = `Aquí aparecerán los posts publicados en ${ARCHIVE_YEAR}.`;
   header.append(title, subtitle);
 
   const content = document.createElement("div");
@@ -234,7 +241,7 @@ const mapSnapshotToPosts = (snapshot: { docs: Array<{ id: string; data: () => un
   });
 };
 
-const loadPosts2026 = async () => {
+const loadPostsForYear = async () => {
   if (!postsGrid) return;
 
   if (!hasValidFirebaseConfig()) {
@@ -259,7 +266,7 @@ const loadPosts2026 = async () => {
     const postsRef = collection(db, "posts");
     const postsQuery = query(
       postsRef,
-      where("year", "==", 2026),
+      where("year", "==", ARCHIVE_YEAR),
       orderBy("createdAt", "desc")
     );
 
@@ -274,9 +281,9 @@ const loadPosts2026 = async () => {
       }
 
       console.warn(
-        "[archivo/2026] missing index for year + createdAt, using fallback query"
+        `[archivo/${ARCHIVE_YEAR}] missing index for year + createdAt, using fallback query`
       );
-      const fallbackQuery = query(postsRef, where("year", "==", 2026));
+      const fallbackQuery = query(postsRef, where("year", "==", ARCHIVE_YEAR));
       const fallbackSnapshot = await getDocs(fallbackQuery);
       loadedPosts = mapSnapshotToPosts(fallbackSnapshot);
     }
@@ -293,11 +300,11 @@ const loadPosts2026 = async () => {
       attachPostCard(createPostCard(post));
     });
   } catch (error) {
-    console.error("[archivo/2026] failed to load posts", error);
+    console.error(`[archivo/${ARCHIVE_YEAR}] failed to load posts`, error);
     showError(
       "No se pudieron leer los posts desde Firestore. Revisa reglas e índice de consulta."
     );
   }
 };
 
-loadPosts2026();
+loadPostsForYear();

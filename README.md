@@ -1,116 +1,102 @@
-# Astro Starter Kit: Basics
+# El Alma de las Flores — Blog
 
-```sh
-npm create astro@latest -- --template basics
-```
+Blog en **Astro 6** (SSR, adapter `@astrojs/node`) con backend **Firebase**
+(Auth, Firestore, Storage, Cloud Functions). Tailwind v4 para estilos.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+> Proyecto Firebase: `el-alma-de-las-flores-blog`. Estado: desarrollo local;
+> destino de despliegue previsto Firebase Hosting (aún no desplegado).
 
-## 🚀 Project Structure
+## Arquitectura
 
-Inside of your Astro project, you'll see the following folders and files:
+- **Frontend:** Astro `output: "server"` + `@astrojs/node` (standalone). Las
+  páginas cargan el SDK de Firebase vía CDN (`gstatic 11.0.2`) con `import()`
+  dinámico. El paquete npm `firebase` está pinneado a `11.0.2` solo como fuente
+  de tipos (ver `src/types/firebase-cdn-modules.d.ts`).
+- **Auth:** Email/Password. El alta la hace el cliente con el SDK de Auth; el
+  servidor provisiona el perfil (`upsertUserProfile` callable + trigger de
+  respaldo `provisionUserProfile`). No se envían contraseñas a funciones propias.
+- **Firestore:** colecciones `users`, `posts`, `comments`, `likes`.
+- **Storage:** imágenes de posts (`blog/posts/{uid}/`, lectura pública) y
+  avatares (`users/{uid}/avatar/`, lectura pública, escritura solo dueño).
+- **Cloud Functions** (gen2, `europe-west1`, salvo triggers Auth gen1 en
+  `us-central1`): `upsertUserProfile`, `provisionUserProfile`, `publishPost`,
+  `addComment`, `deleteComment`, `toggleLike`, `deleteUserData`,
+  `exportUserData`, `cleanupOnUserDeleted`.
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
-```
+### Rutas principales
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+| Ruta | Función |
+| :--- | :--- |
+| `/` | Portada |
+| `/acceder`, `/registrate` | Login y registro (`scripts/auth/entry.js`) |
+| `/publicar` | Editor: sube imagen a Storage + `publishPost` |
+| `/mis-publicaciones` | Posts del autor actual (`authorUid`) |
+| `/mi-perfil` | Editar perfil/avatar + exportar/eliminar datos (RGPD) |
+| `/archivo/2011`–`/archivo/2017` | Histórico estático |
+| `/archivo/2026` y `/archivo/[year]` | Posts del año desde Firestore |
+| `/flores-de-bach/[slug]` | Fichas estáticas (`src/data/flowers.js`) |
 
-## 🧞 Commands
+El **año de un post lo fija el servidor** (`publishPost`,
+`new Date().getFullYear()`); el archivo por año es dinámico (`[year].astro`)
+para años ≥ 2018 sin página propia.
 
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## Firebase auth (entrada)
-
-La portada (`/`) incluye registro e inicio de sesión con Firebase Authentication.
-Al registrar/iniciar sesión se crea/actualiza el perfil en Firestore (`users/{uid}`) y el acceso de escritura se realiza en `/publicar`.
-
-1. Copia `.env.example` a `.env`.
-2. Completa los valores `PUBLIC_FIREBASE_*` desde **Firebase Console > Project settings > Your apps > SDK setup and configuration**.
-3. Asegúrate de tener habilitado **Authentication > Sign-in method > Email/Password**.
-
-## Firebase Storage (reglas)
-
-- Reglas en `storage.rules`.
-- Ruta pública para imágenes del blog: `blog/posts/{uid}/{archivo}`.
-- Solo el `uid` propietario puede crear/actualizar/eliminar su archivo.
-- Límite de subida: 10 MB y tipo `image/*`.
-- El editor `/publicar` sube aquí las imágenes destacadas.
-
-Deploy de reglas:
+## Puesta en marcha
 
 ```bash
-firebase deploy --only storage
+npm install            # deps del front
+cp .env.example .env   # rellena los valores PUBLIC_FIREBASE_*
+npm run dev            # http://localhost:4321
 ```
 
-## Firestore (rules + indexes)
+Valores `PUBLIC_FIREBASE_*`: **Firebase Console > Project settings > Your apps >
+SDK setup and configuration**. Habilita **Authentication > Sign-in method >
+Email/Password**.
 
-- Reglas en `firebase.rules`.
-- Índices en `firestore.indexes.json`.
-- El editor `/publicar` guarda posts en la colección `posts`.
-- La página `/archivo/2026` lee posts desde Firestore (query por `year` y `createdAt`).
-- La página `/mis-publicaciones` (sesión autenticada) lee solo posts del autor actual (`authorUid` y `createdAt`).
+### Comandos
 
-Deploy de Firestore:
+| Comando | Acción |
+| :--- | :--- |
+| `npm run dev` | Dev server en `localhost:4321` |
+| `npm run build` | Build de producción en `./dist/` |
+| `npm run preview` | Sirve el build local |
+| `npm run migrate:legacy:dry` | Simula migración de contenido legacy |
+| `npm run migrate:legacy` | Migración real (ver abajo) |
+
+### Cloud Functions
 
 ```bash
-firebase deploy --only firestore
+cd functions
+npm install
+npm run build          # tsc
 ```
 
-## Migración legacy (2011-2017)
-
-Script para migrar contenido histórico (`src/pages/archivo/2011..2017`) a Firestore y subir imágenes asociadas a Storage:
-
-1. Revisa qué se va a migrar:
+## Despliegue de reglas y funciones
 
 ```bash
-npm run migrate:legacy:dry
+firebase deploy --only storage     # storage.rules
+firebase deploy --only firestore   # firebase.rules + firestore.indexes.json
+firebase deploy --only functions   # Cloud Functions
 ```
 
-2. Ejecuta migración real:
+> Las credenciales de service account **no viven en el repo**. Referéncialas por
+> `GOOGLE_APPLICATION_CREDENTIALS` o por ruta absoluta (p.ej.
+> `~/.firebase-keys/<archivo>.json`).
+
+## Migración legacy (2011–2017)
+
+Migra el histórico (`src/pages/archivo/2011..2017`) a Firestore y sube las
+imágenes a Storage:
 
 ```bash
-npm run migrate:legacy
+npm run migrate:legacy:dry         # revisa qué se migraría
+npm run migrate:legacy             # ejecuta
 ```
 
-Opciones útiles:
+Opciones: `--overwrite`, `--years=2011,2012`,
+`--service-account=/ruta/abs/clave.json`, `--bucket=<storage-bucket>`,
+`--author-uid`, `--author-name`, `--author-email`.
 
-- `--overwrite`: sobrescribe documentos `posts/{postId}` ya existentes.
-- `--years=2011,2012`: migra años específicos.
-- `--service-account=./ruta/service-account.json`: usa credenciales explícitas.
-- `--bucket=<tu-storage-bucket>`: define bucket manualmente.
-- `--author-uid`, `--author-name`, `--author-email`: autor a guardar en posts legacy.
+## Más
 
-Ejemplo:
-
-```bash
-node functions/scripts/migrate-legacy-content.mjs \
-  --years=2011,2012,2013,2014,2015,2016,2017 \
-  --service-account=./service-account.json \
-  --bucket=tu-proyecto.appspot.com
-```
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- Análisis y gaps pendientes: [`docs/ANALISIS-Y-GAPS.md`](docs/ANALISIS-Y-GAPS.md).
+- Docs de Astro: <https://docs.astro.build>.

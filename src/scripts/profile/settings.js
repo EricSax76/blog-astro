@@ -10,6 +10,9 @@ if (typeof window !== "undefined") {
   const avatarPreview = document.getElementById("profile-avatar-preview");
   const avatarFallback = document.getElementById("profile-avatar-fallback");
   const saveButton = document.getElementById("profile-save-button");
+  const gdprMessage = document.getElementById("gdpr-message");
+  const gdprExportButton = document.getElementById("gdpr-export-button");
+  const gdprDeleteButton = document.getElementById("gdpr-delete-button");
 
   const requiredKeys = ["apiKey", "authDomain", "projectId", "appId"];
 
@@ -38,6 +41,25 @@ if (typeof window !== "undefined") {
     if (!message) return;
     message.textContent = "";
     message.classList.add("hidden");
+  };
+
+  const setGdprMessage = (text, type = "error") => {
+    if (!gdprMessage) return;
+    gdprMessage.textContent = text;
+    gdprMessage.classList.remove(
+      "hidden",
+      "border-red-200",
+      "bg-red-50",
+      "text-red-700",
+      "border-green-200",
+      "bg-green-50",
+      "text-green-700"
+    );
+    if (type === "success") {
+      gdprMessage.classList.add("border-green-200", "bg-green-50", "text-green-700");
+    } else {
+      gdprMessage.classList.add("border-red-200", "bg-red-50", "text-red-700");
+    }
   };
 
   const setSaving = (isSaving) => {
@@ -105,6 +127,8 @@ if (typeof window !== "undefined") {
 
   if (!hasValidConfig) {
     configWarning?.classList.remove("hidden");
+    if (gdprExportButton instanceof HTMLButtonElement) gdprExportButton.disabled = true;
+    if (gdprDeleteButton instanceof HTMLButtonElement) gdprDeleteButton.disabled = true;
     if (form instanceof HTMLFormElement) {
       Array.from(form.elements).forEach((element) => {
         if (
@@ -129,7 +153,7 @@ if (typeof window !== "undefined") {
       .then(
         ([firebaseApp, firebaseAuth, firebaseFunctions, firebaseStorage, firebaseFirestore]) => {
           const { getApp, getApps, initializeApp } = firebaseApp;
-          const { getAuth, onAuthStateChanged, updateProfile } = firebaseAuth;
+          const { getAuth, onAuthStateChanged, updateProfile, signOut } = firebaseAuth;
           const { getFunctions, httpsCallable } = firebaseFunctions;
           const { getStorage, ref, uploadBytes, getDownloadURL } = firebaseStorage;
           const { getFirestore, doc, getDoc } = firebaseFirestore;
@@ -271,6 +295,91 @@ if (typeof window !== "undefined") {
                 setMessage("No se pudieron guardar los cambios. Inténtalo de nuevo.");
               } finally {
                 setSaving(false);
+              }
+            });
+          }
+
+          // --- RGPD: exportar datos (art. 20) ---
+          if (gdprExportButton instanceof HTMLButtonElement) {
+            gdprExportButton.addEventListener("click", async () => {
+              if (!currentUser) {
+                setGdprMessage("Tu sesión no está activa. Vuelve a iniciar sesión.");
+                return;
+              }
+
+              gdprExportButton.disabled = true;
+              const originalText = gdprExportButton.textContent;
+              gdprExportButton.textContent = "Exportando...";
+
+              try {
+                const result = await httpsCallable(functions, "exportUserData")();
+                const payload = result?.data?.data ?? result?.data ?? {};
+                const blob = new Blob([JSON.stringify(payload, null, 2)], {
+                  type: "application/json",
+                });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = `mis-datos-${currentUser.uid}.json`;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                URL.revokeObjectURL(url);
+
+                setGdprMessage(
+                  "Tus datos se han descargado en formato JSON.",
+                  "success"
+                );
+              } catch (error) {
+                console.error("[gdpr/export] failed", error);
+                setGdprMessage("No se pudieron exportar tus datos. Inténtalo de nuevo.");
+              } finally {
+                gdprExportButton.disabled = false;
+                gdprExportButton.textContent = originalText;
+              }
+            });
+          }
+
+          // --- RGPD: eliminar cuenta (art. 17) ---
+          if (gdprDeleteButton instanceof HTMLButtonElement) {
+            gdprDeleteButton.addEventListener("click", async () => {
+              if (!currentUser) {
+                setGdprMessage("Tu sesión no está activa. Vuelve a iniciar sesión.");
+                return;
+              }
+
+              const confirmed = window.confirm(
+                "Esto eliminará tu cuenta y TODOS tus datos (publicaciones, comentarios, archivos) de forma permanente. ¿Seguro que quieres continuar?"
+              );
+              if (!confirmed) return;
+
+              gdprDeleteButton.disabled = true;
+              if (gdprExportButton instanceof HTMLButtonElement) {
+                gdprExportButton.disabled = true;
+              }
+              const originalText = gdprDeleteButton.textContent;
+              gdprDeleteButton.textContent = "Eliminando...";
+
+              try {
+                await httpsCallable(functions, "deleteUserData")();
+                try {
+                  await signOut(auth);
+                } catch {}
+                try {
+                  localStorage.removeItem("blog-auth-state");
+                } catch {}
+                window.alert("Tu cuenta y tus datos han sido eliminados.");
+                window.location.assign("/");
+              } catch (error) {
+                console.error("[gdpr/delete] failed", error);
+                setGdprMessage(
+                  "No se pudo eliminar la cuenta. Inténtalo de nuevo o contacta con soporte."
+                );
+                gdprDeleteButton.disabled = false;
+                if (gdprExportButton instanceof HTMLButtonElement) {
+                  gdprExportButton.disabled = false;
+                }
+                gdprDeleteButton.textContent = originalText;
               }
             });
           }

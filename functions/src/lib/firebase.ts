@@ -9,16 +9,35 @@ admin.initializeApp();
 export const db = admin.firestore();
 export const bucket = admin.storage().bucket();
 
-/** Elimina todos los documentos de una colección que coincidan con un campo. */
+/** Máximo de escrituras por batch en Firestore. */
+const BATCH_LIMIT = 500;
+
+/**
+ * Elimina todos los documentos de una colección que coincidan con un campo.
+ * Itera en lotes de 500 (límite de Firestore) para soportar volúmenes
+ * grandes; un único batch dejaría datos sin borrar y rompería RGPD.
+ */
 export async function deleteCollection(
   collectionName: string,
   field: string,
   value: string
 ): Promise<void> {
-  const snapshot = await db.collection(collectionName).where(field, "==", value).get();
-  const batch = db.batch();
-  snapshot.docs.forEach((doc) => batch.delete(doc.ref));
-  await batch.commit();
+  const baseQuery = db
+    .collection(collectionName)
+    .where(field, "==", value)
+    .limit(BATCH_LIMIT);
+
+  for (;;) {
+    const snapshot = await baseQuery.get();
+    if (snapshot.empty) break;
+
+    const batch = db.batch();
+    snapshot.docs.forEach((doc) => batch.delete(doc.ref));
+    await batch.commit();
+
+    // Última página: menos documentos que el límite → no quedan más.
+    if (snapshot.size < BATCH_LIMIT) break;
+  }
 }
 
 /** Obtiene todos los documentos de una colección que coincidan con un campo. */

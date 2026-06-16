@@ -1,6 +1,13 @@
 ---
-const years = [2026, 2017, 2016, 2015, 2014, 2013, 2012, 2011];
+// Años con contenido: histórico estático + el año vivo de Firestore (2026+).
+// Incluye el año actual y el activo aunque aún no estén en la lista base.
+const staticYears = [2026, 2017, 2016, 2015, 2014, 2013, 2012, 2011];
 const { activeYear } = Astro.props;
+const currentYear = new Date().getFullYear();
+
+const years = Array.from(
+  new Set([currentYear, activeYear, ...staticYears].filter((y) => typeof y === "number"))
+).sort((a, b) => b - a);
 ---
 
 <nav class="flex flex-wrap justify-center gap-2 mb-12">

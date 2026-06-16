@@ -2,6 +2,7 @@
 
 > Documento de diagnóstico. Fecha: 2026-06-16. Estado: blog en Astro (SSR) + Firebase.
 > Objetivo: vista general de la arquitectura, inventario de gaps y plan de trabajo priorizado.
+> Actualización 2026-06-16: ejecutados G1–G3, G6–G10, G13/G14, G17/G18 (ver §3 Estado).
 
 ---
 
@@ -40,27 +41,28 @@ Cliente carga el SDK por **dos vías distintas**:
 
 ### 🔴 Críticos (seguridad / datos)
 
-**G1. Credencial de service account en el árbol del repo**
+**G1. Credencial de service account en el árbol del repo** — ✅ RESUELTO (parcial, 2026-06-16)
 `el-alma-de-las-flores-blog-cdb7d0a9e656.json` contiene `private_key`. Está en `.gitignore`
-(no trackeado), pero vive en disco en la raíz y es fácil filtrarlo (zip, backup, deploy).
-→ Mover fuera del repo, **rotar la clave** en GCP IAM por precaución, y referenciarla solo
-por ruta absoluta o `GOOGLE_APPLICATION_CREDENTIALS`.
+(no trackeado), pero vivía en disco en la raíz.
+- Movido a `~/.firebase-keys/` (`chmod 700` dir, `600` archivo), fuera del repo.
+- README documenta usar `GOOGLE_APPLICATION_CREDENTIALS` / ruta absoluta.
+- ⚠️ **PENDIENTE MANUAL:** rotar la clave en GCP IAM por precaución (no se puede
+  desde aquí: GCP Console > IAM & Admin > Service Accounts > Keys).
 
-**G2. XSS almacenado en comentarios**
-`scripts/posts/social/interactions.js` renderiza `data.content` (y la respuesta) con
-`el.innerHTML = \`...${data.content}...\``. El contenido es texto libre del usuario sin
-sanitizar. Un comentario con `<img onerror>` ejecuta JS en todos los visitantes.
-→ Usar `textContent` (como ya hace `yearbook-2026.ts`) o sanitizar. `addComment` tampoco
-escapa/filtra HTML en el servidor.
+**G2. XSS almacenado en comentarios** — ✅ RESUELTO (2026-06-16)
+`scripts/posts/social/interactions.js` interpolaba `data.content` y `data.authorName` en
+`innerHTML`. Un comentario con `<img onerror>` ejecutaba JS en todos los visitantes.
+- Cliente: `createCommentElement` ahora construye los nodos con `createElement` +
+  `textContent` (autor, fecha, cuerpo). Sin interpolación de texto de usuario en HTML.
+- Servidor (defensa en profundidad): `addComment` aplica `stripHtml()` al contenido
+  antes de persistir y rechaza si queda vacío.
 
-**G3. Avatares de perfil ilegibles para terceros**
-`storage.rules`: `match /users/{uid}/avatar/{...}` tiene `allow read: if isOwner(uid)`.
-Pero el `photoURL` resultante se muestra en el header y (potencialmente) en comentarios,
-es decir contenido **público**. Resultado: solo el dueño ve su propio avatar; para el resto
-la imagen falla (403).
-→ **Decidido: avatares públicos.** El avatar es identidad pública del autor (como el nombre).
-Cambiar la subruta a `allow read: if true` y dejar `create/update/delete: if isOwner(uid)`.
-Lo privado (datos personales) sigue en Firestore `users/{uid}` con lectura solo-dueño.
+**G3. Avatares de perfil ilegibles para terceros** — ✅ RESUELTO (2026-06-16)
+El avatar (`users/{uid}/avatar/`) tenía `read: if isOwner(uid)` pero se muestra en header
+y comentarios (contenido público) → 403 para terceros.
+- `storage.rules`: subruta avatar ahora `allow read: if true`; escritura sigue solo dueño.
+- La regla específica `users/{uid}/avatar/**` gana por path más largo sobre `users/{uid}/**`.
+- ⚠️ Requiere `firebase deploy --only storage` para aplicar.
 
 ### 🟠 Altos (arquitectura / consistencia)
 
@@ -90,56 +92,73 @@ Auth en cliente** + provisión del perfil en servidor. No se envían contraseña
 - `entry.js` envía `username` al provisionar en el registro.
 Build de functions (`tsc`) y front verificados.
 
-**G6. `src/pages/api/posts.ts` escribe a JSON local**
-Endpoint que hace `fs.writeFile` sobre `src/data/posts.json`. No funciona en despliegue
-serverless/inmutable y compite conceptualmente con el flujo real (Firestore `publishPost`).
-Es legacy de la plantilla. → Eliminar (y revisar `src/data/posts.json`, `flowers.js`).
+**G6. `src/pages/api/posts.ts` escribe a JSON local** — ✅ RESUELTO (2026-06-16)
+Endpoint legacy que hacía `fs.writeFile` sobre `src/data/posts.json`.
+- Eliminados `src/pages/api/posts.ts` y `src/data/posts.json` (este último 241 KB, nadie
+  lo leía salvo el endpoint). Directorio `src/pages/api/` vacío → borrado.
+- `flowers.js` se mantiene: es fuente de verdad de las fichas estáticas de flores
+  (lo usan `home-page.ts`, `sitemap.xml.ts`, `flores-de-bach/[slug].astro`).
 
-**G7. Doble fuente del SDK de Firebase y versiones divergentes**
-`package.json` declara `firebase@^12.9.0`; los scripts vivos importan CDN `11.0.2`; los
-type-decls (`firebase-cdn-modules.d.ts`) fijan `11.0.2`. → Unificar a una sola vía/versión
-(preferible bundle npm; el CDN añade latencia y desincronización de tipos).
+**G7. Doble fuente del SDK de Firebase y versiones divergentes** — ✅ RESUELTO (2026-06-16)
+`package.json` declaraba `firebase@^12.9.0`; los scripts vivos usan CDN `11.0.2`; los
+type-decls fijaban `11.0.2` → divergencia.
+- Runtime único: CDN `11.0.2` (vía `import()` dinámico). Confirmado que ningún script
+  vivo importa el bundle npm (el código muerto que lo usaba se eliminó en G4).
+- `firebase` movido a `devDependencies` y **pinneado exacto a `11.0.2`** (solo fuente de
+  tipos para `firebase-cdn-modules.d.ts`). Cero divergencia runtime↔tipos.
+- Migrar a bundle npm queda como mejora futura (elimina latencia CDN), no urgente.
 
 ### 🟡 Medios (robustez / escala / cumplimiento)
 
-**G8. Funciones RGPD sin interfaz**
-`deleteUserData` (art. 17) y `exportUserData` (art. 20) están implementadas y exportadas,
-pero **ningún script las llama** y `/mi-perfil` no tiene botones de "exportar mis datos" /
-"eliminar cuenta". → Cablear UI en el perfil.
+**G8. Funciones RGPD sin interfaz** — ✅ RESUELTO (2026-06-16)
+`deleteUserData` (art. 17) y `exportUserData` (art. 20) no tenían UI.
+- `/mi-perfil` (`_views/author/mi-perfil.astro`): nueva sección "Tus datos personales"
+  con botones **Exportar mis datos** y **Eliminar mi cuenta** + zona de mensajes.
+- `scripts/profile/settings.js`: exportar → llama `exportUserData`, descarga JSON
+  (`mis-datos-{uid}.json`). Eliminar → `confirm` doble → `deleteUserData` → `signOut` +
+  limpia `localStorage` → redirige a `/`. Botones deshabilitados si falta config Firebase.
 
-**G9. Borrado por lotes sin paginación (límite 500)**
-`deleteCollection` en `functions/src/lib/firebase.ts` hace un único `batch` (máx 500 escrituras
-por batch en Firestore). Un usuario con >500 posts/comentarios/likes deja datos sin borrar →
-incumple G8/RGPD silenciosamente. Igual en `cleanupOnUserDeleted`. → Iterar en lotes.
+**G9. Borrado por lotes sin paginación (límite 500)** — ✅ RESUELTO (2026-06-16)
+`deleteCollection` (`functions/src/lib/firebase.ts`) ahora itera en lotes de 500
+(`limit(500)` + bucle hasta `snapshot.empty`/página incompleta). Beneficia a
+`deleteUserData` y `cleanupOnUserDeleted`. `deleteStorageFiles` ya pagina vía `getFiles`.
 
-**G10. `year` fijo a 2026 al publicar**
-`editor.ts` llama `publishPost({ ..., year: 2026 })`. Los archivos `/archivo/2011..2017` son
-estáticos y solo `/archivo/2026` lee Firestore. Tras 2026 las entradas quedan mal clasificadas.
-→ Derivar el año del servidor (ya hay fallback `new Date().getFullYear()` en la función) y/o
-generar la página de archivo por año dinámicamente.
+**G10. `year` fijo a 2026 al publicar** — ✅ RESUELTO (2026-06-16)
+- `publishPost` deriva `year = new Date().getFullYear()` (server-authoritative), ignora
+  cualquier `year` del cliente y lo devuelve en la respuesta.
+- `editor.ts` ya no envía `year`; redirige a `/archivo/{year}` según la respuesta.
+- Archivo dinámico: `_views/archive/Yearbook.astro` (vista reutilizable por año),
+  `archivo/[year].astro` (SSR, años 2018..actual+1), `archivo/2026.astro` la reusa.
+  Script `yearbook.ts` (antes `yearbook-2026.ts`) lee el año de `data-year`.
+  `YearbookNav` incluye el año actual dinámicamente.
 
-**G11. Sin App Check ni control de abuso en callables**
-`addComment`, `publishPost`, `toggleLike` no validan App Check ni tienen rate limiting. Un
-script puede crear comentarios/posts masivamente con una cuenta. → Habilitar App Check y/o
-límites por usuario.
+**G11. Sin App Check ni control de abuso en callables** — ⏳ PENDIENTE
+`addComment`, `publishPost`, `toggleLike` no validan App Check ni rate limiting.
+→ Requiere alta en consola (reCAPTCHA/App Check provider + clave) antes de tocar código.
+No ejecutado: necesita acción en Firebase/GCP Console fuera del repo.
 
-**G12. Sin tests**
-`functions/package.json` incluye `firebase-functions-test` pero no hay tests. Cero cobertura
-en front y back. → Mínimo: tests de reglas (emulador) y de las callables críticas.
+**G12. Sin tests** — ⏳ PENDIENTE
+Cero cobertura. → Trabajo de mayor alcance (suite + emulador). No ejecutado en esta tanda;
+candidato siguiente una vez estabilizado el resto.
 
 ### 🟢 Bajos (mantenimiento / docs)
 
-- **G13.** `README.md` es la plantilla de Astro con secciones Firebase pegadas al final.
-  No documenta arquitectura, rutas, ni despliegue del sitio (solo de reglas/funciones).
-- **G14.** No hay `.env.example` (el README lo menciona) — onboarding manual.
-- **G15.** `tsconfig` excluye `functions`; las functions tienen su propio tsconfig. OK, pero no
-  hay `astro check`/lint en el front.
-- **G16.** Likes: el cliente se suscribe a toda la colección `likes` filtrada por `postId` y
-  cuenta `snapshot.size`. Funciona, pero no escala; no hay contador denormalizado en el post.
-- **G17.** `src/data/` (`posts.json`, `flowers.js`, `home-page.ts`) mezcla datos estáticos con
-  el modelo Firestore; conviene aclarar qué es fuente de verdad.
-- **G18.** Inconsistencia de región: `cleanupOnUserDeleted` (gen1, `us-central1`) vs resto
-  (`europe-west1`). Es obligado para triggers Auth gen1, pero conviene documentarlo.
+- **G13.** ✅ RESUELTO (2026-06-16) — `README.md` reescrito: arquitectura, tabla de rutas,
+  puesta en marcha, comandos, despliegue de reglas/funciones, nota de credenciales y migración.
+- **G14.** ✅ RESUELTO (2026-06-16) — Añadido `.env.example` con las 6 claves `PUBLIC_FIREBASE_*`
+  y nota de que el prefijo `PUBLIC_` las expone al cliente (no meter secretos de servidor).
+- **G15.** ⏳ PENDIENTE — `tsconfig` excluye `functions` (OK, tienen su propio tsconfig). Falta
+  `astro check`/lint en el front. (No bloqueante; el build verifica tipos de `.astro`/scripts.)
+- **G16.** ⏳ PENDIENTE — Likes vía suscripción a toda la colección filtrada por `postId`
+  (`snapshot.size`). No escala. Mejora: contador denormalizado `likeCount` en el post
+  (transacción en `toggleLike` + backfill de posts existentes + cambiar lectura en
+  `interactions.js`). No ejecutado: requiere migración de datos y decisión de diseño.
+- **G17.** ✅ ACLARADO (2026-06-16) — Eliminado `posts.json` (legacy, ver G6). Fuentes de verdad:
+  estático en `src/data/` (`flowers.js`, `home-page.ts`); dinámico en Firestore (`posts`,
+  `comments`, `likes`, `users`). Documentado en README.
+- **G18.** ✅ DOCUMENTADO (2026-06-16) — Región: `cleanupOnUserDeleted` y `provisionUserProfile`
+  en `us-central1` (gen1, obligado para triggers Auth); el resto en `europe-west1`. Recogido
+  en la sección de arquitectura del README.
 
 ---
 
@@ -151,6 +170,20 @@ en front y back. → Mínimo: tests de reglas (emulador) y de las callables crí
 3. **Cumplimiento RGPD:** G8 (UI export/delete) + G9 (paginar borrados).
 4. **Robustez:** G10 (año), G11 (App Check), G16 (contador likes).
 5. **Calidad/Docs:** G12 (tests con emulador), G13/G14 (README real + `.env.example`).
+
+### Estado (2026-06-16)
+
+- ✅ **Resueltos:** G1 (parcial — falta rotar clave), G2, G3, G4, G5, G6, G7, G8, G9, G10,
+  G13, G14, G17, G18.
+- ⏳ **Pendientes:** G11 (App Check — necesita consola), G12 (tests), G15 (lint/astro check),
+  G16 (contador likes denormalizado — necesita migración de datos).
+- ⚠️ **Acciones manuales fuera del repo:**
+  - Rotar la clave de service account en GCP IAM (G1).
+  - `firebase deploy --only storage` para aplicar avatares públicos (G3).
+  - `firebase deploy --only functions` para publicar cambios de `addComment`/`publishPost`/
+    `deleteCollection` (G2/G9/G10) — y eliminar `registerUser` ya retirado (G5).
+
+Verificado: `tsc` de functions OK y `astro build` OK tras los cambios.
 
 ---
 

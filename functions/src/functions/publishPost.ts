@@ -16,12 +16,15 @@ export const publishPost = onCall(async (request) => {
     throw new HttpsError("unauthenticated", "Debes estar autenticado para publicar.");
   }
 
-  const { title, content, imageUrl, year } = (request.data ?? {}) as {
+  const { title, content, imageUrl } = (request.data ?? {}) as {
     title?: string;
     content?: string;
     imageUrl?: string;
-    year?: number;
   };
+
+  // El año es server-authoritative: se deriva del reloj del servidor,
+  // nunca del cliente, para que el archivo clasifique siempre bien.
+  const year = new Date().getFullYear();
 
   const cleanTitle = typeof title === "string" ? title.trim() : "";
   const cleanContent = typeof content === "string" ? content.trim() : "";
@@ -46,11 +49,11 @@ export const publishPost = onCall(async (request) => {
     authorUid: uid,
     authorEmail: request.auth?.token?.email ?? "",
     authorName,
-    year: typeof year === "number" ? year : new Date().getFullYear(),
+    year,
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
     createdAtMs: Date.now(),
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
   });
 
-  return { success: true, postId: docRef.id };
+  return { success: true, postId: docRef.id, year };
 });

@@ -130,6 +130,45 @@ import Layout from "../../../layouts/Layout.astro";
         </div>
       </form>
     </article>
+
+    <!-- Datos personales (RGPD): portabilidad (art. 20) y supresión (art. 17) -->
+    <article
+      class="mt-8 bg-white/90 border border-sage/20 rounded-[2rem] shadow-xl shadow-sage/5 p-6 md:p-8 space-y-5"
+    >
+      <header class="space-y-1">
+        <h2 class="font-serif text-2xl font-bold text-deep-green">
+          Tus datos personales
+        </h2>
+        <p class="text-sm text-deep-green/70">
+          Descarga una copia de tus datos o elimina tu cuenta de forma
+          permanente. La eliminación borra tus publicaciones, comentarios y
+          archivos, y no se puede deshacer.
+        </p>
+      </header>
+
+      <p
+        id="gdpr-message"
+        class="hidden rounded-2xl border px-4 py-3 text-sm"
+        aria-live="polite"
+      ></p>
+
+      <div class="flex flex-col gap-3 sm:flex-row">
+        <button
+          id="gdpr-export-button"
+          type="button"
+          class="inline-flex w-full items-center justify-center rounded-full border border-sage/40 px-6 py-3 font-semibold text-deep-green hover:bg-sage/10 transition-colors disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+        >
+          Exportar mis datos
+        </button>
+        <button
+          id="gdpr-delete-button"
+          type="button"
+          class="inline-flex w-full items-center justify-center rounded-full border border-red-300 bg-red-50 px-6 py-3 font-semibold text-red-700 hover:bg-red-100 transition-colors disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+        >
+          Eliminar mi cuenta
+        </button>
+      </div>
+    </article>
   </section>
 </Layout>
 

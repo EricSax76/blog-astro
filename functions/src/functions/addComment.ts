@@ -12,6 +12,18 @@ import { db } from "../lib/firebase";
 
 const MAX_COMMENT_LENGTH = 1000;
 
+/**
+ * Neutraliza HTML en texto libre del usuario. Defensa en profundidad:
+ * el cliente ya renderiza con textContent, pero el servidor no debe
+ * almacenar markup ejecutable (otros consumidores podrían no escapar).
+ */
+function stripHtml(value: string): string {
+  return value
+    .replace(/<[^>]*>/g, "")
+    .replace(/&lt;|&gt;/g, "")
+    .trim();
+}
+
 export const addComment = onCall(async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
@@ -40,6 +52,11 @@ export const addComment = onCall(async (request) => {
     );
   }
 
+  const safeContent = stripHtml(content);
+  if (safeContent.length === 0) {
+    throw new HttpsError("invalid-argument", "El comentario no puede estar vacío.");
+  }
+
   const userDoc = await db.collection("users").doc(uid).get();
   const userData = userDoc.data() ?? {};
   const authorName =
@@ -53,7 +70,7 @@ export const addComment = onCall(async (request) => {
     title: typeof title === "string" ? title.trim() : "",
     authorId: uid,
     authorName,
-    content: content.trim(),
+    content: safeContent,
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
   };
 

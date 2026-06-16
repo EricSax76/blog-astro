@@ -200,15 +200,20 @@ const publishPost = async (): Promise<void> => {
       imageUrl = await uploadImageToStorage(clients, user.uid, file);
     }
 
+    // El año lo deriva el servidor (new Date().getFullYear()); no se fija
+    // en cliente para no clasificar mal tras el año en curso.
     const publishPost = clients.httpsCallable(clients.functions, "publishPost");
-    await publishPost({ title, content, imageUrl, year: 2026 });
+    const result = await publishPost({ title, content, imageUrl });
+    const publishedYear =
+      (result?.data && (result.data as { year?: number }).year) ??
+      new Date().getFullYear();
 
     if (titleInput) titleInput.value = "";
     if (contentInput) contentInput.value = "";
     if (imageInput) imageInput.value = "";
     resetPreview();
 
-    window.location.href = "/archivo/2026";
+    window.location.href = `/archivo/${publishedYear}`;
   } catch (error) {
     console.error(error);
     alert("No se pudo publicar en Firebase. Revisa reglas/configuración e inténtalo de nuevo.");
@@ -233,6 +238,6 @@ if (publishButton) {
 
 if (goButton) {
   goButton.addEventListener("click", () => {
-    window.location.href = "/archivo/2026";
+    window.location.href = `/archivo/${new Date().getFullYear()}`;
   });
 }

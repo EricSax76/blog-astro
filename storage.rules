@@ -33,8 +33,10 @@ service firebase.storage {
 
     // Avatar de perfil por usuario:
     // path esperado: users/{uid}/avatar/{archivo}
+    // El avatar es identidad publica del autor (se muestra en header y comentarios),
+    // por eso lectura publica; escritura solo del propietario.
     match /users/{uid}/avatar/{allPaths=**} {
-      allow read: if isOwner(uid);
+      allow read: if true;
       allow create, update: if isOwner(uid) && isValidAvatarUpload();
       allow delete: if isOwner(uid);
     }
