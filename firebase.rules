@@ -41,12 +41,20 @@ service cloud.firestore {
       return isSignedIn() && request.resource.data.authorUid == request.auth.uid;
     }
 
+    // likeCount es contador denormalizado: solo lo escribe toggleLike (Admin SDK,
+    // que se salta estas reglas). El cliente nunca puede crearlo ni modificarlo.
+    function likeCountUntouchedOnUpdate() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(["likeCount"]);
+    }
+
     // Lectura pública del blog. Escritura solo del autor dueño del post.
     match /posts/{postId} {
       allow read: if true;
-      allow create: if isCreatingOwnPost();
+      allow create: if isCreatingOwnPost()
+        && !request.resource.data.keys().hasAny(["likeCount"]);
       allow update: if isPostOwner()
-        && request.resource.data.authorUid == resource.data.authorUid;
+        && request.resource.data.authorUid == resource.data.authorUid
+        && likeCountUntouchedOnUpdate();
       allow delete: if isPostOwner();
     }
 

@@ -146,6 +146,8 @@ class BlogSocialInteractions extends HTMLElement {
       where,
       orderBy,
       onSnapshot,
+      doc,
+      getDoc,
     } = firestoreOps;
 
     const callAddComment = (data) => httpsCallable(functions, "addComment")(data);
@@ -181,23 +183,26 @@ class BlogSocialInteractions extends HTMLElement {
     onAuthStateChanged(auth, updateAuthUI);
 
     // --- Likes ---
-    let currentLikeSnapshot = null;
-
+    // Contador denormalizado: se lee likeCount del doc del post (O(1)), no se
+    // escanea la colección "likes". El estado "yo di like" es un único getDoc
+    // al doc likes/{postId}_{uid}, solo cuando hay sesión.
     const subscribeToLikes = () => {
-      const q = query(collection(db, "likes"), where("postId", "==", this.postId));
-      onSnapshot(q, (snapshot) => {
-        likeCountSpan.textContent = snapshot.size;
-        currentLikeSnapshot = snapshot;
-        checkUserLike();
+      const postRef = doc(db, "posts", this.postId);
+      onSnapshot(postRef, (snap) => {
+        const count = snap.exists() ? snap.data().likeCount : 0;
+        likeCountSpan.textContent = count ?? 0;
       });
     };
 
-    const checkUserLike = () => {
-      if (!currentUser || !currentLikeSnapshot) return;
-      const isLiked = currentLikeSnapshot.docs.some(
-        (d) => d.data().userId === currentUser.uid
-      );
-      likeBtn.classList.toggle("liked", isLiked);
+    const checkUserLike = async () => {
+      if (!currentUser) return;
+      try {
+        const likeRef = doc(db, "likes", `${this.postId}_${currentUser.uid}`);
+        const likeSnap = await getDoc(likeRef);
+        likeBtn.classList.toggle("liked", likeSnap.exists());
+      } catch (e) {
+        console.error("Error checking user like:", e);
+      }
     };
 
     likeBtn.addEventListener("click", async () => {
@@ -206,7 +211,10 @@ class BlogSocialInteractions extends HTMLElement {
         return;
       }
       try {
-        await callToggleLike(this.postId);
+        const res = await callToggleLike(this.postId);
+        // El contador llega vía onSnapshot del post; el estado propio lo fija
+        // la respuesta de la función (evita un getDoc extra de ida y vuelta).
+        likeBtn.classList.toggle("liked", !!res?.data?.liked);
       } catch (e) {
         console.error("Error toggling like:", e);
       }

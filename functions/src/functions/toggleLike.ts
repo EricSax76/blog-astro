@@ -21,20 +21,34 @@ export const toggleLike = onCall(async (request) => {
     throw new HttpsError("invalid-argument", "postId es obligatorio.");
   }
 
-  const likeDocId = `${postId.trim()}_${uid}`;
-  const likeRef = db.collection("likes").doc(likeDocId);
-  const snapshot = await likeRef.get();
+  const id = postId.trim();
+  const likeRef = db.collection("likes").doc(`${id}_${uid}`);
+  const postRef = db.collection("posts").doc(id);
 
-  if (snapshot.exists) {
-    await likeRef.delete();
-    return { success: true, liked: false };
-  }
+  // Transacción: el doc de like (saber si ESTE usuario dio like) y el contador
+  // denormalizado posts/{id}.likeCount se actualizan atómicamente. La lectura del
+  // contador en cliente pasa a ser O(1) (un doc) en vez de escanear la colección.
+  const liked = await db.runTransaction(async (tx) => {
+    const likeSnap = await tx.get(likeRef);
 
-  await likeRef.set({
-    postId: postId.trim(),
-    userId: uid,
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    if (likeSnap.exists) {
+      tx.delete(likeRef);
+      tx.update(postRef, {
+        likeCount: admin.firestore.FieldValue.increment(-1),
+      });
+      return false;
+    }
+
+    tx.set(likeRef, {
+      postId: id,
+      userId: uid,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    tx.update(postRef, {
+      likeCount: admin.firestore.FieldValue.increment(1),
+    });
+    return true;
   });
 
-  return { success: true, liked: true };
+  return { success: true, liked };
 });

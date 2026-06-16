@@ -50,6 +50,7 @@ export const publishPost = onCall(async (request) => {
     authorEmail: request.auth?.token?.email ?? "",
     authorName,
     year,
+    likeCount: 0,
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
     createdAtMs: Date.now(),
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),

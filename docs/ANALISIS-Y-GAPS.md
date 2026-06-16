@@ -149,10 +149,13 @@ candidato siguiente una vez estabilizado el resto.
   y nota de que el prefijo `PUBLIC_` las expone al cliente (no meter secretos de servidor).
 - **G15.** ⏳ PENDIENTE — `tsconfig` excluye `functions` (OK, tienen su propio tsconfig). Falta
   `astro check`/lint en el front. (No bloqueante; el build verifica tipos de `.astro`/scripts.)
-- **G16.** ⏳ PENDIENTE — Likes vía suscripción a toda la colección filtrada por `postId`
-  (`snapshot.size`). No escala. Mejora: contador denormalizado `likeCount` en el post
-  (transacción en `toggleLike` + backfill de posts existentes + cambiar lectura en
-  `interactions.js`). No ejecutado: requiere migración de datos y decisión de diseño.
+- **G16.** ✅ HECHO (2026-06-16) — Contador denormalizado `likeCount` en el post.
+  `toggleLike` actualiza like-doc + `posts/{id}.likeCount` con `increment(±1)` en una
+  transacción atómica; `publishPost` siembra `likeCount: 0`. Lectura en `interactions.js`:
+  `onSnapshot` del doc del post (O(1), tiempo real) para el contador y `getDoc` único de
+  `likes/{postId}_{uid}` para el estado propio — se elimina el escaneo de la colección.
+  Reglas: el cliente no puede crear ni modificar `likeCount` (solo Admin SDK). Sin backfill:
+  no hay usuarios reales todavía.
 - **G17.** ✅ ACLARADO (2026-06-16) — Eliminado `posts.json` (legacy, ver G6). Fuentes de verdad:
   estático en `src/data/` (`flowers.js`, `home-page.ts`); dinámico en Firestore (`posts`,
   `comments`, `likes`, `users`). Documentado en README.
