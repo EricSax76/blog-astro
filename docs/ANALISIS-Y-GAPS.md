@@ -77,11 +77,18 @@ Eliminados `auth/login.js`, `auth/register.js`, `profile/dashboard.js`, `user/co
 `lib/auth/navigation.ts`, y la rama `terapeuta` de `lib/firebase/profiles.ts`
 (`getMyAccountContext`). Revisar también `lib/firebase/auth.ts` (solo lo usa código muerto).
 
-**G5. `registerUser` (Cloud Function) nunca se invoca en el flujo vivo**
-`entry.js` registra con `createUserWithEmailAndPassword` en cliente y luego llama
-`upsertUserProfile`. La función `registerUser` (que crea Auth + perfil atómicamente desde el
-servidor, el patrón "correcto" documentado en su propio comentario) solo la usa el código muerto
-(`lib/firebase/auth.ts`). → Unificar: o se adopta `registerUser`, o se elimina.
+**G5. `registerUser` (Cloud Function) nunca se invoca en el flujo vivo** — ✅ RESUELTO (2026-06-16)
+Adoptado el patrón estándar de Firebase (más usado y fiable): alta de cuenta con el **SDK de
+Auth en cliente** + provisión del perfil en servidor. No se envían contraseñas a funciones propias.
+- Eliminada la función `registerUser` (creaba Auth+perfil con password en el servidor).
+- `upsertUserProfile` ahora persiste `username` y el `role` en la creación (server-authoritative).
+  → **Arregla el bug** por el que `username` nunca se guardaba en el alta (lo leen
+  `addComment`/`publishPost` como nombre de autor preferente).
+- Nuevo trigger `provisionUserProfile` (Auth `onCreate`, gen1 `us-central1`, simétrico a
+  `cleanupOnUserDeleted`): red de seguridad que garantiza el perfil aunque el cliente falle →
+  sin cuentas huérfanas.
+- `entry.js` envía `username` al provisionar en el registro.
+Build de functions (`tsc`) y front verificados.
 
 **G6. `src/pages/api/posts.ts` escribe a JSON local**
 Endpoint que hace `fs.writeFile` sobre `src/data/posts.json`. No funciona en despliegue

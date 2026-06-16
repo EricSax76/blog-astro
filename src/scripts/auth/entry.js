@@ -188,10 +188,13 @@ if (typeof window !== "undefined") {
         const auth = getAuth(app);
         const functions = getFunctions(app, "europe-west1");
 
-        const callUpsertUserProfile = async (user) => {
+        // Provisiona/sincroniza el perfil en servidor. `extra` permite enviar el
+        // username en el alta (el rol lo fija siempre la Cloud Function).
+        const callUpsertUserProfile = async (user, extra = {}) => {
           if (!user?.uid) return;
           await httpsCallable(functions, "upsertUserProfile")({
             displayName: user.displayName ?? "",
+            ...extra,
           });
         };
 
@@ -237,7 +240,7 @@ if (typeof window !== "undefined") {
               }
 
               try {
-                await callUpsertUserProfile(userCredential.user);
+                await callUpsertUserProfile(userCredential.user, { username: name });
               } catch (profileError) {
                 console.error("[firebase/register-profile] failed", profileError);
                 setMessage(

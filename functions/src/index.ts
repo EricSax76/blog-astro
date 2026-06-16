@@ -11,8 +11,10 @@ export { deleteUserData } from "./functions/deleteUserData";
 export { exportUserData } from "./functions/exportUserData";
 export { cleanupOnUserDeleted } from "./functions/cleanupOnUserDeleted";
 
-// Operaciones con datos de usuario (RGPD art. 5)
-export { registerUser } from "./functions/registerUser";
+// Provisión y sincronización del perfil (RGPD art. 5)
+// El alta de la cuenta la hace el cliente con el SDK de Auth; el servidor
+// provisiona el perfil (rol + username) vía callable y un trigger de respaldo.
+export { provisionUserProfile } from "./functions/provisionUserProfile";
 export { upsertUserProfile } from "./functions/upsertUserProfile";
 
 // Contenido generado por el usuario
