@@ -1,5 +1,9 @@
 rules_version = '2';
 
+// Todas las escrituras pasan por Cloud Functions (Admin SDK, que ignora estas
+// reglas). El SDK cliente solo lee: así ninguna escritura puede saltarse la
+// validación/sanitización del backend (publishPost, addComment, toggleLike,
+// deleteComment, upsertUserProfile, deleteUserData).
 service cloud.firestore {
   match /databases/{database}/documents {
     function isSignedIn() {
@@ -10,76 +14,29 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    function isValidDisplayName() {
-      return !request.resource.data.keys().hasAny(["displayName"])
-        || (request.resource.data.displayName is string
-          && request.resource.data.displayName.size() <= 50);
-    }
-
-    function isValidPhotoURL() {
-      return !request.resource.data.keys().hasAny(["photoURL"])
-        || (request.resource.data.photoURL is string
-          && request.resource.data.photoURL.size() <= 2048);
-    }
-
-    function isAllowedUserProfilePatch() {
-      return request.resource.data.diff(resource.data).changedKeys().hasOnly([
-          "displayName",
-          "photoURL",
-          "updatedAt",
-          "lastSeenAt"
-        ])
-        && isValidDisplayName()
-        && isValidPhotoURL();
-    }
-
-    function isPostOwner() {
-      return isSignedIn() && resource.data.authorUid == request.auth.uid;
-    }
-
-    function isCreatingOwnPost() {
-      return isSignedIn() && request.resource.data.authorUid == request.auth.uid;
-    }
-
-    // likeCount es contador denormalizado: solo lo escribe toggleLike (Admin SDK,
-    // que se salta estas reglas). El cliente nunca puede crearlo ni modificarlo.
-    function likeCountUntouchedOnUpdate() {
-      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(["likeCount"]);
-    }
-
-    // Lectura pública del blog. Escritura solo del autor dueño del post.
+    // Lectura pública del blog. Escritura solo desde Cloud Functions.
     match /posts/{postId} {
       allow read: if true;
-      allow create: if isCreatingOwnPost()
-        && !request.resource.data.keys().hasAny(["likeCount"]);
-      allow update: if isPostOwner()
-        && request.resource.data.authorUid == resource.data.authorUid
-        && likeCountUntouchedOnUpdate();
-      allow delete: if isPostOwner();
+      allow write: if false;
     }
 
-    // Perfil privado por usuario:
-    // - lectura: solo el propio usuario
-    // - actualización: solo campos de perfil editables por cliente
-    // - creación/borrado: solo backend (Cloud Functions admin)
+    // Perfil privado: lectura solo del propio usuario.
+    // Escritura solo desde Cloud Functions (upsertUserProfile).
     match /users/{userId} {
       allow read: if isOwnUser(userId);
-      allow update: if isOwnUser(userId) && isAllowedUserProfilePatch();
-      allow create, delete: if false;
+      allow write: if false;
     }
 
-    // Social Interactions: Likes
+    // Social Interactions: Likes (escritura via toggleLike)
     match /likes/{likeId} {
       allow read: if true;
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow write: if false;
     }
 
-    // Social Interactions: Comments
+    // Social Interactions: Comments (escritura via addComment/deleteComment)
     match /comments/{commentId} {
       allow read: if true;
-      allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
-      allow delete: if isSignedIn() && resource.data.authorId == request.auth.uid;
+      allow write: if false;
     }
 
     // Deniega por defecto cualquier otra colección.
