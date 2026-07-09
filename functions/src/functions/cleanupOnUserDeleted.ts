@@ -14,17 +14,36 @@ export const cleanupOnUserDeleted = region("us-central1")
   .onDelete(async (user) => {
   const { uid } = user;
 
-  try {
-    await Promise.allSettled([
-      deleteCollection("posts", "authorUid", uid),
-      deleteCollection("comments", "authorId", uid),
-      deleteCollection("likes", "userId", uid),
-      db.collection("users").doc(uid).delete(),
-      deleteStorageFiles(`blog/posts/${uid}/`),
-      deleteStorageFiles(`users/${uid}/`),
-    ]);
-    console.log(`Limpieza completada para usuario: ${uid}`);
-  } catch (error) {
-    console.error(`Error al limpiar datos del usuario ${uid}:`, error);
+  // Se intentan todas las limpiezas (son idempotentes) y después se falla
+  // en bloque si alguna no terminó: tragarse un fallo parcial dejaría datos
+  // personales residuales sin reintento, incumpliendo el art. 17 RGPD.
+  const tasks: Array<[string, Promise<unknown>]> = [
+    ["posts", deleteCollection("posts", "authorUid", uid)],
+    ["comments", deleteCollection("comments", "authorId", uid)],
+    ["likes", deleteCollection("likes", "userId", uid)],
+    ["perfil", db.collection("users").doc(uid).delete()],
+    ["storage:blog", deleteStorageFiles(`blog/posts/${uid}/`)],
+    ["storage:users", deleteStorageFiles(`users/${uid}/`)],
+  ];
+
+  const results = await Promise.allSettled(tasks.map(([, promise]) => promise));
+  const failures = results
+    .map((result, i) => ({ result, name: tasks[i][0] }))
+    .filter(({ result }) => result.status === "rejected");
+
+  if (failures.length > 0) {
+    failures.forEach(({ name, result }) => {
+      console.error(
+        `Fallo limpiando "${name}" del usuario ${uid}:`,
+        (result as PromiseRejectedResult).reason
+      );
+    });
+    throw new Error(
+      `Limpieza incompleta para ${uid}: fallaron ${failures
+        .map(({ name }) => name)
+        .join(", ")}`
+    );
   }
+
+  console.log(`Limpieza completada para usuario: ${uid}`);
 });
