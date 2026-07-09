@@ -17,6 +17,7 @@ import { getDownloadURL } from "firebase-admin/storage";
 import * as admin from "firebase-admin";
 import { db, bucket } from "../lib/firebase";
 import { requireAllowedKeys, cleanOptionalText } from "../lib/validation";
+import { enforceRateLimit } from "../lib/rateLimit";
 
 const MAX_TITLE_LENGTH = 120;
 const MAX_CONTENT_LENGTH = 10000;
@@ -73,6 +74,8 @@ export const publishPost = onCall(async (request) => {
   if (!uid) {
     throw new HttpsError("unauthenticated", "Debes estar autenticado para publicar.");
   }
+
+  await enforceRateLimit(uid, "publishPost");
 
   requireAllowedKeys(request.data, ["title", "content", "imagePath"]);
 

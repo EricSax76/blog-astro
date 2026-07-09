@@ -8,12 +8,15 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { db } from "../lib/firebase";
+import { enforceRateLimit } from "../lib/rateLimit";
 
 export const toggleLike = onCall(async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError("unauthenticated", "Debes iniciar sesión para dar me gusta.");
   }
+
+  await enforceRateLimit(uid, "toggleLike");
 
   const { postId } = (request.data ?? {}) as { postId?: string };
 

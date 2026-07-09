@@ -9,12 +9,15 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
 import { db } from "../lib/firebase";
+import { enforceRateLimit } from "../lib/rateLimit";
 
 export const upsertUserProfile = onCall(async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError("unauthenticated", "Debes estar autenticado.");
   }
+
+  await enforceRateLimit(uid, "upsertUserProfile");
 
   const { displayName, username } = (request.data ?? {}) as {
     displayName?: string;

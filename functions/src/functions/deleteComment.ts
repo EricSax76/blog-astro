@@ -8,12 +8,15 @@
 
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { db } from "../lib/firebase";
+import { enforceRateLimit } from "../lib/rateLimit";
 
 export const deleteComment = onCall(async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError("unauthenticated", "Debes estar autenticado.");
   }
+
+  await enforceRateLimit(uid, "deleteComment");
 
   const { commentId } = (request.data ?? {}) as { commentId?: string };
 
