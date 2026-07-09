@@ -10,6 +10,18 @@ export const initHeaderMobileMenu = (): void => {
 
   let isMenuOpen = false;
 
+  // Contenido de fondo que debe quedar inerte mientras el dialog está
+  // abierto (el menú es un overlay fixed que tapa toda la página).
+  const getBackgroundRegions = (): HTMLElement[] =>
+    Array.from(document.querySelectorAll<HTMLElement>("main, footer"));
+
+  const getFocusableInMenu = (): HTMLElement[] =>
+    Array.from(
+      mobileMenu.querySelectorAll<HTMLElement>(
+        "a[href], button:not([disabled]), [tabindex]:not([tabindex='-1'])"
+      )
+    ).filter((element) => element.offsetParent !== null);
+
   const openMenu = () => {
     isMenuOpen = true;
     mobileMenu.classList.remove("opacity-0", "pointer-events-none");
@@ -17,6 +29,10 @@ export const initHeaderMobileMenu = (): void => {
     menuBtn.setAttribute("aria-expanded", "true");
     menuBtn.setAttribute("aria-label", "Cerrar menú de navegación");
     menuBtn.innerHTML = SVG_CLOSE;
+    getBackgroundRegions().forEach((region) => {
+      region.setAttribute("inert", "");
+      region.setAttribute("aria-hidden", "true");
+    });
     const firstLink = mobileMenu.querySelector<HTMLElement>("a, button");
     firstLink?.focus();
   };
@@ -28,6 +44,10 @@ export const initHeaderMobileMenu = (): void => {
     menuBtn.setAttribute("aria-expanded", "false");
     menuBtn.setAttribute("aria-label", "Abrir menú de navegación");
     menuBtn.innerHTML = SVG_HAMBURGER;
+    getBackgroundRegions().forEach((region) => {
+      region.removeAttribute("inert");
+      region.removeAttribute("aria-hidden");
+    });
     menuBtn.focus();
   };
 
@@ -36,8 +56,34 @@ export const initHeaderMobileMenu = (): void => {
   });
 
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && isMenuOpen) {
+    if (!isMenuOpen) return;
+
+    if (event.key === "Escape") {
       closeMenu();
+      return;
+    }
+
+    // Focus trap: Tab circula entre el botón de cierre (en el header) y los
+    // elementos del menú; nunca sale al contenido de fondo.
+    if (event.key === "Tab") {
+      const cycle = [menuBtn, ...getFocusableInMenu()];
+      if (cycle.length === 0) return;
+
+      const active = document.activeElement as HTMLElement | null;
+      const currentIndex = active ? cycle.indexOf(active) : -1;
+
+      let nextIndex: number;
+      if (event.shiftKey) {
+        nextIndex = currentIndex <= 0 ? cycle.length - 1 : currentIndex - 1;
+      } else {
+        nextIndex =
+          currentIndex === -1 || currentIndex === cycle.length - 1
+            ? 0
+            : currentIndex + 1;
+      }
+
+      event.preventDefault();
+      cycle[nextIndex]?.focus();
     }
   });
 

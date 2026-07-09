@@ -66,6 +66,7 @@ import Layout from "../../../layouts/Layout.astro";
                 data-publish-control
                 type="text"
                 name="title"
+                maxlength="120"
                 disabled
                 placeholder="Ej: Flores que inspiran calma"
                 class="min-h-[48px] w-full rounded-2xl border border-sage/30 bg-cream/65 px-4 py-3 text-base text-deep-green shadow-sm placeholder:text-deep-green/35 focus:border-sage/45 focus:outline-none focus:ring-2 focus:ring-sage/30 disabled:cursor-not-allowed disabled:opacity-50"
@@ -87,6 +88,7 @@ import Layout from "../../../layouts/Layout.astro";
                 data-publish-control
                 name="content"
                 rows="10"
+                maxlength="10000"
                 disabled
                 placeholder="Comparte la historia, reflexión o enseñanza del día..."
                 class="min-h-[220px] w-full resize-y rounded-2xl border border-sage/30 bg-cream/65 px-4 py-3 text-base leading-7 text-deep-green shadow-sm placeholder:text-deep-green/35 focus:border-sage/45 focus:outline-none focus:ring-2 focus:ring-sage/30 disabled:cursor-not-allowed disabled:opacity-50"
@@ -101,14 +103,16 @@ import Layout from "../../../layouts/Layout.astro";
                 >
                   Foto destacada
                 </span>
-                <span class="text-xs text-deep-green/45">Formato recomendado: horizontal</span>
+                <span class="text-xs text-deep-green/45"
+                  >JPEG, PNG, WebP o GIF · máx. 10MB · horizontal recomendado</span
+                >
               </div>
               <input
                 id="blog-image-input"
                 data-publish-control
                 type="file"
                 name="image"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp,image/gif"
                 disabled
                 class="block w-full cursor-pointer rounded-2xl border border-dashed border-sage/35 bg-cream/55 px-4 py-3 text-sm text-deep-green file:mr-4 file:rounded-full file:border-0 file:bg-sage/20 file:px-4 file:py-2 file:font-semibold file:text-deep-green hover:file:bg-sage/30 disabled:cursor-not-allowed disabled:opacity-50"
               />
@@ -152,10 +156,10 @@ import Layout from "../../../layouts/Layout.astro";
             </button>
             <button
               type="button"
-              id="blog-go-2026"
+              id="blog-go-current-year"
               class="inline-flex w-full items-center justify-center rounded-full border border-sage/40 px-6 py-3 font-semibold text-deep-green transition-colors hover:bg-sage/10 focus:outline-none focus:ring-2 focus:ring-sage/35 sm:w-auto"
             >
-              Ir al 2026
+              Ir al anuario actual
             </button>
             <a
               href="/mis-publicaciones"
@@ -166,11 +170,19 @@ import Layout from "../../../layouts/Layout.astro";
           </div>
 
           <p
+            id="blog-form-status"
+            role="status"
+            aria-live="polite"
+            class="hidden rounded-2xl border px-4 py-3 text-sm leading-6"
+          >
+          </p>
+
+          <p
             id="blog-help"
             class="rounded-2xl border border-sage/20 bg-sage/5 px-4 py-3 text-sm leading-6 text-deep-green/70"
           >
-            Deseosos de leerte pronto. Si tienes dudas, revisa el flujo recomendado o contáctanos.
-            
+            Título hasta 120 caracteres y contenido hasta 10.000. Si tienes dudas, revisa el
+            flujo recomendado o contáctanos.
           </p>
         </form>
       </div>

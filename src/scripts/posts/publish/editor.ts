@@ -52,8 +52,11 @@ const publishButton = document.getElementById(
   "blog-publish-button"
 ) as HTMLButtonElement | null;
 const goButton = document.getElementById(
-  "blog-go-2026"
+  "blog-go-current-year"
 ) as HTMLButtonElement | null;
+const statusMessage = document.getElementById(
+  "blog-form-status"
+) as HTMLParagraphElement | null;
 
 type FirebaseClients = {
   auth: {
@@ -170,14 +173,44 @@ const setPublishingState = (isPublishing: boolean) => {
   publishButton.textContent = isPublishing ? "Publicando..." : "Publicar";
 };
 
+// Estado inline accesible (role=status) en lugar de alert(): no bloquea y
+// lo anuncian los lectores de pantalla.
+const showStatus = (message: string, type: "error" | "success") => {
+  if (!statusMessage) {
+    alert(message);
+    return;
+  }
+  statusMessage.textContent = message;
+  statusMessage.classList.remove(
+    "hidden",
+    "border-red-200",
+    "bg-red-50",
+    "text-red-700",
+    "border-green-200",
+    "bg-green-50",
+    "text-green-700"
+  );
+  statusMessage.classList.add(
+    ...(type === "success"
+      ? ["border-green-200", "bg-green-50", "text-green-700"]
+      : ["border-red-200", "bg-red-50", "text-red-700"])
+  );
+};
+
+const clearStatus = () => {
+  statusMessage?.classList.add("hidden");
+};
+
 const publishPost = async (): Promise<void> => {
+  clearStatus();
+
   if (!isAuthenticatedUser()) {
-    alert("Debes iniciar sesión para publicar en el blog.");
+    showStatus("Debes iniciar sesión para publicar en el blog.", "error");
     return;
   }
 
   if (!hasValidFirebaseConfig()) {
-    alert("Falta configurar Firebase (`PUBLIC_FIREBASE_*`).");
+    showStatus("Falta configurar Firebase (`PUBLIC_FIREBASE_*`).", "error");
     return;
   }
 
@@ -186,17 +219,17 @@ const publishPost = async (): Promise<void> => {
   const file = imageInput?.files?.[0];
 
   if (file && !ALLOWED_IMAGE_TYPES.has(file.type)) {
-    alert("Formato de imagen no permitido. Usa JPEG, PNG, WebP o GIF.");
+    showStatus("Formato de imagen no permitido. Usa JPEG, PNG, WebP o GIF.", "error");
     return;
   }
 
   if (file && file.size >= MAX_IMAGE_BYTES) {
-    alert("La imagen supera el límite de 10MB.");
+    showStatus("La imagen supera el límite de 10MB.", "error");
     return;
   }
 
   if (!title && !content && !file) {
-    alert("Añade un título, contenido o una imagen antes de publicar.");
+    showStatus("Añade un título, contenido o una imagen antes de publicar.", "error");
     return;
   }
 
@@ -228,10 +261,15 @@ const publishPost = async (): Promise<void> => {
     if (imageInput) imageInput.value = "";
     resetPreview();
 
+    showStatus("Publicado. Te llevamos al anuario...", "success");
     window.location.href = `/archivo/${publishedYear}`;
   } catch (error) {
     console.error(error);
-    alert("No se pudo publicar en Firebase. Revisa reglas/configuración e inténtalo de nuevo.");
+    const message =
+      error instanceof Error && error.message.trim().length > 0
+        ? error.message
+        : "No se pudo publicar. Inténtalo de nuevo en unos minutos.";
+    showStatus(message, "error");
   } finally {
     setPublishingState(false);
   }
