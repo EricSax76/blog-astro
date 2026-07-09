@@ -239,8 +239,8 @@ const logoutFromHeader = async (elements: AuthElements): Promise<void> => {
       ).__FIREBASE_CONFIG__ || {};
 
       const [firebaseApp, firebaseAuth] = await Promise.all([
-        import("https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js"),
-        import("https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js"),
+        import("firebase/app"),
+        import("firebase/auth"),
       ]);
 
       const { getApp, getApps, initializeApp } = firebaseApp;

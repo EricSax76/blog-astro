@@ -117,10 +117,10 @@ class BlogSocialInteractions extends HTMLElement {
 
     try {
       const [firebaseApp, firebaseAuth, firebaseFirestore, firebaseFunctions] = await Promise.all([
-        import("https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js"),
-        import("https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js"),
-        import("https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js"),
-        import("https://www.gstatic.com/firebasejs/11.0.2/firebase-functions.js"),
+        import("firebase/app"),
+        import("firebase/auth"),
+        import("firebase/firestore"),
+        import("firebase/functions"),
       ]);
 
       const { initializeApp, getApps, getApp } = firebaseApp;

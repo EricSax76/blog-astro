@@ -21,7 +21,7 @@ const getFirebaseConfig = (): Record<string, string> => {
 };
 
 const getOrInitFirebaseApp = async () => {
-  const firebaseApp = await import("https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js");
+  const firebaseApp = await import("firebase/app");
   const { initializeApp, getApp, getApps } = firebaseApp;
   const config = getFirebaseConfig();
   return getApps().length > 0 ? getApp() : initializeApp(config);
@@ -39,7 +39,7 @@ export const observeMyPostsAuth = async (
   onUserState: (uid: string | null) => void
 ): Promise<void> => {
   const [firebaseAuth, app] = await Promise.all([
-    import("https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js"),
+    import("firebase/auth"),
     getOrInitFirebaseApp(),
   ]);
 
@@ -53,7 +53,7 @@ export const observeMyPostsAuth = async (
 
 export const fetchMyPosts = async (uid: string): Promise<LoadedPost[]> => {
   const [firebaseFirestore, app] = await Promise.all([
-    import("https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js"),
+    import("firebase/firestore"),
     getOrInitFirebaseApp(),
   ]);
 

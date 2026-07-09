@@ -144,11 +144,11 @@ if (typeof window !== "undefined") {
     configWarning?.classList.add("hidden");
 
     Promise.all([
-      import("https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js"),
-      import("https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js"),
-      import("https://www.gstatic.com/firebasejs/11.0.2/firebase-functions.js"),
-      import("https://www.gstatic.com/firebasejs/11.0.2/firebase-storage.js"),
-      import("https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js"),
+      import("firebase/app"),
+      import("firebase/auth"),
+      import("firebase/functions"),
+      import("firebase/storage"),
+      import("firebase/firestore"),
     ])
       .then(
         ([firebaseApp, firebaseAuth, firebaseFunctions, firebaseStorage, firebaseFirestore]) => {

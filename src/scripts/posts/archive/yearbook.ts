@@ -251,8 +251,8 @@ const loadPostsForYear = async () => {
 
   try {
     const [firebaseApp, firebaseFirestore] = await Promise.all([
-      import("https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js"),
-      import("https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js"),
+      import("firebase/app"),
+      import("firebase/firestore"),
     ]);
 
     const { initializeApp, getApp, getApps } = firebaseApp;

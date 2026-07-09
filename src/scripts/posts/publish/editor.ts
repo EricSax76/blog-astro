@@ -74,11 +74,10 @@ const getFirebaseClients = async (): Promise<FirebaseClients> => {
 
   const [firebaseApp, firebaseAuth, firebaseStorage, firebaseFunctions] =
     await Promise.all([
-      import("https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js"),
-      import("https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js"),
-      import("https://www.gstatic.com/firebasejs/11.0.2/firebase-storage.js"),
-      // @ts-ignore — CDN module, tipos no disponibles en tsconfig
-      import("https://www.gstatic.com/firebasejs/11.0.2/firebase-functions.js"),
+      import("firebase/app"),
+      import("firebase/auth"),
+      import("firebase/storage"),
+      import("firebase/functions"),
     ]);
 
   const { getApp, getApps, initializeApp } = firebaseApp;
