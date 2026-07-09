@@ -105,6 +105,8 @@ const sanitizeFileName = (name: string): string => {
   return cleaned.length > 0 ? cleaned : "imagen";
 };
 
+// El servidor (publishPost) valida la ruta, comprueba propiedad/tipo y deriva
+// la URL pública; el cliente solo envía la ruta de Storage subida.
 const uploadImageToStorage = async (
   clients: FirebaseClients,
   uid: string,
@@ -122,7 +124,7 @@ const uploadImageToStorage = async (
     contentType,
   });
 
-  return clients.getDownloadURL(fileRef);
+  return storagePath;
 };
 
 const resetPreview = () => {
@@ -195,15 +197,15 @@ const publishPost = async (): Promise<void> => {
       throw new Error("Tu sesión expiró. Vuelve a iniciar sesión.");
     }
 
-    let imageUrl = "";
+    let imagePath = "";
     if (file) {
-      imageUrl = await uploadImageToStorage(clients, user.uid, file);
+      imagePath = await uploadImageToStorage(clients, user.uid, file);
     }
 
     // El año lo deriva el servidor (new Date().getFullYear()); no se fija
     // en cliente para no clasificar mal tras el año en curso.
     const publishPost = clients.httpsCallable(clients.functions, "publishPost");
-    const result = await publishPost({ title, content, imageUrl });
+    const result = await publishPost({ title, content, imagePath });
     const publishedYear =
       (result?.data && (result.data as { year?: number }).year) ??
       new Date().getFullYear();

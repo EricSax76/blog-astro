@@ -29,6 +29,11 @@ export const toggleLike = onCall(async (request) => {
   // denormalizado posts/{id}.likeCount se actualizan atómicamente. La lectura del
   // contador en cliente pasa a ser O(1) (un doc) en vez de escanear la colección.
   const liked = await db.runTransaction(async (tx) => {
+    const postSnap = await tx.get(postRef);
+    if (!postSnap.exists) {
+      throw new HttpsError("not-found", "La publicación no existe.");
+    }
+
     const likeSnap = await tx.get(likeRef);
 
     if (likeSnap.exists) {
