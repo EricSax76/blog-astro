@@ -1,17 +1,24 @@
 ---
-// Archivo dinámico por año (SSR). Los años con página propia
-// (2011–2017, 2026) tienen prioridad sobre esta ruta. Aquí se atienden
-// los años futuros (2027+) leyendo Firestore con el mismo componente.
+// Archivo dinámico por año, prerenderizado. Los años con página propia
+// (2011–2017, 2026) tienen prioridad sobre esta ruta. Aquí se generan los
+// años intermedios y el siguiente al del build; el contenido real lo carga
+// el cliente desde Firestore con el mismo componente Yearbook, así que las
+// páginas nunca quedan desactualizadas aunque el HTML sea estático.
+// Nota: al empezar un año nuevo basta un rebuild/deploy para generar el
+// siguiente año.
 import Yearbook from "../_views/archive/Yearbook.astro";
+
+export function getStaticPaths() {
+  const currentYear = new Date().getFullYear();
+  const years = [];
+  for (let year = 2018; year <= currentYear + 1; year++) {
+    years.push({ params: { year: String(year) } });
+  }
+  return years;
+}
 
 const { year: yearParam } = Astro.params;
 const year = Number.parseInt(yearParam ?? "", 10);
-
-// Solo años plausibles para contenido en Firestore; el resto → 404.
-const currentYear = new Date().getFullYear();
-if (!Number.isInteger(year) || year < 2018 || year > currentYear + 1) {
-  return new Response(null, { status: 404 });
-}
 ---
 
 <Yearbook year={year} />
