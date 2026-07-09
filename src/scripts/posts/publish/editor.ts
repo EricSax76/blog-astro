@@ -100,6 +100,15 @@ const getFirebaseClients = async (): Promise<FirebaseClients> => {
   };
 };
 
+// Debe coincidir con storage.rules (isRasterImage) y publishPost.
+const ALLOWED_IMAGE_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+]);
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+
 const sanitizeFileName = (name: string): string => {
   const cleaned = name.trim().replace(/[^a-zA-Z0-9._-]+/g, "-");
   return cleaned.length > 0 ? cleaned : "imagen";
@@ -177,8 +186,13 @@ const publishPost = async (): Promise<void> => {
   const content = contentInput?.value?.trim() ?? "";
   const file = imageInput?.files?.[0];
 
-  if (file && file.type && !file.type.startsWith("image/")) {
-    alert("El archivo seleccionado no es una imagen válida.");
+  if (file && !ALLOWED_IMAGE_TYPES.has(file.type)) {
+    alert("Formato de imagen no permitido. Usa JPEG, PNG, WebP o GIF.");
+    return;
+  }
+
+  if (file && file.size >= MAX_IMAGE_BYTES) {
+    alert("La imagen supera el límite de 10MB.");
     return;
   }
 

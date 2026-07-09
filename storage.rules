@@ -10,34 +10,51 @@ service firebase.storage {
       return isSignedIn() && request.auth.uid == uid;
     }
 
+    // Solo formatos raster: se excluye image/svg+xml porque un SVG servido
+    // desde Storage es un documento con scripting potencial, no solo una imagen.
+    // Nota: contentType es metadato declarado por el cliente, no inspección de
+    // bytes; la defensa completa la aporta publishPost al validar la imagen.
+    function isRasterImage() {
+      return request.resource.contentType in
+        ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    }
+
+    function hasSafeFileName(fileName) {
+      return fileName.matches('[A-Za-z0-9._-]{1,200}');
+    }
+
     function isValidImageUpload() {
       return request.resource != null
         && request.resource.size < 10 * 1024 * 1024
-        && request.resource.contentType.matches('image/.*');
+        && isRasterImage();
     }
 
     function isValidAvatarUpload() {
       return request.resource != null
         && request.resource.size < 5 * 1024 * 1024
-        && request.resource.contentType.matches('image/.*');
+        && isRasterImage();
     }
 
     // Imagenes publicadas del blog:
-    // path esperado: blog/posts/{uid}/{archivo}
+    // path esperado: blog/posts/{uid}/{archivo} (sin subdirectorios)
     // lectura publica, escritura solo por el propietario autenticado.
-    match /blog/posts/{uid}/{allPaths=**} {
+    match /blog/posts/{uid}/{fileName} {
       allow read: if true;
-      allow create, update: if isOwner(uid) && isValidImageUpload();
+      allow create, update: if isOwner(uid)
+        && isValidImageUpload()
+        && hasSafeFileName(fileName);
       allow delete: if isOwner(uid);
     }
 
     // Avatar de perfil por usuario:
-    // path esperado: users/{uid}/avatar/{archivo}
+    // path esperado: users/{uid}/avatar/{archivo} (sin subdirectorios)
     // El avatar es identidad publica del autor (se muestra en header y comentarios),
     // por eso lectura publica; escritura solo del propietario.
-    match /users/{uid}/avatar/{allPaths=**} {
+    match /users/{uid}/avatar/{fileName} {
       allow read: if true;
-      allow create, update: if isOwner(uid) && isValidAvatarUpload();
+      allow create, update: if isOwner(uid)
+        && isValidAvatarUpload()
+        && hasSafeFileName(fileName);
       allow delete: if isOwner(uid);
     }
 

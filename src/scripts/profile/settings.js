@@ -241,8 +241,10 @@ if (typeof window !== "undefined") {
               const file =
                 photoInput instanceof HTMLInputElement ? photoInput.files?.[0] || null : null;
 
-              if (file && file.type && !file.type.startsWith("image/")) {
-                setMessage("El archivo seleccionado no es una imagen válida.");
+              // Debe coincidir con storage.rules (isRasterImage): sin SVG.
+              const allowedAvatarTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+              if (file && !allowedAvatarTypes.includes(file.type)) {
+                setMessage("Formato de imagen no permitido. Usa JPEG, PNG, WebP o GIF.");
                 return;
               }
 
