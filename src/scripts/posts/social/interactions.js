@@ -4,6 +4,10 @@ class BlogSocialInteractions extends HTMLElement {
   constructor() {
     super();
     this.initialized = false;
+    // Funciones de baja de listeners Firestore/Auth activos; se ejecutan en
+    // disconnectedCallback para no dejar suscripciones vivas tras quitar el
+    // nodo del DOM (re-render dinámico, navegación con transiciones).
+    this.unsubscribers = [];
   }
 
   connectedCallback() {
@@ -20,6 +24,19 @@ class BlogSocialInteractions extends HTMLElement {
 
     this.render();
     this.initFirebase();
+  }
+
+  disconnectedCallback() {
+    this.unsubscribers.forEach((unsubscribe) => {
+      try {
+        unsubscribe();
+      } catch {
+        // listener ya liberado
+      }
+    });
+    this.unsubscribers = [];
+    // Permite re-inicializar si el nodo vuelve a conectarse al DOM.
+    this.initialized = false;
   }
 
   render() {
@@ -73,6 +90,12 @@ class BlogSocialInteractions extends HTMLElement {
 
         <!-- Comments Section -->
         <div class="comments-section hidden mt-6 space-y-6">
+          <button
+            type="button"
+            class="load-more-comments hidden mx-auto block text-xs font-semibold text-sage hover:underline"
+          >
+            Ver comentarios anteriores
+          </button>
           <div class="comments-list space-y-4">
             <p class="no-comments-msg text-center text-sm italic opacity-60">
               Sé el primero en comentar.
@@ -148,6 +171,7 @@ class BlogSocialInteractions extends HTMLElement {
       onSnapshot,
       doc,
       getDoc,
+      limit,
     } = firestoreOps;
 
     const callAddComment = (data) => httpsCallable(functions, "addComment")(data);
@@ -163,6 +187,7 @@ class BlogSocialInteractions extends HTMLElement {
     const noCommentsMsg = this.querySelector(".no-comments-msg");
     const newCommentForm = this.querySelector(".new-comment-form");
     const authRequiredMsg = this.querySelector(".auth-required-msg");
+    const loadMoreCommentsBtn = this.querySelector(".load-more-comments");
 
     let currentUser = null;
 
@@ -180,7 +205,7 @@ class BlogSocialInteractions extends HTMLElement {
       }
     };
 
-    onAuthStateChanged(auth, updateAuthUI);
+    this.unsubscribers.push(onAuthStateChanged(auth, updateAuthUI));
 
     // --- Likes ---
     // Contador denormalizado: se lee likeCount del doc del post (O(1)), no se
@@ -188,10 +213,12 @@ class BlogSocialInteractions extends HTMLElement {
     // al doc likes/{postId}_{uid}, solo cuando hay sesión.
     const subscribeToLikes = () => {
       const postRef = doc(db, "posts", this.postId);
-      onSnapshot(postRef, (snap) => {
-        const count = snap.exists() ? snap.data().likeCount : 0;
-        likeCountSpan.textContent = count ?? 0;
-      });
+      this.unsubscribers.push(
+        onSnapshot(postRef, (snap) => {
+          const count = snap.exists() ? snap.data().likeCount : 0;
+          likeCountSpan.textContent = count ?? 0;
+        })
+      );
     };
 
     const checkUserLike = async () => {
@@ -221,22 +248,48 @@ class BlogSocialInteractions extends HTMLElement {
     });
 
     // --- Comments ---
+    // Ventana realtime acotada: se suscribe a los N comentarios más recientes
+    // (orden desc + limit) y se renderizan en orden cronológico. "Ver
+    // comentarios anteriores" amplía la ventana y resuscribe. Así un post con
+    // cientos de comentarios no descarga la colección completa.
+    const COMMENTS_PAGE = 50;
+    let commentsLimit = COMMENTS_PAGE;
+    let stopComments = null;
+
     const subscribeToComments = () => {
+      if (stopComments) stopComments();
+
       const q = query(
         collection(db, "comments"),
         where("postId", "==", this.postId),
-        orderBy("createdAt", "asc")
+        orderBy("createdAt", "desc"),
+        limit(commentsLimit)
       );
 
-      onSnapshot(q, (snapshot) => {
+      stopComments = onSnapshot(q, (snapshot) => {
         const comments = [];
         snapshot.forEach((doc) => {
           comments.push({ id: doc.id, ...doc.data() });
         });
-        commentCountSpan.textContent = comments.length;
+        comments.reverse();
+
+        const windowFull = comments.length >= commentsLimit;
+        commentCountSpan.textContent = windowFull
+          ? `${comments.length}+`
+          : String(comments.length);
+        loadMoreCommentsBtn.classList.toggle("hidden", !windowFull);
         renderComments(comments);
       });
     };
+
+    this.unsubscribers.push(() => {
+      if (stopComments) stopComments();
+    });
+
+    loadMoreCommentsBtn.addEventListener("click", () => {
+      commentsLimit += COMMENTS_PAGE;
+      subscribeToComments();
+    });
 
     const renderComments = (comments) => {
       commentsList.innerHTML = "";

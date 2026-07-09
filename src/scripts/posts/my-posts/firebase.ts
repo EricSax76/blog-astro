@@ -51,36 +51,60 @@ export const observeMyPostsAuth = async (
   });
 };
 
-export const fetchMyPosts = async (uid: string): Promise<LoadedPost[]> => {
+const PAGE_SIZE = 20;
+
+export type MyPostsPage = {
+  posts: LoadedPost[];
+  /** Cursor opaco (último doc de la página) para pedir la siguiente. */
+  cursor: unknown;
+  hasMore: boolean;
+};
+
+export const fetchMyPosts = async (
+  uid: string,
+  cursor: unknown = null
+): Promise<MyPostsPage> => {
   const [firebaseFirestore, app] = await Promise.all([
     import("firebase/firestore"),
     getOrInitFirebaseApp(),
   ]);
 
-  const { getFirestore, collection, query, where, orderBy, getDocs } =
+  const { getFirestore, collection, query, where, orderBy, getDocs, limit, startAfter } =
     firebaseFirestore;
   const db = getFirestore(app);
   const postsRef = collection(db, "posts");
   const orderedQuery = query(
     postsRef,
     where("authorUid", "==", uid),
-    orderBy("createdAt", "desc")
+    orderBy("createdAt", "desc"),
+    ...(cursor ? [startAfter(cursor)] : []),
+    limit(PAGE_SIZE)
   );
 
   try {
     const snapshot = await getDocs(orderedQuery);
-    return mapSnapshotToPosts(snapshot);
+    return {
+      posts: mapSnapshotToPosts(snapshot),
+      cursor: snapshot.docs[snapshot.docs.length - 1] ?? cursor,
+      hasMore: snapshot.docs.length === PAGE_SIZE,
+    };
   } catch (error) {
     if (!isMissingIndexError(error)) {
       throw error;
     }
 
+    // Sin índice compuesto no hay orden estable para cursores: se degrada
+    // a la carga completa (comportamiento previo).
     console.warn(
       "[mis-publicaciones] missing index for authorUid + createdAt, using fallback query"
     );
 
     const fallbackQuery = query(postsRef, where("authorUid", "==", uid));
     const fallbackSnapshot = await getDocs(fallbackQuery);
-    return mapSnapshotToPosts(fallbackSnapshot);
+    return {
+      posts: mapSnapshotToPosts(fallbackSnapshot),
+      cursor: null,
+      hasMore: false,
+    };
   }
 };

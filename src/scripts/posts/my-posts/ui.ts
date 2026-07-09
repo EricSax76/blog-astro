@@ -18,6 +18,8 @@ type MyPostsUi = {
   showError: (message: string) => void;
   showEmpty: () => void;
   showPosts: (posts: LoadedPost[]) => void;
+  appendPosts: (posts: LoadedPost[]) => void;
+  setLoadMore: (visible: boolean, onClick?: () => void) => void;
 };
 
 const formatDate = (date: Date | null): string => {
@@ -129,6 +131,26 @@ export const createMyPostsUi = (): MyPostsUi | null => {
   const elements = getUiElements();
   if (!elements) return null;
 
+  // Botón de paginación: vive justo después del grid y solo se muestra
+  // cuando la última página vino completa (hay más por cargar).
+  const loadMoreButton = document.createElement("button");
+  loadMoreButton.type = "button";
+  loadMoreButton.className =
+    "mx-auto mt-6 block rounded-full border border-sage/30 bg-white px-6 py-2 text-sm font-semibold text-deep-green shadow-sm transition-colors hover:bg-sage/10";
+  loadMoreButton.textContent = "Ver más publicaciones";
+  loadMoreButton.hidden = true;
+  elements.grid.insertAdjacentElement("afterend", loadMoreButton);
+  let loadMoreHandler: (() => void) | null = null;
+  loadMoreButton.addEventListener("click", () => {
+    loadMoreHandler?.();
+  });
+
+  const appendPosts = (posts: LoadedPost[]): void => {
+    posts.forEach((post) => {
+      elements.grid.appendChild(createPostCard(post));
+    });
+  };
+
   const clearCards = (): void => {
     elements.grid.innerHTML = "";
   };
@@ -174,9 +196,13 @@ export const createMyPostsUi = (): MyPostsUi | null => {
     showPosts: (posts: LoadedPost[]): void => {
       clearCards();
       hideStatusCards();
-      posts.forEach((post) => {
-        elements.grid.appendChild(createPostCard(post));
-      });
+      appendPosts(posts);
+    },
+    appendPosts,
+    setLoadMore: (visible: boolean, onClick?: () => void): void => {
+      loadMoreHandler = onClick ?? null;
+      loadMoreButton.hidden = !visible;
+      loadMoreButton.disabled = false;
     },
   };
 };

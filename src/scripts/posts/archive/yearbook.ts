@@ -241,6 +241,19 @@ const mapSnapshotToPosts = (snapshot: { docs: Array<{ id: string; data: () => un
   });
 };
 
+// Paginación por cursor: se piden páginas de PAGE_SIZE posts y un botón
+// "Ver más" carga la siguiente. Evita descargar el año completo de golpe.
+const PAGE_SIZE = 20;
+
+const createLoadMoreButton = (): HTMLButtonElement => {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className =
+    "mx-auto block rounded-full border border-sage/30 bg-white px-6 py-2 text-sm font-semibold text-deep-green shadow-sm hover:bg-sage/10 transition-colors";
+  button.textContent = "Ver más entradas";
+  return button;
+};
+
 const loadPostsForYear = async () => {
   if (!postsGrid) return;
 
@@ -256,49 +269,91 @@ const loadPostsForYear = async () => {
     ]);
 
     const { initializeApp, getApp, getApps } = firebaseApp;
-    const { getFirestore, collection, query, where, orderBy, getDocs } =
-      firebaseFirestore;
+    const {
+      getFirestore,
+      collection,
+      query,
+      where,
+      orderBy,
+      getDocs,
+      limit,
+      startAfter,
+    } = firebaseFirestore;
 
     const config = window.__FIREBASE_CONFIG__ as Record<string, string>;
     const app = getApps().length > 0 ? getApp() : initializeApp(config);
     const db = getFirestore(app);
 
     const postsRef = collection(db, "posts");
-    const postsQuery = query(
-      postsRef,
-      where("year", "==", ARCHIVE_YEAR),
-      orderBy("createdAt", "desc")
-    );
+    const loadMoreButton = createLoadMoreButton();
+    let cursor: unknown = null;
+    let isFirstPage = true;
 
-    let loadedPosts: LoadedPost[] = [];
+    const loadPage = async (): Promise<void> => {
+      loadMoreButton.disabled = true;
 
-    try {
-      const snapshot = await getDocs(postsQuery);
-      loadedPosts = mapSnapshotToPosts(snapshot);
-    } catch (error) {
-      if (!isMissingIndexError(error)) {
-        throw error;
+      const constraints = [
+        where("year", "==", ARCHIVE_YEAR),
+        orderBy("createdAt", "desc"),
+        ...(cursor ? [startAfter(cursor)] : []),
+        limit(PAGE_SIZE),
+      ];
+
+      let loadedPosts: LoadedPost[] = [];
+      let pageIsFull = false;
+
+      try {
+        const snapshot = await getDocs(query(postsRef, ...constraints));
+        loadedPosts = mapSnapshotToPosts(snapshot);
+        cursor = snapshot.docs[snapshot.docs.length - 1] ?? cursor;
+        pageIsFull = snapshot.docs.length === PAGE_SIZE;
+      } catch (error) {
+        if (!isMissingIndexError(error)) {
+          throw error;
+        }
+
+        // Sin índice compuesto no hay orden estable para cursores:
+        // se degrada a la carga completa del año (comportamiento previo).
+        console.warn(
+          `[archivo/${ARCHIVE_YEAR}] missing index for year + createdAt, using fallback query`
+        );
+        const fallbackSnapshot = await getDocs(
+          query(postsRef, where("year", "==", ARCHIVE_YEAR))
+        );
+        loadedPosts = mapSnapshotToPosts(fallbackSnapshot);
+        pageIsFull = false;
       }
 
-      console.warn(
-        `[archivo/${ARCHIVE_YEAR}] missing index for year + createdAt, using fallback query`
-      );
-      const fallbackQuery = query(postsRef, where("year", "==", ARCHIVE_YEAR));
-      const fallbackSnapshot = await getDocs(fallbackQuery);
-      loadedPosts = mapSnapshotToPosts(fallbackSnapshot);
-    }
+      if (isFirstPage) {
+        clearRenderedPosts();
+        removeLoadingAndError();
 
-    clearRenderedPosts();
-    removeLoadingAndError();
+        if (loadedPosts.length === 0) {
+          attachPostCard(createEmptyCard());
+          return;
+        }
+        isFirstPage = false;
+      }
 
-    if (loadedPosts.length === 0) {
-      attachPostCard(createEmptyCard());
-      return;
-    }
+      loadMoreButton.remove();
+      loadedPosts.forEach((post) => {
+        attachPostCard(createPostCard(post));
+      });
 
-    loadedPosts.forEach((post) => {
-      attachPostCard(createPostCard(post));
+      if (pageIsFull) {
+        loadMoreButton.disabled = false;
+        postsGrid.appendChild(loadMoreButton);
+      }
+    };
+
+    loadMoreButton.addEventListener("click", () => {
+      loadPage().catch((error) => {
+        console.error(`[archivo/${ARCHIVE_YEAR}] failed to load more posts`, error);
+        loadMoreButton.disabled = false;
+      });
     });
+
+    await loadPage();
   } catch (error) {
     console.error(`[archivo/${ARCHIVE_YEAR}] failed to load posts`, error);
     showError(

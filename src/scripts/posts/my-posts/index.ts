@@ -15,17 +15,36 @@ const initMyPosts = async (): Promise<void> => {
   const loadPostsForUser = async (uid: string): Promise<void> => {
     const currentSequence = ++loadSequence;
     ui.showLoading();
+    ui.setLoadMore(false);
 
     try {
-      const posts = await fetchMyPosts(uid);
+      const firstPage = await fetchMyPosts(uid);
       if (currentSequence !== loadSequence) return;
 
-      if (posts.length === 0) {
+      if (firstPage.posts.length === 0) {
         ui.showEmpty();
         return;
       }
 
-      ui.showPosts(posts);
+      ui.showPosts(firstPage.posts);
+
+      let cursor = firstPage.cursor;
+
+      const loadNextPage = async (): Promise<void> => {
+        try {
+          const page = await fetchMyPosts(uid, cursor);
+          if (currentSequence !== loadSequence) return;
+
+          cursor = page.cursor;
+          ui.appendPosts(page.posts);
+          ui.setLoadMore(page.hasMore, () => void loadNextPage());
+        } catch (error) {
+          if (currentSequence !== loadSequence) return;
+          console.error("[mis-publicaciones] failed to load more posts", error);
+        }
+      };
+
+      ui.setLoadMore(firstPage.hasMore, () => void loadNextPage());
     } catch (error) {
       if (currentSequence !== loadSequence) return;
       console.error("[mis-publicaciones] failed to load posts", error);
@@ -36,6 +55,7 @@ const initMyPosts = async (): Promise<void> => {
   try {
     await observeMyPostsAuth((uid) => {
       ui.clearCards();
+      ui.setLoadMore(false);
 
       if (!uid) {
         ui.showAuthRequired();
