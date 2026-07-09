@@ -239,7 +239,7 @@ export const flowers = [
     emotionalState: "Agotamiento por esfuerzo incesante, rigidez, obsesión por el trabajo, incapacidad para descansar. Lucha constante sin disfrute.",
     positiveState: "Fuerza equilibrada. Capacidad para ser fuerte pero flexible, sabiendo cuándo luchar y cuándo descansar. Disfrute de la vida y el ocio.",
     affirmation: "Reconozco mis límites y me permito descansar.",
-    img: "/images/bach-flowers/Oak%20(Quercus%20robur).png",
+    img: "/images/bach-flowers/Oak%20(Quercus%20robur).jpg",
   },
   {
     id: 23,

@@ -12,6 +12,8 @@
     "migrate:legacy": "node functions/scripts/migrate-legacy-content.mjs"
   },
   "dependencies": {
+    "@fontsource/cormorant-garamond": "^5.2.11",
+    "@fontsource/red-hat-text": "^5.2.8",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^6.0.5",

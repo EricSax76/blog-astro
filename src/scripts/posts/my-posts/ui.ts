@@ -82,6 +82,8 @@ const createPostCard = (post: LoadedPost): HTMLElement => {
     const image = document.createElement("img");
     image.src = post.imageUrl;
     image.alt = post.title || "Imagen de la publicación";
+    image.loading = "lazy";
+    image.decoding = "async";
     image.className = "h-56 w-full object-cover md:h-64";
     figure.appendChild(image);
     article.appendChild(figure);
