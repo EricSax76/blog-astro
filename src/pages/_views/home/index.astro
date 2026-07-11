@@ -1,17 +1,19 @@
 ---
-import HomeAuthorsAccess from "../../../components/home/HomeAuthorsAccess.astro";
-import HomeContentMap from "../../../components/home/HomeContentMap.astro";
-import HomeFeaturedFlowers from "../../../components/home/HomeFeaturedFlowers.astro";
+import HomeBachJourney from "../../../components/home/HomeBachJourney.astro";
+import HomeClosing from "../../../components/home/HomeClosing.astro";
+import HomeCommunityInvitation from "../../../components/home/HomeCommunityInvitation.astro";
+import HomeEmotionalCompass from "../../../components/home/HomeEmotionalCompass.astro";
+import HomeFlowerAtlas from "../../../components/home/HomeFlowerAtlas.astro";
 import HomeHero from "../../../components/home/HomeHero.astro";
-import HomePrinciplesTimeline from "../../../components/home/HomePrinciplesTimeline.astro";
+import HomeLatestStories from "../../../components/home/HomeLatestStories.astro";
 import {
-  HOME_CONTENT_SECTIONS,
   HOME_FEATURED_FLOWERS,
   HOME_PRINCIPLES,
   HOME_TIMELINE,
   NEWEST_ARCHIVE_YEAR,
 } from "../../../data/home-page";
 import Layout from "../../../layouts/Layout.astro";
+import scrollReveal from "../../../scripts/home/scroll-reveal.ts?url";
 ---
 
 <Layout
@@ -19,11 +21,12 @@ import Layout from "../../../layouts/Layout.astro";
   description="Explora las 38 flores de Bach, la biografía de Edward Bach y el anuario del blog. Fichas completas con estado emocional, transformación positiva y afirmación."
 >
   <HomeHero newestArchiveYear={NEWEST_ARCHIVE_YEAR} />
-  <HomeContentMap sections={HOME_CONTENT_SECTIONS} />
-  <HomePrinciplesTimeline
-    principles={HOME_PRINCIPLES}
-    timeline={HOME_TIMELINE}
-  />
-  <HomeFeaturedFlowers featuredFlowers={HOME_FEATURED_FLOWERS} />
-  <HomeAuthorsAccess newestArchiveYear={NEWEST_ARCHIVE_YEAR} />
+  <HomeEmotionalCompass />
+  <HomeFlowerAtlas featuredFlowers={HOME_FEATURED_FLOWERS} />
+  <HomeBachJourney principles={HOME_PRINCIPLES} timeline={HOME_TIMELINE} />
+  <HomeLatestStories newestArchiveYear={NEWEST_ARCHIVE_YEAR} />
+  <HomeCommunityInvitation />
+  <HomeClosing />
+
+  <script type="module" src={scrollReveal}></script>
 </Layout>
