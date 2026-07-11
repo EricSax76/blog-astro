@@ -43,6 +43,11 @@ if (typeof window !== "undefined") {
       localStorage.setItem("blog-auth-state", JSON.stringify(window.__BLOG_AUTH_STATE__));
     } catch {}
 
+    if (lockedMessage && !isAuthenticated) {
+      lockedMessage.innerHTML =
+        'Inicia sesión para escribir y publicar en el cuaderno. <a href="/#login" class="font-semibold underline underline-offset-2">Acceder</a>';
+    }
+
     if (authEmail) {
       authEmail.textContent = isAuthenticated
         ? email || "usuario autenticado"

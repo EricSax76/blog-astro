@@ -39,6 +39,8 @@ const titleInput = document.getElementById(
 const contentInput = document.getElementById(
   "blog-content"
 ) as HTMLTextAreaElement | null;
+const titleCounter = document.getElementById("blog-title-counter");
+const contentCounter = document.getElementById("blog-content-counter");
 const imageInput = document.getElementById(
   "blog-image-input"
 ) as HTMLInputElement | null;
@@ -145,6 +147,18 @@ const resetPreview = () => {
   preview.removeAttribute("src");
 };
 
+const formatCount = (value: number): string =>
+  new Intl.NumberFormat("es-ES").format(value);
+
+const updateCounters = (): void => {
+  if (titleCounter) {
+    titleCounter.textContent = `${formatCount(titleInput?.value.length ?? 0)} / 120`;
+  }
+  if (contentCounter) {
+    contentCounter.textContent = `${formatCount(contentInput?.value.length ?? 0)} / 10.000`;
+  }
+};
+
 const handleImageChange = (event: Event): void => {
   if (!preview || !placeholder) return;
   const imgPreview = preview;
@@ -170,7 +184,7 @@ const handleImageChange = (event: Event): void => {
 const setPublishingState = (isPublishing: boolean) => {
   if (!publishButton) return;
   publishButton.disabled = isPublishing;
-  publishButton.textContent = isPublishing ? "Publicando..." : "Publicar";
+  publishButton.textContent = isPublishing ? "Publicando…" : "Publicar entrada";
 };
 
 // Estado inline accesible (role=status) en lugar de alert(): no bloquea y
@@ -260,6 +274,7 @@ const publishPost = async (): Promise<void> => {
     if (contentInput) contentInput.value = "";
     if (imageInput) imageInput.value = "";
     resetPreview();
+    updateCounters();
 
     showStatus("Publicado. Te llevamos al anuario...", "success");
     window.location.href = `/archivo/${publishedYear}`;
@@ -278,6 +293,10 @@ const publishPost = async (): Promise<void> => {
 if (form) {
   form.addEventListener("submit", (event) => event.preventDefault());
 }
+
+titleInput?.addEventListener("input", updateCounters);
+contentInput?.addEventListener("input", updateCounters);
+updateCounters();
 
 if (imageInput && preview && placeholder) {
   imageInput.addEventListener("change", handleImageChange);

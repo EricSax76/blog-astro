@@ -1,66 +1,88 @@
 ---
 import Layout from "../../../layouts/Layout.astro";
+
+const currentYear = new Date().getFullYear();
 ---
 
 <Layout title="Publicar | El Alma de las Flores">
-  <div class="relative isolate overflow-hidden">
+  <main class="relative isolate overflow-hidden bg-paper text-ink">
     <div
       aria-hidden="true"
-      class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-[radial-gradient(circle_at_top_left,_rgba(165,196,171,0.24),_transparent_55%),radial-gradient(circle_at_top_right,_rgba(244,237,227,0.9),_transparent_45%)]"
+      class="pointer-events-none absolute inset-x-0 top-0 -z-20 h-[22rem] bg-[radial-gradient(circle_at_12%_20%,_rgba(143,163,130,0.2),_transparent_34%),radial-gradient(circle_at_88%_5%,_rgba(217,164,65,0.1),_transparent_32%),linear-gradient(110deg,_#edf0e8_0%,_#f3f0e6_48%,_#f5eee5_100%)]"
     ></div>
+    <svg
+      aria-hidden="true"
+      class="pointer-events-none absolute right-[-4rem] top-4 -z-10 hidden h-64 w-64 text-moss/20 lg:block"
+      viewBox="0 0 240 240"
+      fill="none"
+    >
+      <path d="M202 9C154 66 119 132 97 224" stroke="currentColor" stroke-width="1.4"></path>
+      <path d="M171 55c-29-5-47 7-57 35 28 3 47-9 57-35Z" stroke="currentColor" stroke-width="1.2"></path>
+      <path d="M139 112c-31-3-50 11-58 41 30 1 49-13 58-41Z" stroke="currentColor" stroke-width="1.2"></path>
+      <path d="M120 162c18-21 39-25 63-13-18 20-39 25-63 13Z" stroke="currentColor" stroke-width="1.2"></path>
+    </svg>
 
-    <section class="mx-auto max-w-5xl px-4 py-8 text-center sm:px-6 sm:py-10 lg:px-8">
-      <p
-        class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.32em] text-deep-green/60 shadow-sm backdrop-blur"
-      >
-        Panel de autor
-      </p>
-      <h1
-        class="mt-5 font-serif text-4xl font-bold tracking-tight text-deep-green sm:text-5xl lg:text-6xl"
-      >
-        Publicar en el blog
-      </h1>
-      <p class="mt-4 text-base leading-7 text-deep-green/72 sm:text-lg">
-       Porque tu palabra importa
-      
-      </p>
-    </section>
-
-    <section class="mx-auto max-w-4xl px-4 pb-12 sm:px-6 lg:px-8">
-      <div
-        class="rounded-[2rem] border border-sage/20 bg-white/90 p-5 shadow-2xl shadow-sage/8 backdrop-blur sm:p-7 lg:p-8"
-      >
-        <div
-          class="flex flex-col gap-4 border-b border-sage/15 pb-6 sm:flex-row sm:items-end sm:justify-between"
+    <header class="mx-auto max-w-6xl px-5 pb-16 pt-8 sm:px-8 sm:pb-20 sm:pt-10 lg:px-10">
+      <div class="flex items-center justify-between gap-4">
+        <p class="text-[0.68rem] font-semibold uppercase tracking-[0.34em] text-moss-text">
+          Cuaderno de autor
+        </p>
+        <a
+          href="/mis-publicaciones"
+          class="group inline-flex items-center gap-2 text-sm font-semibold text-ink/70 transition-colors hover:text-ink"
         >
-          <div>
-            
-            <h2 class="mt-2 font-serif text-2xl font-semibold text-deep-green sm:text-3xl">
-              Nueva entrada 
-            </h2>
-            <p class="mt-2 max-w-2xl text-sm leading-6 text-deep-green/68 sm:text-base">
-              Completa título, contenido e imagen destacada
-            </p>
-          </div>
+          Mis publicaciones
+          <span aria-hidden="true" class="transition-transform group-hover:translate-x-1">→</span>
+        </a>
+      </div>
+      <div class="mt-7 max-w-3xl">
+        <h1 class="font-serif text-4xl font-bold leading-[0.95] tracking-tight text-ink sm:text-5xl lg:text-6xl">
+          Publicar en el blog
+        </h1>
+        <p class="mt-4 max-w-xl text-base leading-7 text-ink/70 sm:text-lg">
+          Una nueva página para el cuaderno vivo. Porque tu palabra importa.
+        </p>
+      </div>
+    </header>
 
-          
+    <section class="mx-auto -mt-9 max-w-6xl px-4 pb-16 sm:px-8 lg:px-10 lg:pb-24">
+      <article class="overflow-hidden rounded-[1.25rem] border border-ink/12 bg-[#fffdf8] shadow-[0_20px_60px_rgba(44,85,48,0.08)]">
+        <div class="grid border-b border-ink/10 px-5 py-6 sm:px-8 lg:grid-cols-[1fr_auto] lg:items-end lg:px-10">
+          <div>
+            <p class="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-moss-text">
+              Nueva entrada
+            </p>
+            <h2 class="mt-2 font-serif text-3xl font-semibold text-ink sm:text-4xl">
+              Empieza a escribir
+            </h2>
+          </div>
+          <p class="mt-3 max-w-md text-sm leading-6 text-ink/60 lg:mt-0 lg:text-right">
+            Puedes publicar texto, imagen o ambos.<br class="hidden lg:block" /> Los campos se guardan al enviar.
+          </p>
         </div>
 
         <form
           id="blog-form"
-          class="mt-6 space-y-6 opacity-60 transition-opacity"
-          aria-describedby="blog-help"
+          class="opacity-60 transition-opacity duration-300"
+          aria-describedby="blog-help publish-locked-message"
         >
-          <div class="grid gap-6">
-            <label class="block space-y-2">
-              <div class="flex items-center justify-between gap-4">
-                <span
-                  class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
-                >
+          <div class="space-y-7 px-5 py-7 sm:px-8 sm:py-9 lg:px-10">
+            <p
+              id="publish-locked-message"
+              class="rounded-xl border border-pollen/30 bg-pollen/10 px-4 py-3 text-sm leading-6 text-ink/75"
+            >
+              Estamos comprobando tu sesión para habilitar el cuaderno.
+            </p>
+
+            <label class="block space-y-2.5">
+              <span class="flex items-center justify-between gap-4">
+                <span class="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-moss-text">
                   Título
                 </span>
-               
-              </div>
+                <span id="blog-title-counter" class="text-xs tabular-nums text-ink/55" aria-live="polite">
+                  0 / 120
+                </span>
+              </span>
               <input
                 id="blog-title"
                 data-publish-control
@@ -68,126 +90,113 @@ import Layout from "../../../layouts/Layout.astro";
                 name="title"
                 maxlength="120"
                 disabled
-                placeholder="Ej: Flores que inspiran calma"
-                class="min-h-[48px] w-full rounded-2xl border border-sage/30 bg-cream/65 px-4 py-3 text-base text-deep-green shadow-sm placeholder:text-deep-green/35 focus:border-sage/45 focus:outline-none focus:ring-2 focus:ring-sage/30 disabled:cursor-not-allowed disabled:opacity-50"
+                placeholder="Ej. Flores que inspiran calma"
+                class="min-h-14 w-full border-0 border-b border-ink/20 bg-transparent px-0 py-3 font-serif text-2xl text-ink outline-none transition-colors placeholder:text-ink/35 focus:border-moss focus:ring-0 disabled:cursor-not-allowed sm:text-3xl"
               />
-             
             </label>
 
-            <label class="block space-y-2">
-              <div class="flex items-center justify-between gap-4">
-                <span
-                  class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
-                >
+            <label class="block space-y-2.5">
+              <span class="flex items-center justify-between gap-4">
+                <span class="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-moss-text">
                   Contenido
                 </span>
-               
-              </div>
+                <span id="blog-content-counter" class="text-xs tabular-nums text-ink/55" aria-live="polite">
+                  0 / 10.000
+                </span>
+              </span>
               <textarea
                 id="blog-content"
                 data-publish-control
                 name="content"
-                rows="10"
+                rows="7"
                 maxlength="10000"
                 disabled
-                placeholder="Comparte la historia, reflexión o enseñanza del día..."
-                class="min-h-[220px] w-full resize-y rounded-2xl border border-sage/30 bg-cream/65 px-4 py-3 text-base leading-7 text-deep-green shadow-sm placeholder:text-deep-green/35 focus:border-sage/45 focus:outline-none focus:ring-2 focus:ring-sage/30 disabled:cursor-not-allowed disabled:opacity-50"
+                placeholder="Comparte la historia, reflexión o enseñanza del día…"
+                class="min-h-56 w-full resize-y rounded-xl border border-ink/15 bg-paper/45 px-5 py-4 text-base leading-8 text-ink outline-none transition-[border-color,background-color,box-shadow] placeholder:text-ink/38 focus:border-moss/70 focus:bg-white focus:ring-2 focus:ring-moss/15 disabled:cursor-not-allowed"
               ></textarea>
-              
             </label>
 
-            <label class="block space-y-2">
-              <div class="flex items-center justify-between gap-4">
-                <span
-                  class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
+            <div class="grid gap-6 border-t border-ink/10 pt-7 lg:grid-cols-[minmax(0,1fr)_17.5rem] lg:gap-8">
+              <div>
+                <div class="mb-3 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+                  <p class="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-moss-text">
+                    Imagen destacada
+                  </p>
+                  <p class="text-xs text-ink/55">Horizontal · JPEG, PNG, WebP o GIF · máx. 10 MB</p>
+                </div>
+
+                <label
+                  for="blog-image-input"
+                  class="group relative block aspect-[16/7] min-h-52 cursor-pointer overflow-hidden rounded-xl border border-dashed border-moss/45 bg-[linear-gradient(135deg,_rgba(143,163,130,0.1),_rgba(243,240,230,0.65))] transition-[border-color,background-color] hover:border-moss hover:bg-moss/10"
                 >
-                  Foto destacada
-                </span>
-                <span class="text-xs text-deep-green/45"
-                  >JPEG, PNG, WebP o GIF · máx. 10MB · horizontal recomendado</span
-                >
+                  <input
+                    id="blog-image-input"
+                    data-publish-control
+                    type="file"
+                    name="image"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    disabled
+                    class="sr-only"
+                  />
+                  <img
+                    id="blog-image-preview"
+                    class="hidden h-full w-full object-cover"
+                    alt="Vista previa de la imagen seleccionada"
+                  />
+                  <span
+                    id="blog-image-placeholder"
+                    class="flex h-full min-h-52 flex-col items-center justify-center px-6 py-8 text-center"
+                  >
+                    <span class="flex size-11 items-center justify-center rounded-full border border-moss/30 bg-white/70 text-xl text-ink transition-transform group-hover:-translate-y-1" aria-hidden="true">＋</span>
+                    <span class="mt-4 font-serif text-xl font-semibold text-ink">Añadir una imagen</span>
+                    <span class="mt-1 text-sm leading-6 text-ink/60">Selecciona un archivo para verlo aquí</span>
+                  </span>
+                  <span class="absolute bottom-3 right-3 rounded-full bg-ink/85 px-4 py-2 text-xs font-semibold text-paper opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+                    Elegir imagen
+                  </span>
+                </label>
               </div>
-              <input
-                id="blog-image-input"
-                data-publish-control
-                type="file"
-                name="image"
-                accept="image/jpeg,image/png,image/webp,image/gif"
-                disabled
-                class="block w-full cursor-pointer rounded-2xl border border-dashed border-sage/35 bg-cream/55 px-4 py-3 text-sm text-deep-green file:mr-4 file:rounded-full file:border-0 file:bg-sage/20 file:px-4 file:py-2 file:font-semibold file:text-deep-green hover:file:bg-sage/30 disabled:cursor-not-allowed disabled:opacity-50"
-              />
-              
-            </label>
-          </div>
 
-          <div class="overflow-hidden rounded-[1.8rem] border border-sage/20 bg-cream/50 p-4 shadow-sm">
-            <div class="flex items-center justify-between gap-4">
-              <p
-                class="text-xs uppercase tracking-[0.2em] text-deep-green/60 font-semibold"
-              >
-                Vista previa
-              </p>
-             
+              <aside class="flex flex-col rounded-xl border border-ink/10 bg-paper/55 p-5 lg:min-h-full">
+                <p class="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-moss-text">
+                  Antes de publicar
+                </p>
+                <ul id="blog-help" class="mt-4 space-y-3 text-sm leading-6 text-ink/68">
+                  <li class="flex gap-2.5"><span aria-hidden="true" class="text-pollen">✦</span><span>Revisa que el título explique bien la entrada.</span></li>
+                  <li class="flex gap-2.5"><span aria-hidden="true" class="text-pollen">✦</span><span>Las imágenes horizontales lucen mejor en el anuario.</span></li>
+                  <li class="flex gap-2.5"><span aria-hidden="true" class="text-pollen">✦</span><span>La publicación se incorpora al cuaderno del año actual.</span></li>
+                </ul>
+
+                <div class="mt-auto pt-7">
+                  <p
+                    id="blog-form-status"
+                    role="status"
+                    aria-live="polite"
+                    class="mb-3 hidden rounded-xl border px-4 py-3 text-sm leading-6"
+                  ></p>
+                  <button
+                    type="button"
+                    id="blog-publish-button"
+                    data-publish-control
+                    disabled
+                    class="inline-flex w-full items-center justify-center rounded-full bg-ink px-6 py-3.5 font-semibold text-paper shadow-[0_10px_24px_rgba(44,85,48,0.2)] transition-[transform,background-color] hover:-translate-y-0.5 hover:bg-ink/92 focus:outline-none focus:ring-2 focus:ring-moss/50 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Publicar entrada
+                  </button>
+                  <a
+                    href={`/archivo/${currentYear}`}
+                    class="mt-3 inline-flex w-full items-center justify-center py-2 text-sm font-semibold text-ink/65 transition-colors hover:text-ink"
+                  >
+                    Ver el anuario actual <span aria-hidden="true" class="ml-2">↗</span>
+                  </a>
+                </div>
+              </aside>
             </div>
-            <div class="mt-4 rounded-[1.5rem] border border-dashed border-sage/25 bg-white/70 p-3">
-              <img
-                id="blog-image-preview"
-                class="hidden aspect-[16/9] w-full rounded-[1.15rem] object-cover"
-                alt="Vista previa de la imagen seleccionada"
-              />
-              <p
-                id="blog-image-placeholder"
-                class="flex min-h-40 items-center justify-center rounded-[1.15rem] px-4 py-10 text-center text-sm leading-6 text-deep-green/60 sm:min-h-48"
-              >
-                Selecciona una imagen para verla aquí.
-              </p>
-            </div>
           </div>
-
-          <div class="flex flex-col gap-3 pt-1 sm:flex-row sm:flex-wrap sm:items-center">
-            <button
-              type="button"
-              id="blog-publish-button"
-              data-publish-control
-              disabled
-              class="inline-flex w-full items-center justify-center rounded-full bg-deep-green px-6 py-3 text-cream font-semibold shadow-lg shadow-sage/20 transition-transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-sage/40 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
-            >
-              Publicar
-            </button>
-            <button
-              type="button"
-              id="blog-go-current-year"
-              class="inline-flex w-full items-center justify-center rounded-full border border-sage/40 px-6 py-3 font-semibold text-deep-green transition-colors hover:bg-sage/10 focus:outline-none focus:ring-2 focus:ring-sage/35 sm:w-auto"
-            >
-              Ir al anuario actual
-            </button>
-            <a
-              href="/mis-publicaciones"
-              class="inline-flex w-full items-center justify-center rounded-full border border-sage/40 px-6 py-3 font-semibold text-deep-green transition-colors hover:bg-sage/10 focus:outline-none focus:ring-2 focus:ring-sage/35 sm:w-auto"
-            >
-              Mis publicaciones
-            </a>
-          </div>
-
-          <p
-            id="blog-form-status"
-            role="status"
-            aria-live="polite"
-            class="hidden rounded-2xl border px-4 py-3 text-sm leading-6"
-          >
-          </p>
-
-          <p
-            id="blog-help"
-            class="rounded-2xl border border-sage/20 bg-sage/5 px-4 py-3 text-sm leading-6 text-deep-green/70"
-          >
-            Título hasta 120 caracteres y contenido hasta 10.000. Si tienes dudas, revisa el
-            flujo recomendado o contáctanos.
-          </p>
         </form>
-      </div>
+      </article>
     </section>
-  </div>
+  </main>
 </Layout>
 
 <script src="../../../scripts/auth/guards/publish.js"></script>
