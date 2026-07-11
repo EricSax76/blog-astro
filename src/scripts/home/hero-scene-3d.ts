@@ -16,7 +16,7 @@ type SceneHandle = {
 const PETAL_COLOR = 0xc98a8a; // --color-petal
 const CENTER_COLOR = 0xd9a441; // --color-pollen
 const AMBIENT_COLOR = 0xf3f0e6; // --color-paper
-const PETAL_COUNT = 8;
+const PETAL_COUNT = 7;
 
 const prefersReducedMotion = (): boolean =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -44,21 +44,40 @@ const supportsWebGL2 = (): boolean => {
   }
 };
 
+// Pétalo alargado y puntiagudo (tipo anémona), con una ligera curva
+// cóncava a lo largo de la nervadura central para que la luz lo lea
+// como una superficie orgánica y no como un disco plano.
 const buildPetal = (): THREE.Mesh => {
   const shape = new THREE.Shape();
   shape.moveTo(0, 0);
-  shape.bezierCurveTo(0.35, 0.25, 0.35, 0.95, 0, 1.3);
-  shape.bezierCurveTo(-0.35, 0.95, -0.35, 0.25, 0, 0);
+  shape.quadraticCurveTo(0.22, 0.15, 0.16, 0.85);
+  shape.quadraticCurveTo(0.1, 1.55, 0, 1.85);
+  shape.quadraticCurveTo(-0.1, 1.55, -0.16, 0.85);
+  shape.quadraticCurveTo(-0.22, 0.15, 0, 0);
 
-  const geometry = new THREE.ShapeGeometry(shape, 8);
+  const geometry = new THREE.ShapeGeometry(shape, 12);
+
+  // Curva la nervadura central (leve concavidad) desplazando z según y.
+  const positionAttr = geometry.getAttribute("position");
+  for (let i = 0; i < positionAttr.count; i += 1) {
+    const y = positionAttr.getY(i);
+    const curve = Math.sin((y / 1.85) * Math.PI) * 0.12;
+    positionAttr.setZ(i, curve);
+  }
+  geometry.computeVertexNormals();
+
   const material = new THREE.MeshStandardMaterial({
     color: PETAL_COLOR,
-    roughness: 0.6,
+    roughness: 0.55,
     metalness: 0.05,
     side: THREE.DoubleSide,
   });
 
-  return new THREE.Mesh(geometry, material);
+  const petal = new THREE.Mesh(geometry, material);
+  // Pivote en la base: el pétalo nace en el origen del grupo y se abre
+  // rotando sobre X, como los pétalos de una flor real.
+  petal.position.set(0, 0, 0);
+  return petal;
 };
 
 export const mountHeroScene = (
@@ -70,7 +89,8 @@ export const mountHeroScene = (
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
-  camera.position.set(0, 0.4, 6);
+  camera.position.set(0, 1.6, 6);
+  camera.lookAt(0, 0, 0);
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -87,19 +107,26 @@ export const mountHeroScene = (
   scene.add(ambientLight, keyLight);
 
   const flowerGroup = new THREE.Group();
-  const petals: THREE.Mesh[] = [];
+  // Cada pétalo vive dentro de un pivote propio: el pivote gira en Z
+  // para repartirse alrededor del centro (como radios), y el pétalo
+  // dentro de él rota en X para abrirse desde su base, igual que una
+  // flor real abre los pétalos desde el cáliz.
+  const petalPivots: THREE.Group[] = [];
 
   for (let i = 0; i < PETAL_COUNT; i += 1) {
-    const petal = buildPetal();
+    const pivot = new THREE.Group();
     const angle = (i / PETAL_COUNT) * Math.PI * 2;
-    petal.userData.angle = angle;
-    petal.position.set(0, 0, 0);
-    petal.rotation.z = angle;
-    petals.push(petal);
-    flowerGroup.add(petal);
+    pivot.rotation.z = angle;
+
+    const petal = buildPetal();
+    petal.position.set(0, 0.12, 0); // nace justo al borde del centro
+    pivot.add(petal);
+
+    petalPivots.push(pivot);
+    flowerGroup.add(pivot);
   }
 
-  const centerGeometry = new THREE.SphereGeometry(0.45, 24, 24);
+  const centerGeometry = new THREE.SphereGeometry(0.22, 24, 24);
   const centerMaterial = new THREE.MeshStandardMaterial({
     color: CENTER_COLOR,
     roughness: 0.4,
@@ -109,8 +136,10 @@ export const mountHeroScene = (
   flowerGroup.add(center);
 
   // Desplazada hacia la derecha para no solapar el título ni los CTA,
-  // que viven en la mitad izquierda del hero.
-  flowerGroup.position.set(2.1, 0.2, 0);
+  // que viven en la mitad izquierda del hero. Escalada para encuadrar
+  // bien el pétalo alargado dentro del viewport de la cámara.
+  flowerGroup.position.set(3.6, -0.4, -1);
+  flowerGroup.scale.setScalar(0.85);
   scene.add(flowerGroup);
 
   const particleCount = 60;
@@ -160,18 +189,17 @@ export const mountHeroScene = (
   };
 
   const applyOpenness = () => {
-    petals.forEach((petal) => {
-      const angle = petal.userData.angle as number;
-      const spread = 0.4 + openness * 0.9;
-      petal.position.set(
-        Math.cos(angle) * spread * 0.3,
-        Math.sin(angle) * spread * 0.15,
-        0.05
-      );
-      petal.rotation.x = -openness * 0.6;
-      petal.rotation.z = angle;
-      const scale = 0.85 + openness * 0.3;
-      petal.scale.set(scale, scale, scale);
+    // Cerrada (openness=0): pétalos casi verticales, como un capullo.
+    // Abierta (openness=1): pétalos caídos hacia afuera, como una flor
+    // en plena floración. La rotación ocurre en el pivote, con bisagra
+    // en la base del pétalo, no en su centro.
+    const minTiltFromVertical = 0.35; // rad, capullo entreabierto
+    const maxTiltFromVertical = 1.15; // rad, flor abierta en 3/4, no de canto
+    const tilt =
+      minTiltFromVertical + openness * (maxTiltFromVertical - minTiltFromVertical);
+
+    petalPivots.forEach((pivot) => {
+      pivot.rotation.x = tilt;
     });
   };
 
@@ -253,7 +281,8 @@ export const mountHeroScene = (
     intersectionObserver.disconnect();
     resizeObserver.disconnect();
 
-    petals.forEach((petal) => {
+    petalPivots.forEach((pivot) => {
+      const petal = pivot.children[0] as THREE.Mesh;
       petal.geometry.dispose();
       (petal.material as THREE.Material).dispose();
     });
