@@ -7,43 +7,57 @@ const { newestArchiveYear } = Astro.props;
 ---
 
 <section
-  class="relative overflow-hidden rounded-[2.8rem] bg-transparent border-0 shadow-none px-7 py-12 md:px-12 md:py-16"
+  class="relative flex min-h-[85svh] items-center overflow-hidden bg-paper md:min-h-[92svh]"
 >
   <div
-    class="absolute inset-0 bg-cover bg-center opacity-60"
-    style="background-image: url('/images/bach-flowers/agrimony.jpeg');"
+    class="absolute inset-0 bg-cover bg-center"
+    style="background-image: url('/images/bach-flowers/Rock%20Rose%20(Helianthemum%20nummularium).jpg');"
     aria-hidden="true"
-  ></div>
-  <div class="absolute inset-0 bg-cream/65" aria-hidden="true"></div>
+  >
+  </div>
+  <div
+    class="absolute inset-0 bg-gradient-to-t from-paper via-paper/75 to-paper/20"
+    aria-hidden="true"
+  >
+  </div>
 
-  <div class="relative z-10 max-w-4xl mx-auto text-center space-y-6">
-    <h1 class="font-serif text-4xl md:text-6xl font-bold text-deep-green leading-tight">
+  <div
+    class="relative z-10 mx-auto flex max-w-3xl flex-col items-start gap-6 px-6 py-24 md:px-12"
+    data-reveal
+  >
+    <p class="text-xs font-semibold uppercase tracking-[0.35em] text-ink/60">
       El Alma de las Flores
+    </p>
+    <h1 class="font-serif text-4xl font-bold leading-tight text-ink md:text-6xl">
+      Hay flores que empiezan por dentro
     </h1>
-    <p class="text-lg text-deep-green/75 max-w-2xl mx-auto leading-relaxed">
-      Explora las 38 flores de Bach, comprende su
-      origen histórico y sigue las publicaciones de la comunidad.
+    <p class="max-w-xl text-lg leading-relaxed text-ink/75">
+      Un estudio vivo de las 38 Flores de Bach: su historia, la figura de
+      Edward Bach y las publicaciones de quienes recorren este jardín con
+      nosotros.
     </p>
 
-    <div class="flex flex-wrap justify-center gap-3">
+    <div class="flex flex-wrap gap-3 pt-2">
       <a
         href="/flores-de-bach"
-        class="rounded-full bg-deep-green text-cream px-6 py-3 font-semibold hover:bg-deep-green/90 transition-colors"
+        class="rounded-full bg-ink px-6 py-3 font-semibold text-cream transition-colors hover:bg-ink/90"
       >
-        Explorar flores
+        Explorar las 38 flores
       </a>
       <a
         href={`/archivo/${newestArchiveYear}`}
-        class="rounded-full border border-sage/40 text-deep-green px-6 py-3 font-semibold hover:bg-sage/10 transition-colors"
+        class="rounded-full border border-moss/40 px-6 py-3 font-semibold text-ink transition-colors hover:bg-moss/10"
       >
-        Anuario 
-      </a>
-      <a
-        href="/publicar"
-        class="rounded-full border border-sage/40 text-deep-green px-6 py-3 font-semibold hover:bg-sage/10 transition-colors"
-      >
-        Acceso autores
+        Leer el último cuaderno
       </a>
     </div>
   </div>
+
+  <a
+    href="#brujula-emocional"
+    class="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-ink/60 transition-colors hover:text-ink"
+  >
+    Desciende para explorar
+    <span aria-hidden="true" class="text-lg leading-none">↓</span>
+  </a>
 </section>
