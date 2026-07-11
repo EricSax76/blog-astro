@@ -16,6 +16,14 @@ declare global {
 const postsGrid = document.getElementById("posts-grid");
 const loadingCard = document.getElementById("posts-loading");
 const errorCard = document.getElementById("posts-error");
+const emptyCard = document.getElementById("posts-empty");
+const isSupplementalGrid = postsGrid?.dataset.mode === "supplement";
+
+// Plantilla del pliego renderizada por YearbookEntry.astro (modo template):
+// clonar su markup mantiene una sola fuente de verdad para el diseño.
+const entryTemplate = document.getElementById(
+  "yearbook-entry-template"
+) as HTMLTemplateElement | null;
 
 // El año a consultar lo fija la página vía data-year; fallback al año actual.
 const ARCHIVE_YEAR = (() => {
@@ -52,104 +60,73 @@ type LoadedPost = {
   createdAt: Date | null;
 };
 
-const createEmptyCard = (): HTMLElement => {
-  const article = document.createElement("article");
-  article.className =
-    "bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl shadow-sage/5 border border-sage/10";
-
-  const header = document.createElement("header");
-  header.className = "mb-6 text-center";
-  const title = document.createElement("h2");
-  title.className = "font-serif text-3xl md:text-4xl font-bold text-deep-green";
-  title.textContent = "Próximamente";
-  const subtitle = document.createElement("p");
-  subtitle.className = "text-sm text-deep-green/60 italic font-serif";
-  subtitle.textContent = `Aquí aparecerán los posts publicados en ${ARCHIVE_YEAR}.`;
-  header.append(title, subtitle);
-
-  const content = document.createElement("div");
-  content.className =
-    "prose prose-lg prose-headings:font-serif prose-headings:text-deep-green text-deep-green/80 leading-relaxed max-w-none";
-  const p1 = document.createElement("p");
-  p1.textContent =
-    "Este espacio está listo para recibir tus nuevos textos, reflexiones y fotografías.";
-  const p2 = document.createElement("p");
-  p2.textContent =
-    "Cuando publiques desde el panel, las entradas aparecerán automáticamente aquí.";
-  content.append(p1, p2);
-
-  article.append(header, content);
-  return article;
+const showEmptyState = () => {
+  if (isSupplementalGrid) {
+    emptyCard?.classList.add("hidden");
+    return;
+  }
+  emptyCard?.classList.remove("hidden");
 };
 
-const createPostCard = (post: LoadedPost): HTMLElement => {
-  const article = document.createElement("article");
-  article.className =
-    "bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl shadow-sage/5 border border-sage/10";
+const createPostCard = (post: LoadedPost): HTMLElement | null => {
+  const fragment = entryTemplate?.content.cloneNode(true) as
+    | DocumentFragment
+    | undefined;
+  const article = fragment?.querySelector("article");
+  if (!article) return null;
+  article.removeAttribute("data-reveal");
+  article.classList.add("is-revealed");
 
-  const header = document.createElement("header");
-  header.className = "mb-6 text-center";
-
-  const title = document.createElement("h2");
-  title.className = "font-serif text-3xl md:text-4xl font-bold text-deep-green";
-  title.textContent = post.title || "Entrada sin título";
-  header.appendChild(title);
+  const title = article.querySelector("[data-field='title']");
+  if (title) title.textContent = post.title || "Entrada sin título";
 
   const metaLabelParts = [`Por ${post.authorName}`];
   const dateLabel = formatDate(post.createdAt);
   if (dateLabel) metaLabelParts.push(dateLabel);
 
-  if (metaLabelParts.length > 0) {
-    const meta = document.createElement("p");
-    meta.className = "text-sm text-deep-green/60 italic font-serif";
-    meta.textContent = metaLabelParts.join(" · ");
-    header.appendChild(meta);
-  }
+  const meta = article.querySelector("[data-field='meta']");
+  if (meta) meta.textContent = metaLabelParts.join(" · ");
 
-  article.appendChild(header);
-
-  if (post.imageUrl) {
-    const figure = document.createElement("div");
-    figure.className =
-      "mb-8 overflow-hidden rounded-2xl border border-sage/10 shadow-lg";
-    const img = document.createElement("img");
-    img.src = post.imageUrl;
-    img.alt = post.title || "Imagen del post";
-    img.loading = "lazy";
-    img.decoding = "async";
-    img.className = "h-64 md:h-80 w-full object-cover";
-    figure.appendChild(img);
-    article.appendChild(figure);
-  }
-
-  const content = document.createElement("div");
-  content.className =
-    "prose prose-lg prose-headings:font-serif prose-headings:text-deep-green text-deep-green/80 leading-relaxed max-w-none";
-
-  const paragraphs = post.content
-    .split(/\n+/)
-    .map((chunk) => chunk.trim())
-    .filter(Boolean);
-
-  if (paragraphs.length === 0) {
-    const p = document.createElement("p");
-    p.textContent = "Este post no tiene contenido escrito.";
-    content.appendChild(p);
+  const figure = article.querySelector("[data-field='figure']");
+  const image = article.querySelector<HTMLImageElement>(
+    "[data-field='image']"
+  );
+  if (post.imageUrl && figure && image) {
+    image.src = post.imageUrl;
+    image.alt = post.title || "Imagen del post";
+    figure.classList.remove("hidden");
   } else {
-    paragraphs.forEach((paragraphText) => {
-      const p = document.createElement("p");
-      p.textContent = paragraphText;
-      content.appendChild(p);
-    });
+    figure?.remove();
   }
 
-  article.appendChild(content);
+  const body = article.querySelector("[data-field='body']");
+  if (body) {
+    const paragraphs = post.content
+      .split(/\n+/)
+      .map((chunk) => chunk.trim())
+      .filter(Boolean);
 
-  // Social Interactions
-  const social = document.createElement("blog-social-interactions");
-  social.dataset.postId = post.id;
-  social.dataset.postTitle = post.title;
-  article.appendChild(social);
+    if (paragraphs.length === 0) {
+      const p = document.createElement("p");
+      p.textContent = "Este post no tiene contenido escrito.";
+      body.appendChild(p);
+    } else {
+      paragraphs.forEach((paragraphText) => {
+        const p = document.createElement("p");
+        p.textContent = paragraphText;
+        body.appendChild(p);
+      });
+    }
+  }
+
+  // Social Interactions: el hueco del template se sustituye por el web component.
+  const socialSlot = article.querySelector("[data-field='social']");
+  if (socialSlot) {
+    const social = document.createElement("blog-social-interactions");
+    social.dataset.postId = post.id;
+    social.dataset.postTitle = post.title;
+    socialSlot.replaceWith(social);
+  }
 
   return article;
 };
@@ -162,6 +139,11 @@ const removeLoadingAndError = () => {
 };
 
 const showError = (message: string) => {
+  if (isSupplementalGrid) {
+    removeLoadingAndError();
+    return;
+  }
+
   if (!errorCard) return;
 
   const text = errorCard.querySelector("p");
@@ -182,6 +164,15 @@ const clearRenderedPosts = () => {
 const attachPostCard = (card: HTMLElement) => {
   card.setAttribute("data-post-card", "true");
   postsGrid?.appendChild(card);
+};
+
+const getExistingPostIds = (): Set<string> => {
+  const existing = new Set<string>();
+  document.querySelectorAll<HTMLElement>("[data-post-id]").forEach((element) => {
+    const postId = element.dataset.postId?.trim();
+    if (postId) existing.add(postId);
+  });
+  return existing;
 };
 
 const resolvePostDate = (rawData: Record<string, unknown>): Date | null => {
@@ -251,13 +242,18 @@ const createLoadMoreButton = (): HTMLButtonElement => {
   const button = document.createElement("button");
   button.type = "button";
   button.className =
-    "mx-auto block rounded-full border border-sage/30 bg-white px-6 py-2 text-sm font-semibold text-deep-green shadow-sm hover:bg-sage/10 transition-colors";
+    "mx-auto block rounded-full border border-moss/30 px-6 py-2 text-sm font-semibold text-ink transition-colors hover:bg-moss/10";
   button.textContent = "Ver más entradas";
   return button;
 };
 
 const loadPostsForYear = async () => {
   if (!postsGrid) return;
+
+  if (!entryTemplate) {
+    showError("Falta la plantilla del pliego (#yearbook-entry-template).");
+    return;
+  }
 
   if (!hasValidFirebaseConfig()) {
     showError("Falta configurar Firebase (`PUBLIC_FIREBASE_*`).");
@@ -306,7 +302,10 @@ const loadPostsForYear = async () => {
 
       try {
         const snapshot = await getDocs(query(postsRef, ...constraints));
-        loadedPosts = mapSnapshotToPosts(snapshot);
+        const existingPostIds = getExistingPostIds();
+        loadedPosts = mapSnapshotToPosts(snapshot).filter(
+          (post) => !existingPostIds.has(post.id)
+        );
         cursor = snapshot.docs[snapshot.docs.length - 1] ?? cursor;
         pageIsFull = snapshot.docs.length === PAGE_SIZE;
       } catch (error) {
@@ -322,7 +321,10 @@ const loadPostsForYear = async () => {
         const fallbackSnapshot = await getDocs(
           query(postsRef, where("year", "==", ARCHIVE_YEAR))
         );
-        loadedPosts = mapSnapshotToPosts(fallbackSnapshot);
+        const existingPostIds = getExistingPostIds();
+        loadedPosts = mapSnapshotToPosts(fallbackSnapshot).filter(
+          (post) => !existingPostIds.has(post.id)
+        );
         pageIsFull = false;
       }
 
@@ -331,7 +333,7 @@ const loadPostsForYear = async () => {
         removeLoadingAndError();
 
         if (loadedPosts.length === 0) {
-          attachPostCard(createEmptyCard());
+          showEmptyState();
           return;
         }
         isFirstPage = false;
@@ -339,7 +341,8 @@ const loadPostsForYear = async () => {
 
       loadMoreButton.remove();
       loadedPosts.forEach((post) => {
-        attachPostCard(createPostCard(post));
+        const card = createPostCard(post);
+        if (card) attachPostCard(card);
       });
 
       if (pageIsFull) {

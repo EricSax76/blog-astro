@@ -1,0 +1,198 @@
+---
+// Pliego del anuario: hoja editorial reutilizable del cuaderno de campo.
+// Dos usos:
+//  - Años estáticos: se pasan título/fecha y el contenido va en el slot.
+//  - Anuario dinámico: `template` deja los campos vacíos con ganchos
+//    data-field para que yearbook.ts clone y rellene el mismo markup.
+import SocialInteractions from "./SocialInteractions.astro";
+
+interface Props {
+  title?: string;
+  date?: string;
+  postId?: string;
+  postTitle?: string;
+  /** Modo plantilla para el anuario dinámico (sin data-reveal ni social estático). */
+  template?: boolean;
+}
+
+const {
+  title = "",
+  date = "",
+  postId,
+  postTitle,
+  template = false,
+} = Astro.props;
+---
+
+<article
+  class="yearbook-entry rounded-2xl border border-ink/10 bg-paper-dim/70 p-7 md:p-10"
+  data-reveal={template ? undefined : true}
+>
+  <header class="mb-6">
+    <div
+      class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-ink/10 pb-3"
+    >
+      <span
+        class="entry-number text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-moss-text"
+        aria-hidden="true"></span>
+      <p
+        class="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-moss-text"
+        data-field="meta"
+      >
+        {date}
+      </p>
+    </div>
+    <h2
+      class="mt-5 font-serif text-3xl font-bold leading-tight tracking-tight text-ink md:text-4xl"
+      data-field="title"
+    >
+      {title}
+    </h2>
+  </header>
+
+  {
+    template && (
+      <figure
+        class="mb-8 hidden overflow-hidden rounded-xl border border-ink/10"
+        data-field="figure"
+      >
+        <img
+          class="h-64 w-full object-cover md:h-80"
+          loading="lazy"
+          decoding="async"
+          data-field="image"
+          alt=""
+        />
+      </figure>
+    )
+  }
+
+  <div class="entry-body" data-field="body">
+    <slot />
+  </div>
+
+  {
+    postId && (
+      <SocialInteractions postId={postId} postTitle={postTitle ?? title} />
+    )
+  }
+  {template && <div data-field="social" />}
+</article>
+
+<style>
+  .yearbook-entry {
+    counter-increment: yearbook-entry;
+  }
+
+  /* Numeración de pliego automática: reciclable sin pasar índices a mano. */
+  .entry-number::before {
+    content: "Pliego " counter(yearbook-entry, decimal-leading-zero);
+  }
+
+  .entry-number::after {
+    content: "";
+    display: inline-block;
+    width: 1.5rem;
+    height: 2px;
+    margin-left: 0.75rem;
+    vertical-align: middle;
+    background: var(--color-pollen);
+  }
+
+  /* Tipografía del cuerpo: cubre el contenido del slot y el generado en cliente. */
+  .entry-body {
+    color: color-mix(in srgb, var(--color-ink) 82%, transparent);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    max-width: 65ch;
+  }
+
+  .entry-body :global(p + p) {
+    margin-top: 1em;
+  }
+
+  .entry-body :global(strong) {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+
+  .entry-body :global(em) {
+    color: var(--color-moss-text);
+  }
+
+  .entry-body :global(a) {
+    color: var(--color-moss-text);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--color-pollen) 70%, transparent);
+    text-underline-offset: 3px;
+  }
+
+  .entry-body :global(a:hover),
+  .entry-body :global(a:focus-visible) {
+    color: var(--color-ink);
+  }
+
+  .entry-body :global(h3),
+  .entry-body :global(h4) {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    color: var(--color-ink);
+    margin: 1.5em 0 0.5em;
+  }
+
+  .entry-body :global(h3) {
+    font-size: 1.5rem;
+  }
+
+  .entry-body :global(ul),
+  .entry-body :global(ol) {
+    margin: 1em 0;
+    padding-left: 1.5rem;
+  }
+
+  .entry-body :global(ul) {
+    list-style: disc;
+  }
+
+  .entry-body :global(ol) {
+    list-style: decimal;
+  }
+
+  .entry-body :global(li + li) {
+    margin-top: 0.375em;
+  }
+
+  .entry-body :global(blockquote) {
+    margin: 1.25em 0;
+    padding-left: 1.25rem;
+    border-left: 2px solid var(--color-pollen);
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    font-style: italic;
+    color: var(--color-ink);
+  }
+
+  .entry-body :global(img) {
+    display: block;
+    width: 100%;
+    max-height: 24rem;
+    object-fit: cover;
+    border-radius: 0.75rem;
+    border: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+    margin: 0 0 1.5rem;
+  }
+
+  .entry-body :global(figure) {
+    margin: 0 0 1.5rem;
+  }
+
+  .entry-body :global(figure img) {
+    margin-bottom: 0.5rem;
+  }
+
+  .entry-body :global(figcaption) {
+    font-size: 0.8125rem;
+    color: var(--color-moss-text);
+  }
+</style>

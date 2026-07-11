@@ -1,6 +1,7 @@
 ---
 import Layout from "../../../layouts/Layout.astro";
-import YearbookNav from "../../../components/archive/YearbookNav.astro";
+import YearbookShell from "../../../components/archive/YearbookShell.astro";
+import YearbookEntry from "../../../components/archive/YearbookEntry.astro";
 
 interface Props {
   year: number;
@@ -10,47 +11,49 @@ const { year } = Astro.props;
 ---
 
 <Layout title={`Anuario ${year} | El Alma de las Flores`}>
-  <main class="max-w-4xl mx-auto px-6 py-12 md:py-20">
-    <div class="text-center mb-16 space-y-4">
-      <h1 class="font-serif text-5xl md:text-6xl font-bold text-deep-green">
-        Anuario {year}
-      </h1>
-      <p class="text-xl text-deep-green/60 italic font-serif">
-        Un espacio para las nuevas entradas del año.
-      </p>
-    </div>
-
-    <YearbookNav activeYear={year} />
-
-    <div id="posts-grid" data-year={year} class="grid gap-12">
-      <article
+  <YearbookShell year={year} subtitle="Un espacio para las nuevas entradas del año.">
+    <div id="posts-grid" data-year={year} class="grid gap-10" aria-live="polite">
+      <div
         id="posts-loading"
-        class="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl shadow-sage/5 border border-sage/10"
+        class="rounded-2xl border border-moss/15 bg-paper-dim/60 p-8 text-center"
       >
-        <header class="mb-6 text-center">
-          <h2 class="font-serif text-3xl md:text-4xl font-bold text-deep-green">
-            Cargando entradas
-          </h2>
-          <p class="text-sm text-deep-green/60 italic font-serif">
-            Consultando publicaciones en Firebase...
-          </p>
-        </header>
-      </article>
-      <article
+        <p class="font-serif text-2xl font-bold text-ink">Abriendo el cuaderno</p>
+        <p class="mt-2 text-sm leading-relaxed text-ink/70">
+          Consultando las publicaciones del año…
+        </p>
+      </div>
+
+      <div
         id="posts-error"
-        class="hidden bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl shadow-sage/5 border border-red-200"
+        class="hidden rounded-2xl border border-petal/40 bg-paper-dim/60 p-8 text-center"
       >
-        <header class="mb-4 text-center">
-          <h2 class="font-serif text-3xl font-bold text-red-700">
-            No se pudieron cargar los posts
-          </h2>
-        </header>
-        <p class="text-red-700 text-sm text-center">
+        <p class="font-serif text-2xl font-bold text-ink">
+          No se pudieron cargar las entradas
+        </p>
+        <p class="mt-2 text-sm leading-relaxed text-ink/70">
           Revisa configuración, reglas de Firestore e índice requerido.
         </p>
-      </article>
+      </div>
+
+      <div
+        id="posts-empty"
+        class="hidden rounded-2xl border border-moss/15 bg-paper-dim/60 p-8 text-center"
+      >
+        <p class="font-serif text-2xl font-bold text-ink">Próximamente</p>
+        <p class="mt-2 text-sm leading-relaxed text-ink/70">
+          Aquí aparecerán los posts publicados en {year}. Este espacio está
+          listo para recibir nuevos textos, reflexiones y fotografías: cuando
+          publiques desde el panel, las entradas aparecerán automáticamente.
+        </p>
+      </div>
     </div>
-  </main>
+
+    <!-- Plantilla del pliego: yearbook.ts la clona para cada post de Firestore,
+         de modo que el markup del anuario dinámico y el estático es el mismo. -->
+    <template id="yearbook-entry-template">
+      <YearbookEntry template />
+    </template>
+  </YearbookShell>
 </Layout>
 
 <script src="../../../scripts/posts/archive/yearbook.ts"></script>

@@ -1,5 +1,5 @@
 ---
-// Años con contenido: histórico estático + el año vivo de Firestore (2026+).
+// Índice de años del anuario: histórico estático + el año vivo de Firestore.
 // Incluye el año actual y el activo aunque aún no estén en la lista base.
 const staticYears = [2026, 2017, 2016, 2015, 2014, 2013, 2012, 2011];
 const { activeYear } = Astro.props;
@@ -10,19 +10,30 @@ const years = Array.from(
 ).sort((a, b) => b - a);
 ---
 
-<nav class="flex flex-wrap justify-center gap-2 mb-12">
-  {
-    years.map((year) => (
-      <a
-        href={`/archivo/${year}`}
-        class={`px-4 py-2 rounded-full font-serif font-bold text-lg transition-all transform hover:-translate-y-0.5 ${
-          activeYear === year
-            ? "bg-sage text-white shadow-md"
-            : "bg-white text-deep-green border border-sage/20 hover:bg-sage/10 hover:border-sage/40"
-        }`}
-      >
-        {year}
-      </a>
-    ))
-  }
+<nav aria-label="Anuarios por año" class="border-y border-ink/10 py-4" data-reveal>
+  <ul class="flex flex-wrap items-baseline gap-x-6 gap-y-2">
+    <li
+      class="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-moss-text"
+      aria-hidden="true"
+    >
+      Índice
+    </li>
+    {
+      years.map((year) => (
+        <li>
+          <a
+            href={`/archivo/${year}`}
+            aria-current={activeYear === year ? "page" : undefined}
+            class={`font-serif text-lg transition-colors ${
+              activeYear === year
+                ? "border-b-2 border-pollen pb-0.5 font-bold text-ink"
+                : "font-medium text-moss-text hover:text-ink focus-visible:text-ink"
+            }`}
+          >
+            {year}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
 </nav>

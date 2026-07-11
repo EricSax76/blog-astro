@@ -1,0 +1,62 @@
+---
+// Marco reciclable del anuario: cabecera editorial del año, índice de años
+// y contenedor de pliegos. Lo comparten los años estáticos (2011–2017) y el
+// anuario dinámico de Firestore.
+import YearbookNav from "./YearbookNav.astro";
+
+interface Props {
+  year: number;
+  subtitle?: string;
+}
+
+const { year, subtitle } = Astro.props;
+---
+
+<section class="yearbook mx-auto max-w-4xl">
+  <header class="pb-12 pt-4 md:pt-8" data-reveal>
+    <p
+      class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.3em] text-moss-text"
+    >
+      <span class="inline-block h-px w-10 bg-pollen" aria-hidden="true"></span>
+      Archivo · Cuaderno de campo
+    </p>
+    <h1 class="mt-6 font-serif font-bold leading-none text-ink">
+      <span class="block font-serif text-2xl font-medium italic text-moss-text md:text-3xl">
+        Anuario
+      </span>
+      <span class="block text-[clamp(4.5rem,12vw,7.5rem)] tracking-tight">
+        {year}
+      </span>
+    </h1>
+    {
+      subtitle && (
+        <p class="mt-4 max-w-xl font-serif text-xl italic leading-relaxed text-ink/70">
+          {subtitle}
+        </p>
+      )
+    }
+  </header>
+
+  <YearbookNav activeYear={year} />
+
+  <div class="yearbook-entries mt-12 grid gap-10">
+    <slot />
+  </div>
+</section>
+
+<noscript>
+  <style>
+    [data-reveal] {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  </style>
+</noscript>
+
+<script src="../../scripts/ui/scroll-reveal.ts"></script>
+
+<style>
+  .yearbook-entries {
+    counter-reset: yearbook-entry;
+  }
+</style>
