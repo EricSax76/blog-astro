@@ -1,0 +1,389 @@
+---
+const chapters = [
+  {
+    date: "1886",
+    kicker: "01 · Origen",
+    title: "Una sensibilidad que comienza en la tierra",
+    body: "Edward Bach nace en Moseley, cerca de Birmingham. Antes de convertirse en médico, trabaja durante un tiempo en la fundición familiar y observa de cerca la fragilidad, el esfuerzo y las condiciones de vida de los trabajadores.",
+    note: "La semilla",
+  },
+  {
+    date: "1912",
+    kicker: "02 · Ciencia",
+    title: "El rigor del laboratorio",
+    body: "Se forma en medicina en Birmingham y en el University College Hospital de Londres. Ejerce como médico, cirujano, patólogo y bacteriólogo; investiga vacunas y más tarde se aproxima a la homeopatía.",
+    note: "El estudio",
+  },
+  {
+    date: "1917",
+    kicker: "03 · Umbral",
+    title: "Cuando la certeza se quiebra",
+    body: "Una enfermedad grave interrumpe su carrera. La experiencia refuerza una idea que orientará su trabajo posterior: para Bach, la disposición interior de la persona debía ocupar un lugar central en el cuidado.",
+    note: "La apertura",
+  },
+  {
+    date: "1928—1930",
+    kicker: "04 · Búsqueda",
+    title: "Salir de la ciudad para escuchar",
+    body: "Comienza a experimentar con Impatiens, Mimulus y Clematis. En 1930 deja su consulta y su laboratorio londinenses para dedicar su vida a buscar un método sencillo, vinculado a plantas silvestres y estados emocionales.",
+    note: "El brote",
+  },
+  {
+    date: "1930—1935",
+    kicker: "05 · Hallazgo",
+    title: "De tres flores a un sistema de treinta y ocho",
+    body: "Durante sus recorridos por Gales y el sur de Inglaterra desarrolla los Doce Curadores y amplía progresivamente el sistema. En 1935 considera terminada la serie de 38 remedios.",
+    note: "La flor",
+  },
+  {
+    date: "1936",
+    kicker: "06 · Legado",
+    title: "Una obra que queda en otras manos",
+    body: "Bach muere en noviembre de 1936. Deja su trabajo a Nora Weeks y Victor Bullen, y Mount Vernon continúa hoy como centro dedicado a conservar y transmitir su método original.",
+    note: "El legado",
+  },
+];
+---
+
+<article class="biography" data-biography-journey>
+  <header class="bio-hero">
+    <div class="hero-orbit" aria-hidden="true">
+      <span class="orbit orbit-one"></span>
+      <span class="orbit orbit-two"></span>
+      <span class="hero-seed"></span>
+    </div>
+    <div class="hero-years" aria-hidden="true">1886 <i></i> 1936</div>
+    <div class="hero-copy">
+      <p class="eyebrow"><span></span> Medicina · humanidad · naturaleza</p>
+      <h1>Edward<br /><em>Bach</em></h1>
+      <p class="hero-intro">
+        La historia de un médico que abandonó el centro de Londres para buscar,
+        caminando entre campos y senderos, otra forma de comprender a la persona.
+      </p>
+      <a href="#trayectoria" class="journey-link">
+        Recorrer su historia
+        <span aria-hidden="true">↓</span>
+      </a>
+    </div>
+    <div class="hero-quote">
+      <p>Una vida dedicada a encontrar aquello que, según Bach, podía despertar lo mejor de la naturaleza humana.</p>
+      <cite>El hilo que recorre su obra</cite>
+    </div>
+  </header>
+
+  <section id="trayectoria" class="journey" aria-labelledby="journey-title">
+    <h2 id="journey-title" class="sr-only">Trayectoria de Edward Bach</h2>
+
+    <div class="journey-visual" aria-hidden="true">
+      <canvas data-biography-canvas></canvas>
+      <div class="canvas-vignette"></div>
+      <div class="canvas-fallback" data-canvas-fallback>
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <div class="plate-mark" aria-hidden="true">
+        <span>Tab. I</span>
+        <i></i>
+        <small>Studium naturae</small>
+      </div>
+      <div class="visual-caption">
+        <span data-stage-number>01</span>
+        <p data-stage-label>La semilla</p>
+      </div>
+      <div class="visual-instruction">Desciende para transformar <span>↓</span></div>
+    </div>
+
+    <div class="journey-copy">
+      <div class="journey-progress" aria-hidden="true">
+        <span data-progress-line></span>
+      </div>
+      {chapters.map((chapter, index) => (
+        <section class:list={["chapter", { "is-active": index === 0 }]} data-biography-chapter data-stage={index}>
+          <p class="chapter-kicker">{chapter.kicker}</p>
+          <time>{chapter.date}</time>
+          <h3>{chapter.title}</h3>
+          <p>{chapter.body}</p>
+          <span class="chapter-note"><i></i>{chapter.note}</span>
+        </section>
+      ))}
+    </div>
+  </section>
+
+  <section class="convictions" aria-labelledby="convictions-title">
+    <div class="convictions-heading">
+      <p class="eyebrow dark"><span></span> Su pensamiento</p>
+      <h2 id="convictions-title">Tres ideas para devolver el cuidado a la persona</h2>
+      <p>
+        Estos principios describen la filosofía que Bach formuló en sus escritos.
+        No sustituyen el diagnóstico ni el tratamiento de profesionales sanitarios.
+      </p>
+    </div>
+    <div class="conviction-grid">
+      <article>
+        <span>01</span>
+        <h3>Simplicidad</h3>
+        <p>Un método comprensible y accesible, pensado para que cada persona pudiera participar activamente en su bienestar.</p>
+      </article>
+      <article>
+        <span>02</span>
+        <h3>Individualidad</h3>
+        <p>Observar a la persona y su experiencia particular, no limitar la mirada al nombre de una dolencia.</p>
+      </article>
+      <article>
+        <span>03</span>
+        <h3>Armonía interior</h3>
+        <p>La convicción de Bach de que reconocer los propios conflictos emocionales favorecía una vida más coherente.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="methods" aria-labelledby="methods-title">
+    <div class="method-copy">
+      <p class="eyebrow"><span></span> Elaboración original</p>
+      <h2 id="methods-title">Sol, agua<br />y observación</h2>
+      <p>
+        Bach buscó procedimientos deliberadamente sencillos. Utilizó el método
+        solar para flores delicadas y el método de ebullición para ramas y
+        especies leñosas.
+      </p>
+      <a href="/flores-de-bach">Entrar en el jardín de las 38 flores <span>↗</span></a>
+    </div>
+    <div class="method-diagram" aria-label="Los dos métodos de elaboración descritos por Edward Bach">
+      <div class="sun-symbol" aria-hidden="true"><span></span></div>
+      <article>
+        <span class="method-number">I</span>
+        <div><h3>Método solar</h3><p>Flores flotando en agua de manantial bajo la luz del sol.</p></div>
+      </article>
+      <article>
+        <span class="method-number">II</span>
+        <div><h3>Método de ebullición</h3><p>Material vegetal leñoso hervido en agua de manantial.</p></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="legacy">
+    <div>
+      <p class="eyebrow dark"><span></span> Mount Vernon</p>
+      <blockquote>Una casa pequeña para una idea que viajó por todo el mundo.</blockquote>
+    </div>
+    <div class="legacy-copy">
+      <p>
+        El Bach Centre conserva la casa donde vivió y trabajó durante sus últimos
+        años, junto con documentos, objetos y el jardín asociado a su historia.
+      </p>
+      <a href="https://bachcentre.com/en/about-us/history/dr-bach/" target="_blank" rel="noreferrer">
+        Consultar la fuente histórica <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </section>
+</article>
+
+<script src="../../scripts/biography/bach-journey.ts"></script>
+
+<style>
+  .biography {
+    --ink: #173227;
+    --night: #10251b;
+    --night-soft: #19372a;
+    --paper: #f1ecdd;
+    --pollen: #d9ae3f;
+    --mist: #a9bea8;
+    width: 100vw;
+    margin: -3rem 0 0 calc(50% - 50vw);
+    overflow: clip;
+    color: var(--ink);
+    background: var(--paper);
+  }
+
+  .bio-hero {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(17rem, .7fr);
+    align-items: end;
+    min-height: calc(100svh - 5rem);
+    padding: clamp(5rem, 10vw, 9rem) clamp(1.5rem, 8vw, 8rem) clamp(4rem, 7vw, 7rem);
+    isolation: isolate;
+    background:
+      linear-gradient(110deg, rgb(241 236 221 / 96%) 0%, rgb(241 236 221 / 87%) 48%, rgb(218 224 202 / 35%) 100%),
+      radial-gradient(circle at 76% 42%, #c7d2b8, transparent 34%);
+  }
+
+  .bio-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    opacity: .24;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E");
+  }
+
+  .hero-copy { position: relative; z-index: 2; max-width: 54rem; }
+  .eyebrow { display: flex; align-items: center; gap: .75rem; margin: 0 0 1.3rem; color: #677b65; font-size: .67rem; font-weight: 700; letter-spacing: .25em; text-transform: uppercase; }
+  .eyebrow span { width: 2.7rem; height: 1px; background: var(--pollen); }
+  .eyebrow.dark { color: #657763; }
+
+  .hero-copy h1 {
+    margin: 0;
+    color: var(--ink);
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(6.2rem, 15vw, 13rem);
+    font-weight: 500;
+    line-height: .57;
+    letter-spacing: -.075em;
+  }
+  .hero-copy h1 em { margin-left: clamp(2.5rem, 9vw, 9rem); color: #738a70; font-weight: 400; }
+  .hero-intro { max-width: 35rem; margin: clamp(3rem, 7vw, 6rem) 0 2rem; font-size: clamp(1rem, 1.4vw, 1.16rem); line-height: 1.75; }
+  .journey-link { display: inline-flex; align-items: center; gap: 1.4rem; color: var(--ink); font-size: .72rem; font-weight: 700; letter-spacing: .09em; text-decoration: none; text-transform: uppercase; }
+  .journey-link span { display: grid; place-items: center; width: 2.8rem; height: 2.8rem; border: 1px solid #8fa087; border-radius: 50%; transition: transform .25s ease, background .25s ease; }
+  .journey-link:hover span { color: var(--paper); background: var(--ink); transform: translateY(4px); }
+
+  .hero-quote { align-self: end; max-width: 25rem; margin: 0 0 1rem; padding: 2rem 0 0 2rem; border-top: 1px solid #aab6a2; }
+  .hero-quote p { margin: 0; font-family: "Cormorant Garamond", serif; font-size: clamp(1.55rem, 2.3vw, 2.1rem); font-style: italic; line-height: 1.18; }
+  .hero-quote cite { display: block; margin-top: 1.2rem; color: #71816e; font-size: .62rem; font-style: normal; letter-spacing: .12em; text-transform: uppercase; }
+  .hero-years { position: absolute; top: 8%; right: 7%; display: flex; align-items: center; gap: .7rem; color: #758471; font-family: "Cormorant Garamond", serif; font-size: .8rem; letter-spacing: .12em; writing-mode: vertical-rl; }
+  .hero-years i { width: 1px; height: 4rem; background: #aab7a2; }
+
+  .hero-orbit { position: absolute; z-index: -1; top: 11%; right: 7%; width: min(48vw, 43rem); aspect-ratio: 1; }
+  .orbit { position: absolute; inset: 0; border: 1px solid rgb(38 73 51 / 16%); border-radius: 50%; }
+  .orbit-one { transform: rotate(18deg) scaleY(.37); }
+  .orbit-two { transform: rotate(-24deg) scaleY(.58); }
+  .hero-seed { position: absolute; top: 47%; left: 49%; width: 1.1rem; height: 1.45rem; border-radius: 65% 35% 60% 40%; background: var(--pollen); box-shadow: 0 0 3rem rgb(217 174 63 / 60%); transform: rotate(28deg); animation: seed-breathe 4s ease-in-out infinite; }
+  @keyframes seed-breathe { 50% { transform: rotate(28deg) scale(1.2); box-shadow: 0 0 4.5rem rgb(217 174 63 / 80%); } }
+
+  .journey { position: relative; display: grid; grid-template-columns: minmax(21rem, .78fr) minmax(28rem, 1.22fr); color: #eceddf; background: var(--night); }
+  .journey-visual {
+    position: sticky;
+    top: 5rem;
+    grid-column: 2;
+    grid-row: 1;
+    height: calc(100svh - 5rem);
+    overflow: hidden;
+    background:
+      linear-gradient(rgb(116 91 52 / 5%) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(116 91 52 / 4%) 1px, transparent 1px),
+      radial-gradient(circle at 52% 43%, #fbf7e9 0, #eee7d4 58%, #ddd3bc 100%);
+    background-size: 3.5rem 3.5rem, 3.5rem 3.5rem, auto;
+  }
+  .journey-visual::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: .2;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='.18'/%3E%3C/svg%3E");
+  }
+  .journey-visual::after {
+    content: "";
+    position: absolute;
+    inset: 1rem;
+    border: 1px solid rgb(88 72 48 / 16%);
+    box-shadow: inset 0 0 0 3px rgb(255 252 239 / 18%);
+    pointer-events: none;
+  }
+  [data-biography-canvas] { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .canvas-vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 52% 44%, transparent 36%, rgb(89 67 35 / 12%) 100%), linear-gradient(90deg, rgb(78 57 29 / 10%), transparent 20%); box-shadow: inset 0 0 7rem rgb(100 76 40 / 10%); }
+  .canvas-fallback { position: absolute; inset: 0; display: grid; place-content: center; opacity: 0; }
+  .canvas-fallback.is-visible { opacity: 1; }
+  .canvas-fallback span { position: absolute; top: 50%; left: 50%; width: .7rem; height: .7rem; border-radius: 50%; background: #5c704b; box-shadow: 0 0 0 .25rem rgb(92 112 75 / 12%); transform: rotate(calc(var(--i, 1) * 72deg)) translateX(5rem); }
+  .canvas-fallback span:nth-child(2) { --i: 2; }.canvas-fallback span:nth-child(3) { --i: 3; }.canvas-fallback span:nth-child(4) { --i: 4; }.canvas-fallback span:nth-child(5) { --i: 5; }
+  .plate-mark { position: absolute; top: 2.1rem; left: 2.3rem; display: flex; align-items: center; gap: .75rem; color: #746548; font-family: "Cormorant Garamond", serif; text-transform: uppercase; }
+  .plate-mark span { font-size: .78rem; letter-spacing: .16em; }
+  .plate-mark i { width: 2.4rem; height: 1px; background: rgb(94 77 50 / 32%); }
+  .plate-mark small { font-size: .58rem; font-style: italic; letter-spacing: .12em; }
+  .visual-caption { position: absolute; left: clamp(1.5rem, 5vw, 4rem); bottom: clamp(2rem, 6vw, 5rem); display: flex; align-items: center; gap: 1rem; }
+  .visual-caption > span { color: #9a7832; font-family: "Cormorant Garamond", serif; font-size: 2.5rem; }
+  .visual-caption p { margin: 0; padding-left: 1rem; border-left: 1px solid rgb(65 79 55 / 28%); color: #506148; font-size: .67rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+  .visual-instruction { position: absolute; top: 2.2rem; right: 2.4rem; color: #77816c; font-size: .58rem; letter-spacing: .14em; text-transform: uppercase; }
+  .visual-instruction span { margin-left: .5rem; color: #9a7832; }
+
+  .journey-copy { position: relative; grid-column: 1; grid-row: 1; padding: 0 clamp(2rem, 6vw, 6.5rem); }
+  .journey-progress { position: absolute; top: 8vh; bottom: 8vh; left: clamp(.8rem, 2vw, 2rem); width: 1px; background: rgb(205 218 199 / 12%); }
+  .journey-progress span { display: block; width: 1px; height: 0; background: var(--pollen); transition: height .4s ease; }
+  .chapter { display: flex; min-height: 100svh; flex-direction: column; justify-content: center; padding: 7rem 0; opacity: .24; transform: translateY(1.5rem); transition: opacity .65s ease, transform .65s ease; }
+  .chapter.is-active { opacity: 1; transform: none; }
+  .chapter-kicker { margin: 0 0 3.5rem; color: #86a08b; font-size: .61rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
+  .chapter time { color: #d8b94e; font-family: "Cormorant Garamond", serif; font-size: clamp(4rem, 7vw, 7rem); font-weight: 400; line-height: .8; letter-spacing: -.04em; }
+  .chapter h3 { max-width: 15ch; margin: 2rem 0 1.3rem; color: #f2eedf; font-family: "Cormorant Garamond", serif; font-size: clamp(2.4rem, 4.3vw, 4.4rem); font-weight: 500; line-height: .92; letter-spacing: -.025em; }
+  .chapter > p:not(.chapter-kicker) { max-width: 32rem; margin: 0; color: #b8c6b7; font-size: .95rem; line-height: 1.8; }
+  .chapter-note { display: flex; align-items: center; gap: .7rem; margin-top: 2.6rem; color: #78907e; font-size: .6rem; letter-spacing: .17em; text-transform: uppercase; }
+  .chapter-note i { width: .45rem; height: .45rem; border: 1px solid #d7b74e; border-radius: 50%; box-shadow: 0 0 0 4px rgb(215 183 78 / 8%); }
+
+  .convictions { padding: clamp(5rem, 10vw, 10rem) clamp(1.5rem, 8vw, 8rem); background: var(--paper); }
+  .convictions-heading { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem 6rem; max-width: 84rem; margin: 0 auto 5rem; }
+  .convictions-heading .eyebrow { grid-column: 1 / -1; }
+  .convictions-heading h2, .methods h2 { margin: 0; font-family: "Cormorant Garamond", serif; font-size: clamp(3.4rem, 6vw, 6.4rem); font-weight: 500; line-height: .86; letter-spacing: -.045em; }
+  .convictions-heading > p:last-child { align-self: end; max-width: 31rem; margin: 0; color: #566b59; font-size: .93rem; line-height: 1.8; }
+  .conviction-grid { display: grid; grid-template-columns: repeat(3, 1fr); max-width: 84rem; margin: 0 auto; border-block: 1px solid #bdc8b7; }
+  .conviction-grid article { min-height: 21rem; padding: 2rem clamp(1.5rem, 3vw, 3rem); border-right: 1px solid #bdc8b7; transition: background .3s ease, transform .3s ease; }
+  .conviction-grid article:last-child { border-right: 0; }
+  .conviction-grid article:hover { background: #e7e3d3; transform: translateY(-.5rem); }
+  .conviction-grid article > span { color: #8c9c86; font-family: "Cormorant Garamond", serif; font-size: 1.1rem; }
+  .conviction-grid h3 { margin: 7rem 0 1rem; font-family: "Cormorant Garamond", serif; font-size: 2.2rem; font-weight: 500; }
+  .conviction-grid p { margin: 0; color: #5f7060; font-size: .82rem; line-height: 1.7; }
+
+  .methods { display: grid; grid-template-columns: 1fr 1fr; min-height: 45rem; color: #f0edde; background: var(--night-soft); }
+  .method-copy { display: flex; flex-direction: column; justify-content: center; padding: clamp(4rem, 8vw, 8rem); }
+  .method-copy .eyebrow { color: #8ba08d; }
+  .method-copy h2 { color: #f0edde; }
+  .method-copy > p { max-width: 31rem; margin: 2rem 0; color: #aebdaf; line-height: 1.8; }
+  .method-copy > a { display: flex; max-width: 29rem; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #607767; color: #e8e5d7; font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-decoration: none; text-transform: uppercase; }
+  .method-copy > a span { color: #d9b84e; font-size: 1.2rem; transition: transform .2s ease; }
+  .method-copy > a:hover span { transform: translate(3px, -3px); }
+  .method-diagram { position: relative; display: flex; flex-direction: column; justify-content: center; padding: clamp(3rem, 7vw, 7rem); background: #e9e3d2; color: var(--ink); overflow: hidden; }
+  .sun-symbol { position: absolute; top: -9rem; right: -7rem; width: 25rem; height: 25rem; border: 1px solid #c4ad66; border-radius: 50%; }
+  .sun-symbol::before, .sun-symbol::after { content: ""; position: absolute; inset: 2.2rem; border: 1px solid rgb(196 173 102 / 42%); border-radius: 50%; }
+  .sun-symbol::after { inset: 5rem; }
+  .sun-symbol span { position: absolute; inset: 8rem; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #f6db75, #d6a936); box-shadow: 0 0 4rem rgb(216 177 66 / 34%); }
+  .method-diagram article { position: relative; z-index: 1; display: grid; grid-template-columns: 3rem 1fr; gap: 1.5rem; padding: 2.5rem 0; border-bottom: 1px solid #bdc6b4; }
+  .method-diagram article:first-of-type { margin-top: 11rem; border-top: 1px solid #bdc6b4; }
+  .method-number { color: #a48538; font-family: "Cormorant Garamond", serif; font-size: 1.4rem; }
+  .method-diagram h3 { margin: 0 0 .5rem; font-family: "Cormorant Garamond", serif; font-size: 2rem; font-weight: 500; }
+  .method-diagram p { max-width: 23rem; margin: 0; color: #5d6e5e; font-size: .8rem; line-height: 1.6; }
+
+  .legacy { display: grid; grid-template-columns: 1.35fr .65fr; gap: 5rem; padding: clamp(5rem, 10vw, 10rem) clamp(1.5rem, 8vw, 8rem); background: #dce2d1; }
+  .legacy > div:first-child { max-width: 58rem; }
+  .legacy blockquote { margin: 0; font-family: "Cormorant Garamond", serif; font-size: clamp(3.8rem, 7vw, 7.4rem); font-weight: 400; line-height: .82; letter-spacing: -.045em; }
+  .legacy-copy { align-self: end; max-width: 28rem; }
+  .legacy-copy p { color: #566a57; font-size: .9rem; line-height: 1.8; }
+  .legacy-copy a { display: flex; justify-content: space-between; margin-top: 2rem; padding-bottom: .8rem; border-bottom: 1px solid #9aaa94; color: var(--ink); font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-decoration: none; text-transform: uppercase; }
+  .legacy-copy a span { color: #9a7d2d; }
+
+  @media (max-width: 920px) {
+    .bio-hero { grid-template-columns: 1fr; gap: 4rem; }
+    .hero-quote { margin-left: auto; }
+    .journey { display: block; }
+    .journey-visual { top: 5rem; grid-column: 1; grid-row: 1; height: 50svh; min-height: 23rem; z-index: 2; }
+    .journey-copy { grid-column: 1; grid-row: 2; padding-inline: clamp(2rem, 10vw, 6rem); }
+    .chapter { min-height: 75svh; }
+    .journey-progress { left: 1rem; }
+    .convictions-heading, .methods, .legacy { grid-template-columns: 1fr; }
+    .conviction-grid { grid-template-columns: 1fr; }
+    .conviction-grid article { min-height: auto; border-right: 0; border-bottom: 1px solid #bdc8b7; }
+    .conviction-grid article:last-child { border-bottom: 0; }
+    .conviction-grid h3 { margin-top: 3rem; }
+    .method-diagram { min-height: 40rem; }
+  }
+
+  @media (max-width: 560px) {
+    .bio-hero { min-height: calc(100svh - 5rem); padding-top: 5rem; }
+    .hero-copy h1 { font-size: clamp(5.4rem, 30vw, 8rem); }
+    .hero-copy h1 em { margin-left: 1.5rem; }
+    .hero-orbit { top: 16%; right: -25%; width: 95vw; }
+    .hero-years { display: none; }
+    .hero-quote { padding-left: 1rem; }
+    .journey-visual { height: 44svh; min-height: 20rem; }
+    .visual-instruction { display: none; }
+    .journey-copy { padding-inline: 2rem; }
+    .chapter { min-height: 72svh; padding-block: 4rem; }
+    .chapter-kicker { margin-bottom: 2rem; }
+    .convictions-heading { grid-template-columns: 1fr; margin-bottom: 3rem; }
+    .convictions-heading .eyebrow { grid-column: 1; }
+    .method-copy, .method-diagram { padding-inline: 1.5rem; }
+    .legacy { gap: 2.5rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-seed { animation: none; }
+    .chapter { opacity: .75; transform: none; }
+    .chapter.is-active { opacity: 1; }
+  }
+</style>
