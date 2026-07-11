@@ -6,9 +6,48 @@
   --color-sage: #8fa382;
   --color-earth: #a08060;
 
+  /* Tokens semánticos del herbario vivo: superficie, tinta y acentos florales */
+  --color-paper: #f3f0e6;
+  --color-paper-dim: #ece6d6;
+  --color-ink: #2c5530;
+  --color-moss: #8fa382;
+  --color-moss-text: #4d6642;
+  --color-pollen: #d9a441;
+  --color-petal: #c98a8a;
+
   --font-serif: "Cormorant Garamond", serif;
   --font-sans: "Red Hat Text", system-ui, sans-serif;
   --font-mono:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
     "Courier New", monospace;
+
+  /* Movimiento: revelados por scroll, contenidos y coherentes en todo el index */
+  --ease-garden: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-reveal: 700ms;
+  --duration-hover: 250ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Revelado por scroll compartido por las escenas de la portada. */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(1.25rem);
+  transition:
+    opacity var(--duration-reveal) var(--ease-garden),
+    transform var(--duration-reveal) var(--ease-garden);
+}
+
+[data-reveal].is-revealed {
+  opacity: 1;
+  transform: none;
 }
