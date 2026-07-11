@@ -7,26 +7,17 @@ interface Props {
 
 const { newestArchiveYear } = Astro.props;
 
-// Spike comparativo Fase 2 (§5 del plan): el sitio es estático, así que
-// la variante no puede decidirse en build. La base 2.5D siempre se
-// renderiza; el loader de Three.js (cargado siempre, como chunk aparte)
-// decide en cliente si monta la escena 3D encima según ?hero=3d en la
-// URL. Sin querystring, o si WebGL2/ahorro de datos no lo permiten, solo
-// se ve el 2.5D.
+// Fase 2 (§5 del plan): la escena Three.js procedural ("Flor en
+// transición") no superó a la variante 2.5D — la geometría no se leía
+// como una flor real y no aportaba una diferencia perceptible que
+// justificara su coste. Se retira; 2.5D queda como implementación
+// principal, no como una versión inferior.
 ---
 
 <section
   class="relative flex min-h-[85svh] items-center overflow-hidden bg-paper md:min-h-[92svh]"
 >
-  <div class="absolute inset-0" data-hero-3d-container>
-    <HeroBotanicalFallback />
-
-    <canvas
-      class="absolute inset-0 h-full w-full opacity-0 transition-opacity duration-700"
-      aria-hidden="true"
-      data-hero-3d-canvas
-    ></canvas>
-  </div>
+  <HeroBotanicalFallback />
 
   <div
     class="relative z-10 mx-auto flex max-w-3xl flex-col items-start gap-6 px-6 py-24 md:px-12"
@@ -70,4 +61,3 @@ const { newestArchiveYear } = Astro.props;
 </section>
 
 <script src="../../scripts/home/hero-parallax.ts"></script>
-<script src="../../scripts/home/hero-scene-3d-loader.ts"></script>
