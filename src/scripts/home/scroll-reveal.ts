@@ -25,3 +25,5 @@ if (prefersReducedMotion || !("IntersectionObserver" in window)) {
 
   revealTargets.forEach((el) => observer.observe(el));
 }
+
+export {};

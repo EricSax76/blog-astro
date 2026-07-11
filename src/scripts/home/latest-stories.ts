@@ -252,3 +252,5 @@ const loadLatestStories = async () => {
 };
 
 loadLatestStories();
+
+export {};

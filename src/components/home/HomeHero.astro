@@ -1,24 +1,31 @@
 ---
+import HeroBotanicalFallback from "./hero/HeroBotanicalFallback.astro";
+
 interface Props {
   newestArchiveYear: number;
 }
 
 const { newestArchiveYear } = Astro.props;
+
+// Spike comparativo Fase 2 (§5 del plan): el sitio es estático, así que
+// la variante no puede decidirse en build. La base 2.5D siempre se
+// renderiza; el loader de Three.js (cargado siempre, como chunk aparte)
+// decide en cliente si monta la escena 3D encima según ?hero=3d en la
+// URL. Sin querystring, o si WebGL2/ahorro de datos no lo permiten, solo
+// se ve el 2.5D.
 ---
 
 <section
   class="relative flex min-h-[85svh] items-center overflow-hidden bg-paper md:min-h-[92svh]"
 >
-  <div
-    class="absolute inset-0 bg-cover bg-center"
-    style="background-image: url('/images/bach-flowers/Rock%20Rose%20(Helianthemum%20nummularium).jpg');"
-    aria-hidden="true"
-  >
-  </div>
-  <div
-    class="absolute inset-0 bg-gradient-to-t from-paper via-paper/75 to-paper/20"
-    aria-hidden="true"
-  >
+  <div class="absolute inset-0" data-hero-3d-container>
+    <HeroBotanicalFallback />
+
+    <canvas
+      class="absolute inset-0 h-full w-full opacity-0 transition-opacity duration-700"
+      aria-hidden="true"
+      data-hero-3d-canvas
+    ></canvas>
   </div>
 
   <div
@@ -61,3 +68,6 @@ const { newestArchiveYear } = Astro.props;
     <span aria-hidden="true" class="text-lg leading-none">↓</span>
   </a>
 </section>
+
+<script src="../../scripts/home/hero-parallax.ts"></script>
+<script src="../../scripts/home/hero-scene-3d-loader.ts"></script>
