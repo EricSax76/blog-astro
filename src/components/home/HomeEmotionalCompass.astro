@@ -1,0 +1,51 @@
+---
+import { EMOTIONAL_GROUPS } from "../../data/emotional-groups";
+import { flowers } from "../../data/flowers";
+
+const groupsWithCount = EMOTIONAL_GROUPS.map((group) => ({
+  ...group,
+  count: flowers.filter((flower) => flower.emotionalGroup === group.slug).length,
+}));
+---
+
+<section
+  id="brujula-emocional"
+  class="mx-auto mt-24 max-w-6xl px-6 md:px-12"
+  data-reveal
+>
+  <div class="mx-auto max-w-2xl space-y-3 text-center">
+    <p class="text-xs font-semibold uppercase tracking-[0.3em] text-moss-text">
+      Brújula emocional
+    </p>
+    <h2 class="font-serif text-3xl font-bold text-ink md:text-4xl">
+      Siete caminos para reconocerte
+    </h2>
+    <p class="text-ink/70">
+      Cada grupo reúne flores afines a un estado emocional. Elige el que
+      resuene contigo para empezar a explorar.
+    </p>
+  </div>
+
+  <ul class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    {
+      groupsWithCount.map((group) => (
+        <li>
+          <a
+            href={`/flores-de-bach?grupo=${group.slug}`}
+            class="group flex h-full flex-col gap-2 rounded-3xl border border-moss/20 bg-paper-dim/60 p-5 transition-colors hover:border-moss/50 hover:bg-paper-dim focus-visible:border-moss/50 focus-visible:bg-paper-dim"
+          >
+            <span class="text-xs font-semibold uppercase tracking-[0.2em] text-moss-text">
+              {group.count} {group.count === 1 ? "flor" : "flores"}
+            </span>
+            <span class="font-serif text-xl font-bold text-ink">
+              {group.label}
+            </span>
+            <span class="text-sm leading-relaxed text-ink/70">
+              {group.description}
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</section>

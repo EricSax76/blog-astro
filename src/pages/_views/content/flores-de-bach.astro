@@ -2,6 +2,7 @@
 import Layout from "../../../layouts/Layout.astro";
 
 import { flowers } from "../../../data/flowers";
+import { EMOTIONAL_GROUPS } from "../../../data/emotional-groups";
 ---
 
 <Layout title="Glosario de las 38 Flores de Bach">
@@ -26,10 +27,48 @@ import { flowers } from "../../../data/flowers";
     </p>
   </header>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+  <div
+    id="grupo-filtro"
+    class="mb-10 flex flex-wrap justify-center gap-2"
+    role="group"
+    aria-label="Filtrar por grupo emocional"
+  >
+    <button
+      type="button"
+      data-group-filter="all"
+      aria-pressed="true"
+      class="rounded-full border border-sage/30 px-4 py-2 text-sm font-semibold text-deep-green transition-colors data-[active=true]:bg-deep-green data-[active=true]:text-cream"
+      data-active="true"
+    >
+      Todas
+    </button>
+    {
+      EMOTIONAL_GROUPS.map((group) => (
+        <button
+          type="button"
+          data-group-filter={group.slug}
+          aria-pressed="false"
+          class="rounded-full border border-sage/30 px-4 py-2 text-sm font-semibold text-deep-green transition-colors data-[active=true]:bg-deep-green data-[active=true]:text-cream"
+          data-active="false"
+        >
+          {group.label}
+        </button>
+      ))
+    }
+  </div>
+
+  <div
+    id="flowers-grid"
+    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+  >
     {
       flowers.map((flor) => (
-        <a href={`/flores-de-bach/${flor.slug}`} class="group block">
+        <a
+          href={`/flores-de-bach/${flor.slug}`}
+          class="group block"
+          data-flower-card
+          data-group={flor.emotionalGroup}
+        >
           <article class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-sage/10 h-full flex flex-col">
             <div class="h-64 overflow-hidden relative">
               <div class="absolute inset-0 bg-deep-green/10 group-hover:bg-transparent transition-colors z-10" />
@@ -87,3 +126,5 @@ import { flowers } from "../../../data/flowers";
     }
   </div>
 </Layout>
+
+<script src="../../../scripts/flowers/group-filter.ts"></script>
