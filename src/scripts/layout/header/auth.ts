@@ -1,4 +1,5 @@
 import { AUTH_CHANGED_EVENT, AUTH_STATE_STORAGE_KEY } from "./constants";
+import { getFirebaseApp, hasValidFirebaseConfig } from "../../core/firebase-client";
 
 type AuthState = {
   isAuthenticated?: boolean;
@@ -215,17 +216,6 @@ const setAndBroadcastAuthState = (state: {
   window.dispatchEvent(new CustomEvent(AUTH_CHANGED_EVENT, { detail: state }));
 };
 
-const hasValidFirebaseConfig = (): boolean => {
-  const config = (
-    window as Window & { __FIREBASE_CONFIG__?: Record<string, string> }
-  ).__FIREBASE_CONFIG__ || {};
-
-  return ["apiKey", "authDomain", "projectId", "appId"].every((key) => {
-    const value = config[key];
-    return typeof value === "string" && value.trim().length > 0;
-  });
-};
-
 const logoutFromHeader = async (elements: AuthElements): Promise<void> => {
   closeDesktopProfileDropdown(elements);
 
@@ -234,18 +224,9 @@ const logoutFromHeader = async (elements: AuthElements): Promise<void> => {
 
   try {
     if (hasValidFirebaseConfig()) {
-      const firebaseConfig = (
-        window as Window & { __FIREBASE_CONFIG__?: Record<string, string> }
-      ).__FIREBASE_CONFIG__ || {};
-
-      const [firebaseApp, firebaseAuth] = await Promise.all([
-        import("firebase/app"),
-        import("firebase/auth"),
-      ]);
-
-      const { getApp, getApps, initializeApp } = firebaseApp;
+      const firebaseAuth = await import("firebase/auth");
       const { getAuth, signOut } = firebaseAuth;
-      const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+      const app = getFirebaseApp();
       await signOut(getAuth(app));
     }
 

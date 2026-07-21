@@ -1,15 +1,4 @@
-type FirebaseConfig = {
-  apiKey?: string;
-  authDomain?: string;
-  projectId?: string;
-  storageBucket?: string;
-  messagingSenderId?: string;
-  appId?: string;
-};
-
-const getFirebaseConfig = (): FirebaseConfig =>
-  (window as Window & { __FIREBASE_CONFIG__?: FirebaseConfig })
-    .__FIREBASE_CONFIG__ || {};
+import { getFirebaseApp, hasValidFirebaseConfig } from "../core/firebase-client";
 
 type LoadedStory = {
   id: string;
@@ -25,16 +14,6 @@ type LoadedStory = {
 const container = document.getElementById("latest-stories");
 const loadingState = document.getElementById("latest-stories-loading");
 const emptyState = document.getElementById("latest-stories-empty");
-
-const requiredConfigKeys = ["apiKey", "authDomain", "projectId", "appId"] as const;
-
-const hasValidFirebaseConfig = (): boolean => {
-  const config = getFirebaseConfig();
-  return requiredConfigKeys.every((key) => {
-    const value = config[key];
-    return typeof value === "string" && value.trim().length > 0;
-  });
-};
 
 const formatDate = (date: Date | null): string => {
   if (!date || Number.isNaN(date.getTime())) return "";
@@ -218,17 +197,11 @@ const loadLatestStories = async () => {
   }
 
   try {
-    const [firebaseApp, firebaseFirestore] = await Promise.all([
-      import("firebase/app"),
-      import("firebase/firestore"),
-    ]);
-
-    const { initializeApp, getApp, getApps } = firebaseApp;
+    const firebaseFirestore = await import("firebase/firestore");
     const { getFirestore, collection, query, orderBy, limit, getDocs } =
       firebaseFirestore;
 
-    const config = getFirebaseConfig() as Record<string, string>;
-    const app = getApps().length > 0 ? getApp() : initializeApp(config);
+    const app = getFirebaseApp();
     const db = getFirestore(app);
 
     const postsRef = collection(db, "posts");

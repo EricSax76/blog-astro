@@ -11,7 +11,7 @@ import * as admin from "firebase-admin";
 import { db } from "../lib/firebase";
 import { enforceRateLimit } from "../lib/rateLimit";
 
-export const upsertUserProfile = onCall(async (request) => {
+export const upsertUserProfile = onCall({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError("unauthenticated", "Debes estar autenticado.");

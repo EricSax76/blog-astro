@@ -1,4 +1,6 @@
 
+import { getFirebaseApp, hasValidFirebaseConfig } from "../../core/firebase-client";
+
 // Web Component for Social Interactions
 class BlogSocialInteractions extends HTMLElement {
   constructor() {
@@ -131,27 +133,23 @@ class BlogSocialInteractions extends HTMLElement {
   }
 
   async initFirebase() {
-    // @ts-ignore
-    const firebaseConfig = window.__FIREBASE_CONFIG__;
-    if (!firebaseConfig) {
+    if (!hasValidFirebaseConfig()) {
       console.warn("Firebase config not found. Social interactions disabled.");
       return;
     }
 
     try {
-      const [firebaseApp, firebaseAuth, firebaseFirestore, firebaseFunctions] = await Promise.all([
-        import("firebase/app"),
+      const [firebaseAuth, firebaseFirestore, firebaseFunctions] = await Promise.all([
         import("firebase/auth"),
         import("firebase/firestore"),
         import("firebase/functions"),
       ]);
 
-      const { initializeApp, getApps, getApp } = firebaseApp;
       const { getAuth, onAuthStateChanged } = firebaseAuth;
       const { getFirestore } = firebaseFirestore;
       const { getFunctions, httpsCallable } = firebaseFunctions;
 
-      const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+      const app = getFirebaseApp();
       const auth = getAuth(app);
       const db = getFirestore(app);
       const functions = getFunctions(app, "europe-west1");

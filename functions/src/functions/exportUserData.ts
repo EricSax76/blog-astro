@@ -9,7 +9,7 @@ import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { db, fetchCollection } from "../lib/firebase";
 import { enforceRateLimit } from "../lib/rateLimit";
 
-export const exportUserData = onCall(async (request) => {
+export const exportUserData = onCall({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError("unauthenticated", "Debes estar autenticado para exportar tus datos.");

@@ -97,10 +97,20 @@ const ogImage = new URL(image, Astro.site ?? Astro.url.origin).href;
           messagingSenderId:
             import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? "",
           appId: import.meta.env.PUBLIC_FIREBASE_APP_ID ?? "",
+          // Es una clave pública de reCAPTCHA v3, no un secreto. El
+          // secreto de proveedor nunca se expone al navegador.
+          appCheckSiteKey: import.meta.env.PUBLIC_APPCHECK_SITE_KEY ?? "",
         },
+        // Solo se inserta durante desarrollo. Es un token de depuración de
+        // App Check que debe estar registrado en la consola; nunca se publica
+        // en un build de producción.
+        appCheckDebugToken: import.meta.env.DEV ? import.meta.env.APPCHECK_DEBUG_TOKEN ?? "" : "",
       }}
     >
       window.__FIREBASE_CONFIG__ = firebaseConfig;
+      if (appCheckDebugToken) {
+        self.FIREBASE_APPCHECK_DEBUG_TOKEN = appCheckDebugToken;
+      }
       // Initialize auth state if not present
       if (!window.__BLOG_AUTH_STATE__) {
         try {

@@ -1,38 +1,11 @@
 import { isMissingIndexError, mapSnapshotToPosts } from "./mappers";
 import type { LoadedPost } from "./types";
+import { getFirebaseApp, hasValidFirebaseConfig } from "../../core/firebase-client";
 
-declare global {
-  interface Window {
-    __FIREBASE_CONFIG__?: {
-      apiKey?: string;
-      authDomain?: string;
-      projectId?: string;
-      storageBucket?: string;
-      messagingSenderId?: string;
-      appId?: string;
-    };
-  }
-}
-
-const requiredConfigKeys = ["apiKey", "authDomain", "projectId", "appId"] as const;
-
-const getFirebaseConfig = (): Record<string, string> => {
-  return (window.__FIREBASE_CONFIG__ as Record<string, string>) || {};
-};
+export { hasValidFirebaseConfig };
 
 const getOrInitFirebaseApp = async () => {
-  const firebaseApp = await import("firebase/app");
-  const { initializeApp, getApp, getApps } = firebaseApp;
-  const config = getFirebaseConfig();
-  return getApps().length > 0 ? getApp() : initializeApp(config);
-};
-
-export const hasValidFirebaseConfig = (): boolean => {
-  const config = getFirebaseConfig();
-  return requiredConfigKeys.every((key) => {
-    const value = config[key];
-    return typeof value === "string" && value.trim().length > 0;
-  });
+  return getFirebaseApp();
 };
 
 export const observeMyPostsAuth = async (

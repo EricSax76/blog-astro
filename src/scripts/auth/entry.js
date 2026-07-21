@@ -1,7 +1,11 @@
+import { getFirebaseApp, hasValidFirebaseConfig } from "../core/firebase-client";
+
 if (typeof window !== "undefined") {
   const registerForm = document.getElementById("register-form");
   const loginForm = document.getElementById("login-form");
   const logoutButton = document.getElementById("logout-button");
+  const googleLoginButton = document.getElementById("google-login-button");
+  const googleRegisterButton = document.getElementById("google-register-button");
   const messageContainer = document.getElementById("auth-message");
   const announcer = document.getElementById("auth-announcer");
   const configWarning = document.getElementById("auth-config-warning");
@@ -65,6 +69,11 @@ if (typeof window !== "undefined") {
     "auth/network-request-failed": "Error de conexión. Comprueba tu red e inténtalo de nuevo.",
     "auth/user-disabled":          "Esta cuenta ha sido deshabilitada.",
     "auth/operation-not-allowed":  "Este método de acceso no está habilitado.",
+    "auth/popup-closed-by-user":   "Cerraste la ventana de Google antes de terminar.",
+    "auth/cancelled-popup-request": "Solo puede haber una ventana de Google abierta a la vez.",
+    "auth/popup-blocked":          "El navegador bloqueó la ventana emergente. Permite ventanas emergentes e inténtalo de nuevo.",
+    "auth/account-exists-with-different-credential":
+      "Ya existe una cuenta con ese correo usando otro método de acceso.",
   };
 
   const formatError = (error) => {
@@ -112,6 +121,11 @@ if (typeof window !== "undefined") {
         setMessage(message);
       });
     });
+
+    [googleLoginButton, googleRegisterButton].forEach((button) => {
+      if (!(button instanceof HTMLButtonElement)) return;
+      button.addEventListener("click", () => setMessage(message));
+    });
   };
 
   const setAuthState = (
@@ -147,12 +161,7 @@ if (typeof window !== "undefined") {
     );
   };
 
-  const firebaseConfig = window.__FIREBASE_CONFIG__ || {};
-  const requiredKeys = ["apiKey", "authDomain", "projectId", "appId"];
-  const isConfigValid = requiredKeys.every((key) => {
-    const value = firebaseConfig[key];
-    return typeof value === "string" && value.trim().length > 0;
-  });
+  const isConfigValid = hasValidFirebaseConfig();
 
   if (!isConfigValid) {
     if (configWarning) {
@@ -167,24 +176,21 @@ if (typeof window !== "undefined") {
       configWarning.classList.add("hidden");
     }
 
-    Promise.all([
-      import("firebase/app"),
-      import("firebase/auth"),
-      import("firebase/functions"),
-    ])
-      .then(([firebaseApp, firebaseAuth, firebaseFunctions]) => {
-        const { initializeApp, getApp, getApps } = firebaseApp;
+    Promise.all([import("firebase/auth"), import("firebase/functions")])
+      .then(([firebaseAuth, firebaseFunctions]) => {
         const {
           getAuth,
           createUserWithEmailAndPassword,
           signInWithEmailAndPassword,
+          signInWithPopup,
+          GoogleAuthProvider,
           signOut,
           onAuthStateChanged,
           updateProfile,
         } = firebaseAuth;
         const { getFunctions, httpsCallable } = firebaseFunctions;
 
-        const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+        const app = getFirebaseApp();
         const auth = getAuth(app);
         const functions = getFunctions(app, "europe-west1");
 
@@ -339,6 +345,47 @@ if (typeof window !== "undefined") {
             }
           });
         }
+
+        const handleGoogleSignIn = async (button) => {
+          clearMessage();
+          clearFieldErrors();
+          button.setAttribute("disabled", "true");
+
+          try {
+            const provider = new GoogleAuthProvider();
+            const userCredential = await signInWithPopup(auth, provider);
+
+            try {
+              await callUpsertUserProfile(userCredential.user);
+            } catch (profileError) {
+              console.error("[firebase/google-profile] failed", profileError);
+              setMessage(
+                `Iniciaste sesión, pero no se pudo sincronizar tu perfil. ${formatError(profileError)}.`
+              );
+              return;
+            }
+
+            setMessage("Sesión iniciada. Redirigiendo al editor...", "success");
+            // 1500ms: tiempo suficiente para que los lectores de pantalla lean el mensaje
+            window.setTimeout(() => {
+              window.location.assign("/publicar");
+            }, 1500);
+          } catch (error) {
+            const code = typeof error?.code === "string" ? error.code : "";
+            // El usuario cierra el popup a propósito: no es un error que deba anunciarse.
+            if (code !== "auth/cancelled-popup-request" && code !== "auth/popup-closed-by-user") {
+              console.error("[firebase/google-signin] failed", error);
+              setMessage(formatError(error));
+            }
+          } finally {
+            button.removeAttribute("disabled");
+          }
+        };
+
+        [googleLoginButton, googleRegisterButton].forEach((button) => {
+          if (!(button instanceof HTMLButtonElement)) return;
+          button.addEventListener("click", () => handleGoogleSignIn(button));
+        });
 
         onAuthStateChanged(auth, (user) => {
           if (!user) {

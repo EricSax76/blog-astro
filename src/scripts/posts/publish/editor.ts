@@ -1,4 +1,6 @@
 
+import { getFirebaseApp, hasValidFirebaseConfig } from "../../core/firebase-client";
+
 export {};
 
 declare global {
@@ -7,30 +9,12 @@ declare global {
       isAuthenticated?: boolean;
       email?: string | null;
     };
-    __FIREBASE_CONFIG__?: {
-      apiKey?: string;
-      authDomain?: string;
-      projectId?: string;
-      storageBucket?: string;
-      messagingSenderId?: string;
-      appId?: string;
-    };
   }
 }
 
 const isAuthenticatedUser = (): boolean =>
   typeof window !== "undefined" &&
   window.__BLOG_AUTH_STATE__?.isAuthenticated === true;
-
-const requiredConfigKeys = ["apiKey", "authDomain", "projectId", "appId"] as const;
-
-const hasValidFirebaseConfig = (): boolean => {
-  const config = window.__FIREBASE_CONFIG__ || {};
-  return requiredConfigKeys.every((key) => {
-    const value = config[key];
-    return typeof value === "string" && value.trim().length > 0;
-  });
-};
 
 const form = document.getElementById("blog-form") as HTMLFormElement | null;
 const titleInput = document.getElementById(
@@ -77,21 +61,17 @@ const getFirebaseClients = async (): Promise<FirebaseClients> => {
     throw new Error("Falta configuración Firebase (`PUBLIC_FIREBASE_*`).");
   }
 
-  const [firebaseApp, firebaseAuth, firebaseStorage, firebaseFunctions] =
-    await Promise.all([
-      import("firebase/app"),
-      import("firebase/auth"),
-      import("firebase/storage"),
-      import("firebase/functions"),
-    ]);
+  const [firebaseAuth, firebaseStorage, firebaseFunctions] = await Promise.all([
+    import("firebase/auth"),
+    import("firebase/storage"),
+    import("firebase/functions"),
+  ]);
 
-  const { getApp, getApps, initializeApp } = firebaseApp;
   const { getAuth } = firebaseAuth;
   const { getStorage, ref, uploadBytes, getDownloadURL } = firebaseStorage;
   const { getFunctions, httpsCallable } = firebaseFunctions;
 
-  const config = window.__FIREBASE_CONFIG__ as Record<string, string>;
-  const app = getApps().length > 0 ? getApp() : initializeApp(config);
+  const app = getFirebaseApp();
 
   return {
     auth: getAuth(app) as FirebaseClients["auth"],

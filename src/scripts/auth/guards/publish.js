@@ -1,3 +1,5 @@
+import { getFirebaseApp, hasValidFirebaseConfig } from "../../core/firebase-client";
+
 if (typeof window !== "undefined") {
   const form = document.getElementById("blog-form");
   const controls = Array.from(document.querySelectorAll("[data-publish-control]"));
@@ -60,12 +62,7 @@ if (typeof window !== "undefined") {
     );
   };
 
-  const firebaseConfig = window.__FIREBASE_CONFIG__ || {};
-  const requiredKeys = ["apiKey", "authDomain", "projectId", "appId"];
-  const isConfigValid = requiredKeys.every((key) => {
-    const value = firebaseConfig[key];
-    return typeof value === "string" && value.trim().length > 0;
-  });
+  const isConfigValid = hasValidFirebaseConfig();
 
   if (!isConfigValid) {
     if (configWarning) {
@@ -77,17 +74,12 @@ if (typeof window !== "undefined") {
       configWarning.classList.add("hidden");
     }
 
-    Promise.all([
-      import("firebase/app"),
-      import("firebase/auth"),
-      import("firebase/functions"),
-    ])
-      .then(([firebaseApp, firebaseAuth, firebaseFunctions]) => {
-        const { initializeApp, getApp, getApps } = firebaseApp;
+    Promise.all([import("firebase/auth"), import("firebase/functions")])
+      .then(([firebaseAuth, firebaseFunctions]) => {
         const { getAuth, onAuthStateChanged, signOut } = firebaseAuth;
         const { getFunctions, httpsCallable } = firebaseFunctions;
 
-        const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+        const app = getFirebaseApp();
         const auth = getAuth(app);
         const functions = getFunctions(app, "europe-west1");
 

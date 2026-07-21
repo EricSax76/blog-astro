@@ -10,7 +10,7 @@ import * as admin from "firebase-admin";
 import { db, deleteCollection, deleteStorageFiles } from "../lib/firebase";
 import { enforceRateLimit } from "../lib/rateLimit";
 
-export const deleteUserData = onCall(async (request) => {
+export const deleteUserData = onCall({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError("unauthenticated", "Debes estar autenticado para eliminar tus datos.");

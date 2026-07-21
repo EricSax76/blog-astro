@@ -20,7 +20,10 @@ if (prefersReducedMotion || !("IntersectionObserver" in window)) {
         }
       });
     },
-    { threshold: 0.2, rootMargin: "0px 0px -10% 0px" }
+    // Un umbral proporcional al elemento deja ocultos los pliegos muy largos
+    // (como la primera entrada de 2017) hasta haber hecho mucho scroll.
+    // Basta con que el contenido entre en el área visible para revelarlo.
+    { threshold: 0, rootMargin: "0px 0px -10% 0px" }
   );
 
   revealTargets.forEach((el) => observer.observe(el));

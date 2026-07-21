@@ -1,3 +1,5 @@
+import { getFirebaseApp, hasValidFirebaseConfig } from "../core/firebase-client";
+
 if (typeof window !== "undefined") {
   const form = document.getElementById("profile-form");
   const configWarning = document.getElementById("profile-config-warning");
@@ -13,8 +15,6 @@ if (typeof window !== "undefined") {
   const gdprMessage = document.getElementById("gdpr-message");
   const gdprExportButton = document.getElementById("gdpr-export-button");
   const gdprDeleteButton = document.getElementById("gdpr-delete-button");
-
-  const requiredKeys = ["apiKey", "authDomain", "projectId", "appId"];
 
   const setMessage = (text, type = "error") => {
     if (!message) return;
@@ -119,11 +119,7 @@ if (typeof window !== "undefined") {
     window.dispatchEvent(new CustomEvent("blog-auth-changed", { detail: state }));
   };
 
-  const firebaseConfig = window.__FIREBASE_CONFIG__ || {};
-  const hasValidConfig = requiredKeys.every((key) => {
-    const value = firebaseConfig[key];
-    return typeof value === "string" && value.trim().length > 0;
-  });
+  const hasValidConfig = hasValidFirebaseConfig();
 
   if (!hasValidConfig) {
     configWarning?.classList.remove("hidden");
@@ -144,21 +140,19 @@ if (typeof window !== "undefined") {
     configWarning?.classList.add("hidden");
 
     Promise.all([
-      import("firebase/app"),
       import("firebase/auth"),
       import("firebase/functions"),
       import("firebase/storage"),
       import("firebase/firestore"),
     ])
       .then(
-        ([firebaseApp, firebaseAuth, firebaseFunctions, firebaseStorage, firebaseFirestore]) => {
-          const { getApp, getApps, initializeApp } = firebaseApp;
+        ([firebaseAuth, firebaseFunctions, firebaseStorage, firebaseFirestore]) => {
           const { getAuth, onAuthStateChanged, updateProfile, signOut } = firebaseAuth;
           const { getFunctions, httpsCallable } = firebaseFunctions;
           const { getStorage, ref, uploadBytes, getDownloadURL } = firebaseStorage;
           const { getFirestore, doc, getDoc } = firebaseFirestore;
 
-          const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+          const app = getFirebaseApp();
           const auth = getAuth(app);
           const functions = getFunctions(app, "europe-west1");
           const storage = getStorage(app);

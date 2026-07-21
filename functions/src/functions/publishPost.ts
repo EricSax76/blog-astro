@@ -69,7 +69,7 @@ async function resolveImageUrl(uid: string, imagePath: unknown): Promise<string>
   return getDownloadURL(file);
 }
 
-export const publishPost = onCall(async (request) => {
+export const publishPost = onCall({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError("unauthenticated", "Debes estar autenticado para publicar.");

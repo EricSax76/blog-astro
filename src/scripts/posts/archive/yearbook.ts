@@ -1,17 +1,5 @@
 import "../social/interactions.js";
-
-declare global {
-  interface Window {
-    __FIREBASE_CONFIG__?: {
-      apiKey?: string;
-      authDomain?: string;
-      projectId?: string;
-      storageBucket?: string;
-      messagingSenderId?: string;
-      appId?: string;
-    };
-  }
-}
+import { getFirebaseApp, hasValidFirebaseConfig } from "../../core/firebase-client";
 
 const postsGrid = document.getElementById("posts-grid");
 const loadingCard = document.getElementById("posts-loading");
@@ -31,16 +19,6 @@ const ARCHIVE_YEAR = (() => {
   const parsed = raw ? Number.parseInt(raw, 10) : NaN;
   return Number.isFinite(parsed) ? parsed : new Date().getFullYear();
 })();
-
-const requiredConfigKeys = ["apiKey", "authDomain", "projectId", "appId"] as const;
-
-const hasValidFirebaseConfig = (): boolean => {
-  const config = window.__FIREBASE_CONFIG__ || {};
-  return requiredConfigKeys.every((key) => {
-    const value = config[key];
-    return typeof value === "string" && value.trim().length > 0;
-  });
-};
 
 const formatDate = (date: Date | null): string => {
   if (!date || Number.isNaN(date.getTime())) return "";
@@ -261,12 +239,7 @@ const loadPostsForYear = async () => {
   }
 
   try {
-    const [firebaseApp, firebaseFirestore] = await Promise.all([
-      import("firebase/app"),
-      import("firebase/firestore"),
-    ]);
-
-    const { initializeApp, getApp, getApps } = firebaseApp;
+    const firebaseFirestore = await import("firebase/firestore");
     const {
       getFirestore,
       collection,
@@ -278,8 +251,7 @@ const loadPostsForYear = async () => {
       startAfter,
     } = firebaseFirestore;
 
-    const config = window.__FIREBASE_CONFIG__ as Record<string, string>;
-    const app = getApps().length > 0 ? getApp() : initializeApp(config);
+    const app = getFirebaseApp();
     const db = getFirestore(app);
 
     const postsRef = collection(db, "posts");

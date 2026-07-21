@@ -17,7 +17,7 @@ import { enforceRateLimit } from "../lib/rateLimit";
 const MAX_COMMENT_LENGTH = 1000;
 const MAX_TITLE_LENGTH = 200;
 
-export const addComment = onCall(async (request) => {
+export const addComment = onCall({ enforceAppCheck: true }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError("unauthenticated", "Debes iniciar sesión para comentar.");
