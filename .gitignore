@@ -15,9 +15,10 @@ pnpm-debug.log*
 firebase-debug.log
 firebase-debug.*.log
 
-# environment variables
+# environment variables (cualquier variante: .env.local, .env.backup, etc.)
 .env
-.env.production
+.env.*
+!.env.example
 
 # firebase credentials
 service-account.json
