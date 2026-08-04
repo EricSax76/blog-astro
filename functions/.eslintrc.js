@@ -29,5 +29,9 @@ module.exports = {
     "quotes": ["error", "double"],
     "import/no-unresolved": 0,
     "indent": ["error", 2],
+    // 80 de eslint-config-google es demasiado estricto para TS con tipos largos.
+    "max-len": ["error", {"code": 100}],
+    // Regla deprecada (ESLint >=5.10) y ruidosa con firmas TypeScript.
+    "valid-jsdoc": "off",
   },
 };

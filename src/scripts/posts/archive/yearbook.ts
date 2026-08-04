@@ -169,15 +169,7 @@ const resolvePostDate = (rawData: Record<string, unknown>): Date | null => {
 
 const resolveAuthorName = (rawData: Record<string, unknown>): string => {
   const authorName = String(rawData.authorName ?? "").trim();
-  if (authorName) return authorName;
-
-  const authorEmail = String(rawData.authorEmail ?? "").trim();
-  if (authorEmail) {
-    const emailName = authorEmail.split("@")[0]?.trim();
-    if (emailName) return emailName;
-  }
-
-  return "Autor";
+  return authorName || "Autor";
 };
 
 const isMissingIndexError = (error: unknown): boolean => {

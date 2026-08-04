@@ -5,12 +5,13 @@
  * El servidor fija userId desde el token; el cliente no puede asignar likes a otros.
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
-import * as admin from "firebase-admin";
-import { db } from "../lib/firebase";
-import { enforceRateLimit } from "../lib/rateLimit";
+import {onCall, HttpsError} from "firebase-functions/v2/https";
+import {CALLABLE_OPTIONS} from "../lib/callableOptions";
+import {FieldValue} from "firebase-admin/firestore";
+import {db} from "../lib/firebase";
+import {enforceRateLimit} from "../lib/rateLimit";
 
-export const toggleLike = onCall({ enforceAppCheck: true }, async (request) => {
+export const toggleLike = onCall(CALLABLE_OPTIONS, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError("unauthenticated", "Debes iniciar sesión para dar me gusta.");
@@ -18,7 +19,7 @@ export const toggleLike = onCall({ enforceAppCheck: true }, async (request) => {
 
   await enforceRateLimit(uid, "toggleLike");
 
-  const { postId } = (request.data ?? {}) as { postId?: string };
+  const {postId} = (request.data ?? {}) as { postId?: string };
 
   if (!postId || typeof postId !== "string" || postId.trim().length === 0) {
     throw new HttpsError("invalid-argument", "postId es obligatorio.");
@@ -42,7 +43,7 @@ export const toggleLike = onCall({ enforceAppCheck: true }, async (request) => {
     if (likeSnap.exists) {
       tx.delete(likeRef);
       tx.update(postRef, {
-        likeCount: admin.firestore.FieldValue.increment(-1),
+        likeCount: FieldValue.increment(-1),
       });
       return false;
     }
@@ -50,13 +51,13 @@ export const toggleLike = onCall({ enforceAppCheck: true }, async (request) => {
     tx.set(likeRef, {
       postId: id,
       userId: uid,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
     });
     tx.update(postRef, {
-      likeCount: admin.firestore.FieldValue.increment(1),
+      likeCount: FieldValue.increment(1),
     });
     return true;
   });
 
-  return { success: true, liked };
+  return {success: true, liked};
 });

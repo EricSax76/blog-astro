@@ -33,6 +33,32 @@ const {
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).href;
 const ogImage = new URL(image, Astro.site ?? Astro.url.origin).href;
+
+// Config Firebase inyectada al navegador. En build de producción un `.env`
+// ausente o incompleto debe ROMPER el build: publicar con estas claves vacías
+// deja el sitio online pero con Firebase muerto, sin ningún síntoma visible.
+const firebaseConfig = {
+  apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY ?? "",
+  authDomain: import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN ?? "",
+  projectId: import.meta.env.PUBLIC_FIREBASE_PROJECT_ID ?? "",
+  storageBucket: import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET ?? "",
+  messagingSenderId: import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? "",
+  appId: import.meta.env.PUBLIC_FIREBASE_APP_ID ?? "",
+  // Es una clave pública de reCAPTCHA v3, no un secreto. El
+  // secreto de proveedor nunca se expone al navegador.
+  appCheckSiteKey: import.meta.env.PUBLIC_APPCHECK_SITE_KEY ?? "",
+};
+
+if (import.meta.env.PROD) {
+  const missing = Object.entries(firebaseConfig)
+    .filter(([, value]) => value === "")
+    .map(([key]) => key);
+  if (missing.length > 0) {
+    throw new Error(
+      `Build abortado: faltan variables de entorno de Firebase (.env): ${missing.join(", ")}`
+    );
+  }
+}
 ---
 
 <!doctype html>
@@ -89,18 +115,7 @@ const ogImage = new URL(image, Astro.site ?? Astro.url.origin).href;
     <script
       is:inline
       define:vars={{
-        firebaseConfig: {
-          apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY ?? "",
-          authDomain: import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN ?? "",
-          projectId: import.meta.env.PUBLIC_FIREBASE_PROJECT_ID ?? "",
-          storageBucket: import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET ?? "",
-          messagingSenderId:
-            import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? "",
-          appId: import.meta.env.PUBLIC_FIREBASE_APP_ID ?? "",
-          // Es una clave pública de reCAPTCHA v3, no un secreto. El
-          // secreto de proveedor nunca se expone al navegador.
-          appCheckSiteKey: import.meta.env.PUBLIC_APPCHECK_SITE_KEY ?? "",
-        },
+        firebaseConfig,
         // Solo se inserta durante desarrollo. Es un token de depuración de
         // App Check que debe estar registrado en la consola; nunca se publica
         // en un build de producción.

@@ -10,9 +10,9 @@
  * "expiresAt" para purgar docs antiguos sin coste de mantenimiento.
  */
 
-import { HttpsError } from "firebase-functions/v2/https";
-import { Timestamp } from "firebase-admin/firestore";
-import { db } from "./firebase";
+import {HttpsError} from "firebase-functions/v2/https";
+import {Timestamp} from "firebase-admin/firestore";
+import {db} from "./firebase";
 
 type RateLimitConfig = {
   /** Máximo de llamadas permitidas dentro de la ventana. */
@@ -23,13 +23,13 @@ type RateLimitConfig = {
 
 /** Límites por acción. Ajustar según uso real observado. */
 export const RATE_LIMITS = {
-  publishPost: { maxCalls: 10, windowSeconds: 60 * 60 },
-  addComment: { maxCalls: 10, windowSeconds: 60 },
-  deleteComment: { maxCalls: 20, windowSeconds: 60 },
-  toggleLike: { maxCalls: 30, windowSeconds: 60 },
-  upsertUserProfile: { maxCalls: 10, windowSeconds: 60 },
-  exportUserData: { maxCalls: 5, windowSeconds: 24 * 60 * 60 },
-  deleteUserData: { maxCalls: 3, windowSeconds: 24 * 60 * 60 },
+  publishPost: {maxCalls: 10, windowSeconds: 60 * 60},
+  addComment: {maxCalls: 10, windowSeconds: 60},
+  deleteComment: {maxCalls: 20, windowSeconds: 60},
+  toggleLike: {maxCalls: 30, windowSeconds: 60},
+  upsertUserProfile: {maxCalls: 10, windowSeconds: 60},
+  exportUserData: {maxCalls: 5, windowSeconds: 24 * 60 * 60},
+  deleteUserData: {maxCalls: 3, windowSeconds: 24 * 60 * 60},
 } as const satisfies Record<string, RateLimitConfig>;
 
 export type RateLimitedAction = keyof typeof RATE_LIMITS;
@@ -42,7 +42,7 @@ export async function enforceRateLimit(
   uid: string,
   action: RateLimitedAction
 ): Promise<void> {
-  const { maxCalls, windowSeconds } = RATE_LIMITS[action];
+  const {maxCalls, windowSeconds} = RATE_LIMITS[action];
   const ref = db.collection("rateLimits").doc(`${uid}_${action}`);
   const now = Date.now();
   const windowMs = windowSeconds * 1000;
@@ -70,6 +70,6 @@ export async function enforceRateLimit(
       );
     }
 
-    tx.update(ref, { count: count + 1 });
+    tx.update(ref, {count: count + 1});
   });
 }

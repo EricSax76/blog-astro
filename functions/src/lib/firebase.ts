@@ -2,12 +2,15 @@
  * Inicialización de Firebase Admin y helpers compartidos entre funciones.
  */
 
-import * as admin from "firebase-admin";
+import {initializeApp} from "firebase-admin/app";
+import {getFirestore, FieldPath} from "firebase-admin/firestore";
+import type {DocumentData} from "firebase-admin/firestore";
+import {getStorage} from "firebase-admin/storage";
 
-admin.initializeApp();
+initializeApp();
 
-export const db = admin.firestore();
-export const bucket = admin.storage().bucket();
+export const db = getFirestore();
+export const bucket = getStorage().bucket();
 
 /** Máximo de escrituras por batch en Firestore. */
 const BATCH_LIMIT = 500;
@@ -40,18 +43,58 @@ export async function deleteCollection(
   }
 }
 
-/** Obtiene todos los documentos de una colección que coincidan con un campo. */
+/**
+ * Obtiene todos los documentos de una colección que coincidan con un campo.
+ * Pagina con cursor para que una cuenta con miles de documentos no cargue
+ * la colección entera en una sola query.
+ */
 export async function fetchCollection(
   collectionName: string,
   field: string,
   value: string
-): Promise<admin.firestore.DocumentData[]> {
-  const snapshot = await db.collection(collectionName).where(field, "==", value).get();
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+): Promise<DocumentData[]> {
+  const results: DocumentData[] = [];
+  let query = db
+    .collection(collectionName)
+    .where(field, "==", value)
+    .orderBy(FieldPath.documentId())
+    .limit(BATCH_LIMIT);
+
+  for (;;) {
+    const snapshot = await query.get();
+    snapshot.docs.forEach((doc) => results.push({id: doc.id, ...doc.data()}));
+    if (snapshot.size < BATCH_LIMIT) break;
+    query = query.startAfter(snapshot.docs[snapshot.size - 1]);
+  }
+
+  return results;
 }
 
-/** Elimina todos los archivos de Storage bajo un prefijo dado. */
+/** Deletes concurrentes máximos contra Storage. */
+const STORAGE_DELETE_CONCURRENCY = 25;
+
+/**
+ * Elimina todos los archivos de Storage bajo un prefijo dado.
+ * Lista por páginas y borra en lotes acotados: un prefijo con miles de
+ * archivos no debe traducirse en miles de peticiones simultáneas.
+ */
 export async function deleteStorageFiles(prefix: string): Promise<void> {
-  const [files] = await bucket.getFiles({ prefix });
-  await Promise.all(files.map((file) => file.delete()));
+  let pageToken: string | undefined;
+
+  do {
+    const [files, nextQuery] = await bucket.getFiles({
+      prefix,
+      maxResults: 100,
+      autoPaginate: false,
+      pageToken,
+    });
+
+    for (let i = 0; i < files.length; i += STORAGE_DELETE_CONCURRENCY) {
+      await Promise.all(
+        files.slice(i, i + STORAGE_DELETE_CONCURRENCY).map((file) => file.delete())
+      );
+    }
+
+    pageToken = (nextQuery as {pageToken?: string} | null)?.pageToken;
+  } while (pageToken);
 }

@@ -1,0 +1,31 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { NEWEST_ARCHIVE_YEAR } from "../data/home-page";
+---
+
+<Layout title="Página no encontrada — El Alma de las Flores">
+  <section class="max-w-2xl mx-auto py-24 text-center space-y-8">
+    <p class="text-xs uppercase tracking-[0.2em] text-sage font-semibold">Error 404</p>
+    <h1 class="font-serif text-5xl md:text-6xl font-bold text-deep-green">
+      Esta flor no ha brotado
+    </h1>
+    <p class="text-deep-green/70 leading-relaxed">
+      La página que buscas no existe o ha cambiado de lugar.
+      Quizá el enlace esté marchito o la dirección tenga una errata.
+    </p>
+    <div class="flex flex-wrap justify-center gap-4 pt-4">
+      <a
+        href="/"
+        class="inline-block rounded-full bg-deep-green px-6 py-3 text-sm font-semibold text-white hover:bg-deep-green/90 transition"
+      >
+        Volver al inicio
+      </a>
+      <a
+        href={`/archivo/${NEWEST_ARCHIVE_YEAR}`}
+        class="inline-block rounded-full border border-sage/40 px-6 py-3 text-sm font-semibold text-deep-green hover:bg-sage/10 transition"
+      >
+        Explorar el archivo
+      </a>
+    </div>
+  </section>
+</Layout>

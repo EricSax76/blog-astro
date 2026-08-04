@@ -6,11 +6,12 @@
  * suplantada desde el cliente.
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
-import { db } from "../lib/firebase";
-import { enforceRateLimit } from "../lib/rateLimit";
+import {onCall, HttpsError} from "firebase-functions/v2/https";
+import {CALLABLE_OPTIONS} from "../lib/callableOptions";
+import {db} from "../lib/firebase";
+import {enforceRateLimit} from "../lib/rateLimit";
 
-export const deleteComment = onCall({ enforceAppCheck: true }, async (request) => {
+export const deleteComment = onCall(CALLABLE_OPTIONS, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError("unauthenticated", "Debes estar autenticado.");
@@ -18,7 +19,7 @@ export const deleteComment = onCall({ enforceAppCheck: true }, async (request) =
 
   await enforceRateLimit(uid, "deleteComment");
 
-  const { commentId } = (request.data ?? {}) as { commentId?: string };
+  const {commentId} = (request.data ?? {}) as { commentId?: string };
 
   if (!commentId || typeof commentId !== "string" || commentId.trim().length === 0) {
     throw new HttpsError("invalid-argument", "commentId es obligatorio.");
@@ -37,5 +38,5 @@ export const deleteComment = onCall({ enforceAppCheck: true }, async (request) =
 
   await commentRef.delete();
 
-  return { success: true };
+  return {success: true};
 });

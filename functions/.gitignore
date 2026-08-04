@@ -1,6 +1,5 @@
-# Compiled JavaScript files
-lib/**/*.js
-lib/**/*.js.map
+# Salida de compilación completa (js, sourcemaps y .d.ts)
+lib/
 
 # TypeScript v1 declaration files
 typings/

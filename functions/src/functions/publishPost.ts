@@ -12,12 +12,13 @@
  * tracking en los posts.
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
-import { getDownloadURL } from "firebase-admin/storage";
-import * as admin from "firebase-admin";
-import { db, bucket } from "../lib/firebase";
-import { requireAllowedKeys, cleanOptionalText } from "../lib/validation";
-import { enforceRateLimit } from "../lib/rateLimit";
+import {onCall, HttpsError} from "firebase-functions/v2/https";
+import {CALLABLE_OPTIONS} from "../lib/callableOptions";
+import {getDownloadURL} from "firebase-admin/storage";
+import {FieldValue} from "firebase-admin/firestore";
+import {db, bucket} from "../lib/firebase";
+import {requireAllowedKeys, cleanOptionalText} from "../lib/validation";
+import {enforceRateLimit} from "../lib/rateLimit";
 
 const MAX_TITLE_LENGTH = 120;
 const MAX_CONTENT_LENGTH = 10000;
@@ -69,7 +70,7 @@ async function resolveImageUrl(uid: string, imagePath: unknown): Promise<string>
   return getDownloadURL(file);
 }
 
-export const publishPost = onCall({ enforceAppCheck: true }, async (request) => {
+export const publishPost = onCall(CALLABLE_OPTIONS, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError("unauthenticated", "Debes estar autenticado para publicar.");
@@ -79,7 +80,7 @@ export const publishPost = onCall({ enforceAppCheck: true }, async (request) => 
 
   requireAllowedKeys(request.data, ["title", "content", "imagePath"]);
 
-  const { title, content, imagePath } = (request.data ?? {}) as {
+  const {title, content, imagePath} = (request.data ?? {}) as {
     title?: string;
     content?: string;
     imagePath?: string;
@@ -90,7 +91,10 @@ export const publishPost = onCall({ enforceAppCheck: true }, async (request) => 
   const imageUrl = await resolveImageUrl(uid, imagePath);
 
   if (!cleanTitle && !cleanContent && !imageUrl) {
-    throw new HttpsError("invalid-argument", "Añade un título, contenido o imagen antes de publicar.");
+    throw new HttpsError(
+      "invalid-argument",
+      "Añade un título, contenido o imagen antes de publicar."
+    );
   }
 
   // El año es server-authoritative: se deriva del reloj del servidor,
@@ -110,14 +114,13 @@ export const publishPost = onCall({ enforceAppCheck: true }, async (request) => 
     content: cleanContent,
     imageUrl,
     authorUid: uid,
-    authorEmail: request.auth?.token?.email ?? "",
     authorName,
     year,
     likeCount: 0,
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    createdAt: FieldValue.serverTimestamp(),
     createdAtMs: Date.now(),
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
   });
 
-  return { success: true, postId: docRef.id, year };
+  return {success: true, postId: docRef.id, year};
 });

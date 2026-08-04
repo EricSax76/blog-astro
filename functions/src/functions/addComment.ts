@@ -8,16 +8,17 @@
  * padre existe y pertenece al mismo post (evita huérfanos y cruces).
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
-import * as admin from "firebase-admin";
-import { db } from "../lib/firebase";
-import { requireAllowedKeys, cleanOptionalText, stripHtml } from "../lib/validation";
-import { enforceRateLimit } from "../lib/rateLimit";
+import {onCall, HttpsError} from "firebase-functions/v2/https";
+import {CALLABLE_OPTIONS} from "../lib/callableOptions";
+import {FieldValue} from "firebase-admin/firestore";
+import {db} from "../lib/firebase";
+import {requireAllowedKeys, cleanOptionalText, stripHtml} from "../lib/validation";
+import {enforceRateLimit} from "../lib/rateLimit";
 
 const MAX_COMMENT_LENGTH = 1000;
 const MAX_TITLE_LENGTH = 200;
 
-export const addComment = onCall({ enforceAppCheck: true }, async (request) => {
+export const addComment = onCall(CALLABLE_OPTIONS, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError("unauthenticated", "Debes iniciar sesión para comentar.");
@@ -27,7 +28,7 @@ export const addComment = onCall({ enforceAppCheck: true }, async (request) => {
 
   requireAllowedKeys(request.data, ["postId", "title", "content", "parentId"]);
 
-  const { postId, title, content, parentId } = (request.data ?? {}) as {
+  const {postId, title, content, parentId} = (request.data ?? {}) as {
     postId?: string;
     title?: string;
     content?: string;
@@ -62,9 +63,9 @@ export const addComment = onCall({ enforceAppCheck: true }, async (request) => {
   }
 
   const cleanParentId =
-    typeof parentId === "string" && parentId.trim().length > 0
-      ? parentId.trim()
-      : null;
+    typeof parentId === "string" && parentId.trim().length > 0 ?
+      parentId.trim() :
+      null;
 
   if (cleanParentId) {
     const parentDoc = await db.collection("comments").doc(cleanParentId).get();
@@ -87,13 +88,13 @@ export const addComment = onCall({ enforceAppCheck: true }, async (request) => {
     request.auth?.token?.email?.split("@")[0] ||
     "Anónimo";
 
-  const commentData: Record<string, any> = {
+  const commentData: Record<string, unknown> = {
     postId: cleanPostId,
     title: cleanOptionalText(title, "El título", MAX_TITLE_LENGTH),
     authorId: uid,
     authorName,
     content: safeContent,
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    createdAt: FieldValue.serverTimestamp(),
   };
 
   if (cleanParentId) {
@@ -102,5 +103,5 @@ export const addComment = onCall({ enforceAppCheck: true }, async (request) => {
 
   const docRef = await db.collection("comments").add(commentData);
 
-  return { success: true, commentId: docRef.id };
+  return {success: true, commentId: docRef.id};
 });

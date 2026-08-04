@@ -1,16 +1,23 @@
 /**
  * deleteUserData — Derecho de supresión (art. 17 RGPD)
  *
- * Callable function que elimina todos los datos personales de un usuario:
- * posts, comentarios, likes, perfil de Firestore, archivos de Storage y cuenta de Auth.
+ * Callable que elimina la cuenta de Auth del usuario. La limpieza de datos
+ * (Firestore, Storage, rateLimits) NO se hace aquí: la hace el trigger
+ * cleanupOnUserDeleted, que es idempotente y reintenta ante fallos.
+ *
+ * Diseño deliberado: borrar aquí las 7 superficies en secuencia dejaba, ante
+ * un fallo a medias, un borrado parcial que el rate-limit (3/día) impedía
+ * reintentar — exposición RGPD. Con una única operación, o la cuenta cae y
+ * la limpieza queda garantizada por los reintentos del trigger, o falla
+ * limpio y el usuario puede reintentar.
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
-import * as admin from "firebase-admin";
-import { db, deleteCollection, deleteStorageFiles } from "../lib/firebase";
-import { enforceRateLimit } from "../lib/rateLimit";
+import {onCall, HttpsError} from "firebase-functions/v2/https";
+import {CALLABLE_OPTIONS} from "../lib/callableOptions";
+import {getAuth} from "firebase-admin/auth";
+import {enforceRateLimit} from "../lib/rateLimit";
 
-export const deleteUserData = onCall({ enforceAppCheck: true }, async (request) => {
+export const deleteUserData = onCall(CALLABLE_OPTIONS, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError("unauthenticated", "Debes estar autenticado para eliminar tus datos.");
@@ -19,17 +26,13 @@ export const deleteUserData = onCall({ enforceAppCheck: true }, async (request) 
   await enforceRateLimit(uid, "deleteUserData");
 
   try {
-    await deleteCollection("posts", "authorUid", uid);
-    await deleteCollection("comments", "authorId", uid);
-    await deleteCollection("likes", "userId", uid);
-    await db.collection("users").doc(uid).delete();
-    await deleteStorageFiles(`blog/posts/${uid}/`);
-    await deleteStorageFiles(`users/${uid}/`);
-    await admin.auth().deleteUser(uid);
-
-    return { success: true, message: "Todos tus datos han sido eliminados correctamente." };
+    await getAuth().deleteUser(uid);
+    return {success: true, message: "Todos tus datos han sido eliminados correctamente."};
   } catch (error) {
-    console.error("Error al eliminar datos del usuario:", error);
-    throw new HttpsError("internal", "Error al eliminar los datos. Por favor, contacta con soporte.");
+    console.error("Error al eliminar la cuenta del usuario:", error);
+    throw new HttpsError(
+      "internal",
+      "Error al eliminar los datos. Por favor, contacta con soporte."
+    );
   }
 });

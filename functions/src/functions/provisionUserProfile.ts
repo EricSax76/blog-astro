@@ -10,14 +10,14 @@
  * están disponibles en us-central1.
  */
 
-import { region } from "firebase-functions/v1";
-import * as admin from "firebase-admin";
-import { db } from "../lib/firebase";
+import {region} from "firebase-functions/v1";
+import {FieldValue} from "firebase-admin/firestore";
+import {db} from "../lib/firebase";
 
 export const provisionUserProfile = region("us-central1")
   .auth.user()
   .onCreate(async (user) => {
-    const { uid, email, displayName } = user;
+    const {uid, email, displayName} = user;
     const userRef = db.collection("users").doc(uid);
 
     const snapshot = await userRef.get();
@@ -32,10 +32,10 @@ export const provisionUserProfile = region("us-central1")
         email: email ?? "",
         username: displayName ?? "",
         role: "autor",
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
       },
-      { merge: true }
+      {merge: true}
     );
 
     console.log(`Perfil provisionado automáticamente para: ${uid}`);

@@ -51,8 +51,6 @@ function parseArgs(argv) {
     serviceAccountPath: "",
     authorUid: process.env.MIGRATION_AUTHOR_UID || "legacy-content",
     authorName: process.env.MIGRATION_AUTHOR_NAME || "Archivo historico",
-    authorEmail:
-      process.env.MIGRATION_AUTHOR_EMAIL || "legacy@elalmadelasflores.local",
   };
 
   const takeValue = (arg, index) => {
@@ -123,13 +121,6 @@ function parseArgs(argv) {
       options.authorName = raw;
       continue;
     }
-    if (arg === "--author-email" || arg.startsWith("--author-email=")) {
-      const raw = takeValue(arg, i).trim();
-      if (!raw) throw new Error("Falta valor para --author-email");
-      if (arg === "--author-email") i += 1;
-      options.authorEmail = raw;
-      continue;
-    }
     if (arg === "--help" || arg === "-h") {
       printHelpAndExit(0);
     }
@@ -154,7 +145,6 @@ Opciones:
   --service-account=<ruta>      JSON de service account (si no, usa ADC).
   --author-uid=<uid>            authorUid a guardar en posts legacy.
   --author-name=<nombre>        authorName a guardar en posts legacy.
-  --author-email=<email>        authorEmail a guardar en posts legacy.
   --help                        Muestra esta ayuda.
 `);
   process.exit(exitCode);
@@ -599,7 +589,6 @@ async function migratePosts(posts, options) {
       content: post.content,
       imageUrl,
       authorUid: options.authorUid,
-      authorEmail: options.authorEmail,
       authorName: options.authorName,
       year: post.year,
       createdAt: context.Timestamp.fromDate(post.createdAtDate),

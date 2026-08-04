@@ -14,6 +14,7 @@ yarn-error.log*
 pnpm-debug.log*
 firebase-debug.log
 firebase-debug.*.log
+firestore-debug.log
 
 # environment variables (cualquier variante: .env.local, .env.backup, etc.)
 .env

@@ -6,12 +6,13 @@
  * directamente el documento de Firestore ni puede cambiar su propio rol.
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
-import * as admin from "firebase-admin";
-import { db } from "../lib/firebase";
-import { enforceRateLimit } from "../lib/rateLimit";
+import {onCall, HttpsError} from "firebase-functions/v2/https";
+import {CALLABLE_OPTIONS} from "../lib/callableOptions";
+import {FieldValue} from "firebase-admin/firestore";
+import {db} from "../lib/firebase";
+import {enforceRateLimit} from "../lib/rateLimit";
 
-export const upsertUserProfile = onCall({ enforceAppCheck: true }, async (request) => {
+export const upsertUserProfile = onCall(CALLABLE_OPTIONS, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) {
     throw new HttpsError("unauthenticated", "Debes estar autenticado.");
@@ -19,7 +20,7 @@ export const upsertUserProfile = onCall({ enforceAppCheck: true }, async (reques
 
   await enforceRateLimit(uid, "upsertUserProfile");
 
-  const { displayName, username } = (request.data ?? {}) as {
+  const {displayName, username} = (request.data ?? {}) as {
     displayName?: string;
     username?: string;
   };
@@ -27,12 +28,12 @@ export const upsertUserProfile = onCall({ enforceAppCheck: true }, async (reques
   const userRef = db.collection("users").doc(uid);
   const snapshot = await userRef.get();
 
-  const payload: Record<string, any> = {
+  const payload: Record<string, unknown> = {
     uid,
     email: request.auth?.token?.email ?? "",
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    lastSeenAt: admin.firestore.FieldValue.serverTimestamp(),
-    lastLoginAt: admin.firestore.FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
+    lastSeenAt: FieldValue.serverTimestamp(),
+    lastLoginAt: FieldValue.serverTimestamp(),
   };
 
   if (typeof displayName === "string" && displayName.trim().length > 0) {
@@ -43,12 +44,12 @@ export const upsertUserProfile = onCall({ enforceAppCheck: true }, async (reques
   // El cliente nunca puede cambiar su rol; username queda estable tras el alta.
   if (!snapshot.exists) {
     payload.role = "autor";
-    payload.createdAt = admin.firestore.FieldValue.serverTimestamp();
+    payload.createdAt = FieldValue.serverTimestamp();
 
     const cleanUsername =
-      typeof username === "string" && username.trim().length > 0
-        ? username.trim().substring(0, 50)
-        : payload.displayName ??
+      typeof username === "string" && username.trim().length > 0 ?
+        username.trim().substring(0, 50) :
+        payload.displayName ??
           request.auth?.token?.email?.split("@")[0] ??
           "";
     if (cleanUsername) {
@@ -56,7 +57,7 @@ export const upsertUserProfile = onCall({ enforceAppCheck: true }, async (reques
     }
   }
 
-  await userRef.set(payload, { merge: true });
+  await userRef.set(payload, {merge: true});
 
-  return { success: true };
+  return {success: true};
 });
