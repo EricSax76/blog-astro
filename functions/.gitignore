@@ -1,5 +1,6 @@
-# Salida de compilación completa (js, sourcemaps y .d.ts)
-lib/
+# Salida de compilación completa (js, sourcemaps y .d.ts).
+# Anclado a la raíz: "lib/" a secas también ignoraba src/lib/.
+/lib/
 
 # TypeScript v1 declaration files
 typings/
