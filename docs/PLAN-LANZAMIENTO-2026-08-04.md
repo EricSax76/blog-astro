@@ -12,11 +12,17 @@ Leyenda severidad: 🔴 bloqueante · 🟠 alta · 🟡 media · ⚪ baja
 
 ## Fase 0 — Bloqueantes de seguridad (antes de publicar)
 
-- [ ] 🔴 **Rotar la clave de service account en GCP IAM.**
+- [x] 🔴 **Rotar la clave de service account en GCP IAM.**
   Pendiente desde 2026-06-16 (`docs/ANALISIS-Y-GAPS.md:49`, G1). La clave
   `el-alma-de-las-flores-blog-cdb7d0a9e656.json` vivió en el root del repo en disco
   (nunca commiteada); se movió a `~/.firebase-keys/` pero no se rotó.
-  Acción: GCP Console → IAM → Service Accounts → crear clave nueva, revocar antigua.
+  ✅ Hecho 2026-08-20: **revocadas sin reemplazo** las dos claves de usuario que
+  existían (`cdb7d0a9…` del SA appspot, mar-2026, y `c68ca848…` del SA
+  `firebase-adminsdk-fbsvc`, feb-2026, que no estaba en ningún disco conocido).
+  Fichero local eliminado. Las functions usan el SA de runtime (no necesitan
+  clave); los scripts locales (`functions/scripts/*.mjs`) usan ADC con la cuenta
+  owner (`gcloud auth application-default login`). Verificado: 0 claves de
+  usuario en ambos SA.
 
 - [x] 🔴 **Endurecer reglas Firestore: escritura directa a `posts`, `comments` y `likes`.**
   ✅ Hecho 2026-08-04 en `firebase.rules` (sin desplegar aún). Verificado que el
@@ -59,17 +65,14 @@ Leyenda severidad: 🔴 bloqueante · 🟠 alta · 🟡 media · ⚪ baja
   `functions/scripts/purge-author-email.mjs` (dry-run por defecto).
   `npm run purge:author-email:dry` para contar, `npm run purge:author-email`
   para aplicar.
-  **Dry-run intentado 2026-08-04, bloqueado por credenciales:** ADC apunta a
-  otro proyecto (`upsessions-31987` → "0 posts" engañoso) y la clave
-  `~/.firebase-keys/el-alma-de-las-flores-blog-cdb7d0a9e656.json`
-  (`el-alma-de-las-flores-blog@appspot.gserviceaccount.com`) autentica pero
-  da `PERMISSION_DENIED`: el SA default de App Engine no tiene rol de
-  Firestore. Desbloqueo (cualquiera de los dos):
-  a) `gcloud auth application-default login` con la cuenta owner + rerun con
-     `--project-id=el-alma-de-las-flores-blog`; o
-  b) en la sesión de consola ya planificada: crear SA dedicado con
-     `roles/datastore.user`, clave nueva, borrar la antigua (cierra también
-     la rotación pendiente) y rerun con `--service-account=<clave-nueva>`.
+  **Dry-run bloqueado por credenciales (2026-08-04 y de nuevo 2026-08-20):**
+  ADC autentica como una cuenta sin permisos sobre el proyecto →
+  `Missing or insufficient permissions`. Ya no hay claves SA de usuario
+  (revocadas 2026-08-20), así que el único desbloqueo es:
+  `gcloud auth application-default login` con la cuenta owner del proyecto
+  (interactivo) y después
+  `cd functions && npm run purge:author-email:dry` (contar) →
+  `npm run purge:author-email` (aplicar).
   ✅ Functions desplegadas 2026-08-04 (las 9, incl. `publishPost`; verificado
   con `firebase functions:list`, runtime nodejs22).
 
@@ -102,25 +105,26 @@ Leyenda severidad: 🔴 bloqueante · 🟠 alta · 🟡 media · ⚪ baja
     `gcloud functions describe` → updateTime).
   - ✅ Root: `npm audit fix` 2026-08-04 → 0 vulnerabilidades.
 
-- [ ] 🔴 **Activar backups / PITR de Firestore.**
+- [x] 🔴 **Activar backups / PITR de Firestore.**
   Cero menciones a backup en repo o docs. El contenido generado por usuarios
   (posts, comentarios, likes, perfiles) no tiene ruta de recuperación.
-  Acción: GCP Console → Firestore → habilitar Point-in-Time Recovery y/o backups
-  programados. Documentar procedimiento de restauración.
-  **Verificado 2026-08-04: sigue pendiente** (`pointInTimeRecoveryEnablement:
-  DISABLED`, 0 backup schedules). Con gcloud ya autenticado, comandos directos:
-  `gcloud firestore databases update --database='(default)' --enable-pitr` y
-  `gcloud firestore backups schedules create --database='(default)'
-  --recurrence=daily --retention=7d` (PITR cobra almacenamiento extra por
-  versiones de 7 días).
+  ✅ Hecho 2026-08-20 con gcloud (cuenta owner):
+  - PITR activado (`versionRetentionPeriod: 7d`).
+  - Backup diario con retención 7 días (schedule `e759c668…`).
+  - Protección contra borrado de la base de datos activada
+    (`deleteProtectionState: ENABLED`).
+  Restauración: PITR → `gcloud firestore databases restore` o lecturas con
+  `read_time` del SDK para recuperar docs puntuales; backup → `gcloud firestore
+  backups list` + `gcloud firestore databases restore --source-backup=…
+  --destination-database=<nueva>` (restaura a una BD nueva, no sobre la actual).
+  Ver https://cloud.google.com/firestore/docs/backups
 
-- [ ] 🔴 **Configurar alerta de presupuesto en GCP.**
+- [x] 🔴 **Configurar alerta de presupuesto en GCP.**
   Plan Blaze + callables públicos + uploads a Storage sin techo de gasto definido.
-  Acción: Billing → Budgets & alerts (p. ej. avisos a 10/25/50 €).
-  **Verificado 2026-08-04: sigue pendiente** — la API `billingbudgets` nunca se
-  usó en el proyecto. Por CLI
-  hace falta `--billing-project=el-alma-de-las-flores-blog` (el quota project
-  de ADC apunta a `upsessions-31987`); más simple hacerlo en consola.
+  ✅ Hecho 2026-08-20 con `gcloud billing budgets create`: presupuesto
+  "el-alma-de-las-flores-blog mensual" de 20 €/mes filtrado al proyecto, avisos
+  al 50/90/100 % (10/18/20 €) por email a los administradores de facturación.
+  Solo avisa, no corta servicio. Ajustar el importe cuando haya uso real.
 
 ## Fase 1 — Estabilidad operativa (semana de lanzamiento)
 
@@ -350,8 +354,8 @@ Leyenda severidad: 🔴 bloqueante · 🟠 alta · 🟡 media · ⚪ baja
    existentes (RGPD) — **pendiente, requiere confirmación**.
 3. ✅ Node 22 (desplegado) + `firebase-admin@14.2.0` + `npm audit fix` en ambos
    package.json — crítica y altas resueltas; falta redeploy de functions.
-4. Consola GCP en una sesión: rotar clave SA · App Check enforce (Firestore+Storage)
-   · PITR/backups · budget alert · TTL de `rateLimits`.
+4. ✅ Consola GCP: rotar clave SA · App Check enforce (Firestore+Storage)
+   · PITR/backups · budget alert · TTL de `rateLimits` — todo hecho a 2026-08-20.
 5. Fase 1 código: ✅ 404 · ✅ guard de `.env` · ✅ CORS · ✅ CI functions+audit.
    Falta: límites en export/delete (único 🟠 de código abierto en Fase 1).
 6. Fase 2 y 3 según ritmo, empezando por tests de reglas con emulador.
