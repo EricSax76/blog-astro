@@ -34,7 +34,12 @@ Blog en **Astro 6** (SSR, adapter `@astrojs/node`) con backend **Firebase**
 | `/mi-perfil` | Editar perfil/avatar + exportar/eliminar datos (RGPD) |
 | `/archivo/2011`–`/archivo/2017` | Histórico estático |
 | `/archivo/2026` y `/archivo/[year]` | Posts del año desde Firestore |
-| `/flores-de-bach/[slug]` | Fichas estáticas (`src/data/flowers.js`) |
+
+Las 38 flores y la biografía de Edward Bach se extrajeron en agosto de 2026 al
+repositorio hermano `flores-de-bach` (sitio estático sin Firebase). El blog
+las enlaza solo si `PUBLIC_BACH_SITE_URL` está definida; al publicar ese
+sitio hay que añadir en `firebase.json` redirects 301 de `/flores-de-bach/**`
+y `/biografia` a su dominio.
 
 El **año de un post lo fija el servidor** (`publishPost`,
 `new Date().getFullYear()`); el archivo por año es dinámico (`[year].astro`)

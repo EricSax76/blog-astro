@@ -1,0 +1,67 @@
+---
+// Estantería de anuarios: un lomo por año con página propia. El año vivo
+// (Firestore) va primero y se marca como «en curso»; el resto es el
+// histórico estático 2011–2017. Esta escena es la candidata a pasar a 3D.
+import { ARCHIVE_YEARS, NEWEST_ARCHIVE_YEAR } from "../../data/archive";
+---
+
+<section class="mx-auto mt-24 max-w-6xl px-6 md:px-12" data-reveal>
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div class="space-y-2">
+      <p class="text-xs font-semibold uppercase tracking-[0.3em] text-moss-text">
+        Archivo
+      </p>
+      <h2 class="font-serif text-3xl font-bold text-ink md:text-4xl">
+        Los anuarios, año a año
+      </h2>
+    </div>
+    <p class="max-w-md text-sm leading-relaxed text-ink/65">
+      Cada año es un cuaderno cerrado, salvo el actual, que sigue abierto a
+      nuevas entradas.
+    </p>
+  </div>
+
+  <ul
+    class="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-8"
+    aria-label="Anuarios por año"
+  >
+    {
+      ARCHIVE_YEARS.map((year) => {
+        const isLive = year === NEWEST_ARCHIVE_YEAR;
+        return (
+          <li class="contents">
+            <a
+              href={`/archivo/${year}`}
+              class:list={[
+                "group flex aspect-[3/4] flex-col justify-between rounded-2xl border p-4 transition-all duration-[var(--duration-hover)] hover:-translate-y-1 hover:shadow-lg focus-visible:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pollen",
+                isLive
+                  ? "border-pollen/60 bg-ink text-cream"
+                  : "border-ink/10 bg-paper-dim/70 text-ink hover:border-moss/40",
+              ]}
+            >
+              <span
+                class:list={[
+                  "text-[0.6rem] font-semibold uppercase tracking-[0.25em]",
+                  isLive ? "text-pollen" : "text-moss-text",
+                ]}
+              >
+                {isLive ? "En curso" : "Cuaderno"}
+              </span>
+              <span class="font-serif text-4xl font-bold leading-none tracking-tight md:text-5xl">
+                {year}
+              </span>
+              <span
+                class:list={[
+                  "text-xs font-medium transition-colors",
+                  isLive ? "text-cream/70 group-hover:text-cream" : "text-ink/55 group-hover:text-ink",
+                ]}
+              >
+                Abrir anuario →
+              </span>
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+</section>

@@ -1,63 +1,61 @@
 ---
-import HeroBotanicalFallback from "./hero/HeroBotanicalFallback.astro";
-
-interface Props {
-  newestArchiveYear: number;
-}
-
-const { newestArchiveYear } = Astro.props;
-
-// Fase 2 (§5 del plan): la escena Three.js procedural ("Flor en
-// transición") no superó a la variante 2.5D — la geometría no se leía
-// como una flor real y no aportaba una diferencia perceptible que
-// justificara su coste. Se retira; 2.5D queda como implementación
-// principal, no como una versión inferior.
+// Umbral de la portada del blog. Sin fotografía: el elemento visual es el
+// arco de años del cuaderno (2011 → hoy), en el mismo lenguaje tipográfico
+// que la cabecera del anuario (numerales grandes en serif).
+import { NEWEST_ARCHIVE_YEAR, OLDEST_ARCHIVE_YEAR } from "../../data/archive";
 ---
 
 <section
-  class="relative flex min-h-[85svh] items-center overflow-hidden bg-paper md:min-h-[92svh]"
+  class="relative flex min-h-[80svh] items-center overflow-hidden bg-paper md:min-h-[88svh]"
 >
-  <HeroBotanicalFallback />
+  <p
+    aria-hidden="true"
+    class="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 select-none whitespace-nowrap text-center font-serif font-bold leading-none tracking-tighter text-ink/[0.05]"
+    style="font-size: clamp(6rem, 19vw, 17rem);"
+  >
+    {`${OLDEST_ARCHIVE_YEAR} — ${NEWEST_ARCHIVE_YEAR}`}
+  </p>
 
   <div
     class="relative z-10 mx-auto flex max-w-3xl flex-col items-start gap-6 px-6 py-24 md:px-12"
     data-reveal
   >
-    <p class="text-xs font-semibold uppercase tracking-[0.35em] text-ink/60">
-      El Alma de las Flores
+    <p
+      class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.35em] text-moss-text"
+    >
+      <span class="inline-block h-px w-10 bg-pollen" aria-hidden="true"></span>
+      El Alma de las Flores · Cuaderno de campo
     </p>
     <h1 class="font-serif text-4xl font-bold leading-tight text-ink md:text-6xl">
-      Hay flores que empiezan por dentro
+      Lo que las flores nos hacen escribir
     </h1>
     <p class="max-w-xl text-lg leading-relaxed text-ink/75">
-      Un estudio vivo de las 38 Flores de Bach: su historia, la figura de
-      Edward Bach y las publicaciones de quienes recorren este jardín con
-      nosotros.
+      Un cuaderno colectivo sobre las Flores de Bach: experiencias, lecturas
+      y voces de quienes recorren este jardín, año tras año, desde{" "}
+      {OLDEST_ARCHIVE_YEAR}.
     </p>
 
     <div class="flex flex-wrap gap-3 pt-2">
       <a
-        href="/flores-de-bach"
+        href={`/archivo/${NEWEST_ARCHIVE_YEAR}`}
         class="rounded-full bg-ink px-6 py-3 font-semibold text-cream transition-colors hover:bg-ink/90"
       >
-        Explorar las 38 flores
+        Leer el anuario {NEWEST_ARCHIVE_YEAR}
       </a>
       <a
-        href={`/archivo/${newestArchiveYear}`}
+        href="#cuaderno-vivo"
         class="rounded-full border border-moss/40 px-6 py-3 font-semibold text-ink transition-colors hover:bg-moss/10"
       >
-        Leer el último cuaderno
+        Últimas entradas
       </a>
     </div>
   </div>
 
   <a
-    href="#brujula-emocional"
+    href="#cuaderno-vivo"
     class="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-ink/60 transition-colors hover:text-ink"
   >
-    Desciende para explorar
+    Desciende para leer
     <span aria-hidden="true" class="text-lg leading-none">↓</span>
   </a>
 </section>
-
-<script src="../../scripts/home/hero-parallax.ts"></script>

@@ -1,29 +1,20 @@
 ---
-import HomeBachJourney from "../../../components/home/HomeBachJourney.astro";
 import HomeClosing from "../../../components/home/HomeClosing.astro";
 import HomeCommunityInvitation from "../../../components/home/HomeCommunityInvitation.astro";
-import HomeEmotionalCompass from "../../../components/home/HomeEmotionalCompass.astro";
-import HomeFlowerAtlas from "../../../components/home/HomeFlowerAtlas.astro";
 import HomeHero from "../../../components/home/HomeHero.astro";
 import HomeLatestStories from "../../../components/home/HomeLatestStories.astro";
-import {
-  HOME_FEATURED_FLOWERS,
-  HOME_PRINCIPLES,
-  HOME_TIMELINE,
-  NEWEST_ARCHIVE_YEAR,
-} from "../../../data/home-page";
+import HomeYearbooks from "../../../components/home/HomeYearbooks.astro";
+import { NEWEST_ARCHIVE_YEAR } from "../../../data/archive";
 import Layout from "../../../layouts/Layout.astro";
 ---
 
 <Layout
-  title="El Alma de las Flores | Flores de Bach, historia y comunidad"
-  description="Explora las 38 flores de Bach, la biografía de Edward Bach y el anuario del blog. Fichas completas con estado emocional, transformación positiva y afirmación."
+  title="El Alma de las Flores | Blog y cuaderno de campo sobre Flores de Bach"
+  description="Publicaciones de la comunidad y anuarios desde 2011 sobre las Flores de Bach. Lee las últimas entradas o añade tu propia voz al cuaderno."
 >
-  <HomeHero newestArchiveYear={NEWEST_ARCHIVE_YEAR} />
-  <HomeEmotionalCompass />
-  <HomeFlowerAtlas featuredFlowers={HOME_FEATURED_FLOWERS} />
-  <HomeBachJourney principles={HOME_PRINCIPLES} timeline={HOME_TIMELINE} />
+  <HomeHero />
   <HomeLatestStories newestArchiveYear={NEWEST_ARCHIVE_YEAR} />
+  <HomeYearbooks />
   <HomeCommunityInvitation />
   <HomeClosing />
 

@@ -406,3 +406,25 @@ El rediseño conceptual se considerará logrado cuando:
 Construir primero una portada excelente en HTML, CSS y assets botánicos, con una narrativa clara y composiciones menos repetitivas. Después, dedicar un spike corto a una sola escena Three.js en el hero. Si esa escena supera a la versión 2.5D sin comprometer carga, lectura o accesibilidad, se incorpora como mejora progresiva.
 
 El dinamismo que más necesita el proyecto no procede solo del movimiento: procede de **hacer visibles las relaciones entre las flores, la historia y las publicaciones vivas**. El 3D puede ser la puerta; el contenido debe seguir siendo el jardín.
+
+---
+
+## Addendum 2026-08-26 — extracción del sitio Bach
+
+La portada «Herbario vivo», el jardín 3D, las fichas y la biografía se
+extrajeron al repositorio hermano `flores-de-bach` (`~/flores-de-bach`,
+Astro + Tailwind, sin Firebase). Este blog conserva el sistema de tokens,
+el revelado por scroll y las escenas «Cuaderno vivo» y «Comunidad».
+
+Nueva portada del blog (2D, `src/pages/_views/home/index.astro`):
+
+1. `HomeHero` — umbral tipográfico con el arco de años 2011 → año vivo.
+2. `HomeLatestStories` — cuaderno vivo (posts reales de Firestore).
+3. `HomeYearbooks` — estantería de anuarios, un lomo por año.
+4. `HomeCommunityInvitation` — invitación a escribir.
+5. `HomeClosing` — cierre editorial.
+
+Siguiente fase: **publicaciones en un entorno 3D navegable** (Three.js
+`CSS3DRenderer`, tarjetas como DOM real; scroll nativo = avance de cámara;
+fallback en rejilla con `prefers-reduced-motion`). Sustituirá a la escena 2
+y, si funciona, a la 3.

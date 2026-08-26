@@ -1,16 +1,25 @@
-export const ARCHIVE_YEARS = [2026, 2017, 2016, 2015, 2014, 2013, 2012, 2011] as const;
+import { NEWEST_ARCHIVE_YEAR } from "../../../data/archive";
 
-export const PRIMARY_LINKS = {
-  flowers: {
-    href: "/flores-de-bach",
-    label: "Flores de Bach",
+export { ARCHIVE_YEARS } from "../../../data/archive";
+
+// Sitio hermano con las 38 flores y la biografía de Edward Bach (repositorio
+// `flores-de-bach`). Se enlaza solo cuando PUBLIC_BACH_SITE_URL está definida:
+// hasta que exista el dominio no se pinta ningún enlace roto.
+export const BACH_SITE_URL: string | undefined =
+  import.meta.env.PUBLIC_BACH_SITE_URL || undefined;
+
+export type PrimaryLink = {
+  href: string;
+  label: string;
+  external?: boolean;
+};
+
+export const PRIMARY_LINKS: PrimaryLink[] = [
+  {
+    href: `/archivo/${NEWEST_ARCHIVE_YEAR}`,
+    label: `Anuario ${NEWEST_ARCHIVE_YEAR}`,
   },
-  biography: {
-    href: "/biografia",
-    label: "Biografía",
-  },
-  recommender: {
-    href: "/tratamientos",
-    label: "Recomendador",
-  },
-} as const;
+  ...(BACH_SITE_URL
+    ? [{ href: BACH_SITE_URL, label: "Flores de Bach", external: true }]
+    : []),
+];

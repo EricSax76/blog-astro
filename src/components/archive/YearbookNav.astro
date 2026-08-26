@@ -1,7 +1,9 @@
 ---
 // Índice de años del anuario: histórico estático + el año vivo de Firestore.
 // Incluye el año actual y el activo aunque aún no estén en la lista base.
-const staticYears = [2026, 2017, 2016, 2015, 2014, 2013, 2012, 2011];
+import { ARCHIVE_YEARS } from "../../data/archive";
+
+const staticYears: number[] = [...ARCHIVE_YEARS];
 const { activeYear } = Astro.props;
 const currentYear = new Date().getFullYear();
 
