@@ -53,7 +53,9 @@ const createPostCard = (post: LoadedPost): HTMLElement | null => {
   const article = fragment?.querySelector("article");
   if (!article) return null;
   article.removeAttribute("data-reveal");
-  article.classList.add("is-revealed");
+  article.classList.add("is-revealed", "scroll-mt-28");
+  // Ancla estable para enlazar la entrada desde la portada (#post-{id}).
+  article.id = `post-${post.id}`;
 
   const title = article.querySelector("[data-field='title']");
   if (title) title.textContent = post.title || "Entrada sin título";
@@ -142,6 +144,12 @@ const clearRenderedPosts = () => {
 const attachPostCard = (card: HTMLElement) => {
   card.setAttribute("data-post-card", "true");
   postsGrid?.appendChild(card);
+
+  // Las entradas llegan después de la carga inicial, así que el navegador
+  // no puede resolver el hash por sí solo: se desplaza al pliego enlazado.
+  if (card.id && window.location.hash === `#${card.id}`) {
+    card.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 };
 
 const getExistingPostIds = (): Set<string> => {

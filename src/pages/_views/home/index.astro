@@ -2,7 +2,7 @@
 import HomeClosing from "../../../components/home/HomeClosing.astro";
 import HomeCommunityInvitation from "../../../components/home/HomeCommunityInvitation.astro";
 import HomeHero from "../../../components/home/HomeHero.astro";
-import HomeLatestStories from "../../../components/home/HomeLatestStories.astro";
+import HomeStoryPath from "../../../components/home/HomeStoryPath.astro";
 import HomeYearbooks from "../../../components/home/HomeYearbooks.astro";
 import { NEWEST_ARCHIVE_YEAR } from "../../../data/archive";
 import Layout from "../../../layouts/Layout.astro";
@@ -13,7 +13,7 @@ import Layout from "../../../layouts/Layout.astro";
   description="Publicaciones de la comunidad y anuarios desde 2011 sobre las Flores de Bach. Lee las últimas entradas o añade tu propia voz al cuaderno."
 >
   <HomeHero />
-  <HomeLatestStories newestArchiveYear={NEWEST_ARCHIVE_YEAR} />
+  <HomeStoryPath newestArchiveYear={NEWEST_ARCHIVE_YEAR} />
   <HomeYearbooks />
   <HomeCommunityInvitation />
   <HomeClosing />

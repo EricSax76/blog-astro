@@ -424,7 +424,25 @@ Nueva portada del blog (2D, `src/pages/_views/home/index.astro`):
 4. `HomeCommunityInvitation` — invitación a escribir.
 5. `HomeClosing` — cierre editorial.
 
-Siguiente fase: **publicaciones en un entorno 3D navegable** (Three.js
-`CSS3DRenderer`, tarjetas como DOM real; scroll nativo = avance de cámara;
-fallback en rejilla con `prefers-reduced-motion`). Sustituirá a la escena 2
-y, si funciona, a la 3.
+### El camino del cuaderno (escena 2 en 3D) — implementado 2026-08-26
+
+`HomeStoryPath.astro` + `scripts/home/story-path.ts` + `stories-feed.ts`.
+
+- Las últimas 12 publicaciones se pintan primero en una rejilla 2D (fallback
+  y estado sin movimiento). Si hay movimiento permitido, IntersectionObserver
+  y ≥ 2 entradas, se cargan `three` + `CSS3DRenderer` (~92 KB) y las mismas
+  tarjetas pasan a la escena. Cualquier fallo deja la rejilla.
+- Tarjetas = DOM real (texto seleccionable, enlaces, foco). Three.js solo
+  las posiciona; no hay WebGL ni geometría.
+- Visor `sticky` bajo la cabecera; el scroll nativo de la página mueve la
+  cámara (track de `(N) × 0.85 × alto del visor`). Sin scroll secuestrado.
+- Distancia focal = perspectiva del visor → tarjeta enfocada a escala 1,
+  ancho en px predecible (`--story-card-width`); espaciado, fades y amplitud
+  del serpenteo se derivan de ahí. Fade asimétrico: las tarjetas que la
+  cámara deja atrás se desvanecen rápido (crecen mucho por perspectiva).
+- Paralaje leve con puntero fino; teclado: enfocar una tarjeta desplaza la
+  página a su parada. HUD con contador y pista de scroll.
+- Tarjeta final «Fin del camino» → anuario del año vivo. Enlaces de tarjeta
+  a `/archivo/{año}#post-{id}` (anclas añadidas en `yearbook.ts`).
+- Verificado en Chrome headless (1440×1000 y 390×844) con 12 posts reales
+  vía `astro dev` + token de depuración de App Check.

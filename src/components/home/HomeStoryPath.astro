@@ -1,0 +1,120 @@
+---
+// Cuaderno vivo: las últimas publicaciones. Se pintan primero en rejilla
+// (fallback y estado sin JS/movimiento) y, si es posible, pasan al camino 3D
+// (scripts/home/story-path.ts). El visor es un marco fijo; el scroll de la
+// página mueve la cámara.
+interface Props {
+  newestArchiveYear: number;
+}
+
+const { newestArchiveYear } = Astro.props;
+---
+
+<section
+  id="cuaderno-vivo"
+  class="mx-auto mt-24 max-w-6xl scroll-mt-24 px-6 md:px-12"
+  data-story-path
+  data-newest-year={newestArchiveYear}
+>
+  <div class="flex flex-wrap items-end justify-between gap-4" data-reveal>
+    <div class="space-y-2">
+      <p class="text-xs font-semibold uppercase tracking-[0.3em] text-moss-text">
+        Cuaderno vivo
+      </p>
+      <h2 class="font-serif text-3xl font-bold text-ink md:text-4xl">
+        Lo último que se ha escrito en el jardín
+      </h2>
+    </div>
+    <a
+      href={`/archivo/${newestArchiveYear}`}
+      class="rounded-full border border-moss/30 px-5 py-2 text-sm font-semibold text-ink transition-colors hover:bg-moss/10"
+    >
+      Ir al anuario {newestArchiveYear}
+    </a>
+  </div>
+
+  <p id="story-path-loading" class="mt-10 text-sm text-ink/60" aria-live="polite">
+    Cargando publicaciones recientes…
+  </p>
+
+  <div
+    id="story-path-empty"
+    class="mt-10 hidden rounded-3xl border border-moss/15 bg-paper-dim/60 p-8 text-center"
+  >
+    <p class="font-serif text-xl font-bold text-ink">Del herbario</p>
+    <p class="mt-2 text-sm leading-relaxed text-ink/70">
+      Todavía no hay publicaciones nuevas. Mientras tanto, recorre el
+      <a
+        href={`/archivo/${newestArchiveYear}`}
+        class="font-semibold text-moss-text hover:text-ink"
+      >
+        anuario {newestArchiveYear}
+      </a>
+      para descubrir entradas del archivo.
+    </p>
+  </div>
+
+  <!-- Rejilla 2D: siempre se rellena; es el punto de partida y el fallback. -->
+  <div
+    id="story-path-grid"
+    class="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+    aria-live="polite"
+  >
+  </div>
+
+  <!-- Camino 3D: oculto hasta que story-path.ts lo activa. -->
+  <div id="story-path-track" class="relative mt-10 hidden">
+    <div
+      id="story-path-stage"
+      class="sticky top-24 h-[calc(100svh-7rem)] overflow-hidden rounded-[2rem] border border-moss/15 bg-paper-dim/50"
+    >
+      <div
+        aria-hidden="true"
+        class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgb(236_230_214/0.9)_100%)]"
+      ></div>
+      <div id="story-path-scene" class="absolute inset-0"></div>
+      <div
+        class="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between px-6 pb-5 text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-moss-text"
+      >
+        <p id="story-path-counter" class="shrink-0 whitespace-nowrap" aria-live="polite">
+          1 / 1
+        </p>
+        <p
+          id="story-path-hint"
+          class="whitespace-nowrap text-right transition-opacity duration-500"
+        >
+          Desplázate para avanzar
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* Tarjetas dentro de la escena: ancho fijo (la perspectiva hace el resto),
+     sin transiciones de layout; solo opacidad y foco. */
+  #story-path-scene .story-card {
+    width: var(--story-card-width, min(400px, calc(100vw - 4rem)));
+    transition:
+      opacity 180ms linear,
+      box-shadow 300ms var(--ease-garden),
+      border-color 300ms var(--ease-garden);
+    backface-visibility: hidden;
+  }
+
+  #story-path-scene .story-card--end {
+    width: min(340px, var(--story-card-width, calc(100vw - 5rem)));
+  }
+
+  #story-path-scene .story-card.is-focal {
+    border-color: color-mix(in srgb, var(--color-pollen) 70%, transparent);
+    box-shadow: 0 32px 60px -24px rgb(44 85 48 / 0.35);
+  }
+
+  #story-path-scene .story-card:focus-within {
+    outline: 2px solid var(--color-pollen);
+    outline-offset: 4px;
+  }
+</style>
+
+<script src="../../scripts/home/story-path.ts"></script>
