@@ -10,8 +10,8 @@
     "astro": "astro",
     "migrate:legacy:dry": "node functions/scripts/migrate-legacy-content.mjs --dry-run",
     "migrate:legacy": "node functions/scripts/migrate-legacy-content.mjs",
-    "purge:author-email:dry": "node functions/scripts/purge-author-email.mjs --dry-run",
-    "purge:author-email": "node functions/scripts/purge-author-email.mjs --execute"
+    "purge:author-email:dry": "node functions/scripts/purge-author-email.mjs --project-id=el-alma-de-las-flores-blog --dry-run",
+    "purge:author-email": "node functions/scripts/purge-author-email.mjs --project-id=el-alma-de-las-flores-blog --execute"
   },
   "dependencies": {
     "@fontsource/cormorant-garamond": "^5.2.11",

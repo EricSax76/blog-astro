@@ -176,8 +176,9 @@ Todos usan el Admin SDK con ADC (ver §1) y tienen modo simulación.
 | `functions/scripts/purge-author-email.mjs` | Quitar `authorEmail` de los posts existentes (RGPD). **Pendiente de ejecutar.** | `cd functions && npm run purge:author-email:dry` y después `npm run purge:author-email`. |
 | `functions/scripts/migrate-legacy-content.mjs` | Migrar el histórico 2011–2017 a Firestore y Storage. Hoy sin uso: el histórico se mantiene estático. | `npm run migrate:legacy:dry` y después `npm run migrate:legacy`. |
 
-- Usa los `purge:*` de `functions/`: llevan `--project-id`. Los alias del
-  `package.json` raíz no lo pasan y dependen del proyecto por defecto de ADC.
+- Los `purge:*` existen también en el `package.json` raíz (mismo script).
+  Ambos pasan `--project-id` explícito: sin él, el script consultaría el
+  proyecto por defecto de ADC.
 - Opciones de `migrate-legacy-content.mjs`: `--years=2011,2012`,
   `--overwrite`, `--project-id`, `--bucket`, `--service-account`,
   `--author-uid`, `--author-name` (o `MIGRATION_AUTHOR_UID` /

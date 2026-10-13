@@ -66,7 +66,7 @@ En `functions/`:
 | `npm run lint` | ESLint. |
 | `npm run serve` | Build + emulador de functions. |
 | `npm run logs` | Logs de las funciones desplegadas. |
-| `npm run purge:author-email:dry` / `purge:author-email` | Quita `authorEmail` de los posts (RGPD). Usa estos y no los del root: llevan `--project-id`. |
+| `npm run purge:author-email:dry` / `purge:author-email` | Quita `authorEmail` de los posts (RGPD). También disponibles desde la raíz. |
 
 ## Estructura
 
