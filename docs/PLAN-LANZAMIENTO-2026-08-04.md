@@ -327,30 +327,32 @@ abiertos están actualizadas. Procedimientos (deploy, rollback, backups):
   rollback de Hosting se hace desde la consola; `firebase-tools` 15 no tiene
   `hosting:rollback`.
 
-- [ ] 🔴 **Restaurar los triggers de Auth: hoy no existen en producción.**
-  2026-10-13: el deploy de las 14:34 UTC salió de `main` (triggers en
-  `us-central1`) y a las 14:51 UTC se ejecutó el borrado de
-  `us-central1` antes de que existiera la copia en `europe-west1`. Desde
-  entonces ningún borrado de cuenta limpia sus datos (RGPD art. 17) y no
-  hay red de seguridad del perfil en el alta.
-  - Arreglo: desplegar esta rama (crea ambos en `europe-west1`).
-  - Después, limpiar a mano los datos huérfanos de las cuentas borradas en
-    el hueco. Vía app solo hubo una (`deleteUserData` a las 16:43 UTC, la
-    prueba); los borrados desde la consola no quedan en esos logs.
+- [~] 🔴 **Incidente 2026-10-13: triggers de Auth borrados en producción.**
+  El deploy de las 14:34 UTC salió de `main` (triggers en `us-central1`),
+  y a las 14:51 UTC se ejecutó el borrado de `us-central1` antes de que
+  existiera la copia en `europe-west1`. Durante ~2 h ningún borrado de
+  cuenta limpió sus datos (RGPD art. 17) y no hubo red de seguridad del
+  perfil en el alta.
+  - ✅ Restaurado 16:49 UTC: ambos triggers `ACTIVE` en `europe-west1`;
+    `cleanupOnUserDeleted` con reintentos y 540 s (verificado con
+    `gcloud functions describe`).
+  - ✅ Salvaguarda en `OPERACIONES.md` §9: no borrar la región antigua sin
+    ver antes la copia nueva en `functions:list`.
+  - Pendiente: limpiar a mano los datos huérfanos del hueco. Vía app solo
+    hubo un borrado (`deleteUserData` a las 16:43 UTC, el usuario de
+    prueba); los borrados desde la consola no aparecen en esos logs.
+  - Pendiente: repetir la prueba de alta y borrado con los triggers nuevos.
 
-- [ ] 🟡 **Desplegar los triggers de Auth en `europe-west1`.**
-  Código listo 2026-10-13: `provisionUserProfile` y `cleanupOnUserDeleted`
-  pasan de `us-central1` (Iowa) a `europe-west1`, junto a las callables. Así
-  la limpieza RGPD deja de cruzar el Atlántico en cada operación contra
-  Firestore y Storage (Madrid) y los datos personales no se procesan en
-  EE. UU. por esta vía.
-  - Comentario del código y docs corregidos: la restricción a
-    `us-central1` no existe en la
+- [x] 🟡 **Desplegar los triggers de Auth en `europe-west1`.**
+  ✅ Desplegado 2026-10-13 16:49 UTC: `provisionUserProfile` y
+  `cleanupOnUserDeleted` pasan de `us-central1` (Iowa) a `europe-west1`,
+  junto a las callables. La limpieza RGPD deja de cruzar el Atlántico en
+  cada operación contra Firestore y Storage (Madrid) y los datos personales
+  no se procesan en EE. UU. por esta vía.
+  - La restricción a `us-central1` no existía en la
     [documentación oficial](https://firebase.google.com/docs/functions/locations).
-  - Procedimiento sin hueco en [`OPERACIONES.md`](OPERACIONES.md) §9:
-    deploy interactivo respondiendo **No** al borrado, verificar con un
-    usuario de prueba y después `functions:delete … --region us-central1`.
-  - El mismo deploy sube `firebase-admin` a 14.5 (ya en `main`).
+  - `firebase-admin` 14.5 en producción desde el deploy de las 14:34 UTC
+    (callables) y 16:49 UTC (triggers).
   - Opcional, solo descriptivo: el texto de la alerta "Funciones gen1 con
     errores" en Cloud Monitoring aún dice `us-central1`. Su filtro no
     depende de la región.
@@ -412,7 +414,7 @@ abiertos están actualizadas. Procedimientos (deploy, rollback, backups):
   en gen1 — corregido 2026-08-04).
 - **Regiones coherentes**: `europe-west1` global, cliente y CSP `connect-src`
   alineados. Los triggers de Auth gen1 pasan también a `europe-west1`
-  (2026-10-13, pendiente de deploy): `us-central1` nunca fue obligatorio.
+  (desplegado 2026-10-13): `us-central1` nunca fue obligatorio.
 - **`rateLimits` inaccesible desde cliente** (deny-all en `firebase.rules:82-85`).
 - **Sin supuestos de emulador en código shipped.**
 - **robots.txt, sitemap y legales** (aviso legal, privacidad, cookies) presentes.

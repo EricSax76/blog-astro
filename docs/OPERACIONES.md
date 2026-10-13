@@ -255,8 +255,9 @@ cliente la use.
 Fuente de verdad: [`PLAN-LANZAMIENTO`](PLAN-LANZAMIENTO-2026-08-04.md).
 A fecha de este documento:
 
-- Desplegar functions: los triggers de Auth pasan de `us-central1` a
-  `europe-west1` (procedimiento en §9) y `firebase-admin` sube a 14.5.
+- Incidente del 2026-10-13: limpiar a mano los datos huérfanos de las
+  cuentas borradas sin trigger y repetir la prueba de alta y borrado
+  (PLAN-LANZAMIENTO).
 - Purga de `authorEmail` (requiere ADC con la cuenta owner).
 - Smoke test de las reglas endurecidas en la app real (§4).
 - Redirects 301 del sitio Bach (§9).
