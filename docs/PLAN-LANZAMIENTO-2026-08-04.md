@@ -327,6 +327,17 @@ abiertos están actualizadas. Procedimientos (deploy, rollback, backups):
   rollback de Hosting se hace desde la consola; `firebase-tools` 15 no tiene
   `hosting:rollback`.
 
+- [ ] 🔴 **Restaurar los triggers de Auth: hoy no existen en producción.**
+  2026-10-13: el deploy de las 14:34 UTC salió de `main` (triggers en
+  `us-central1`) y a las 14:51 UTC se ejecutó el borrado de
+  `us-central1` antes de que existiera la copia en `europe-west1`. Desde
+  entonces ningún borrado de cuenta limpia sus datos (RGPD art. 17) y no
+  hay red de seguridad del perfil en el alta.
+  - Arreglo: desplegar esta rama (crea ambos en `europe-west1`).
+  - Después, limpiar a mano los datos huérfanos de las cuentas borradas en
+    el hueco. Vía app solo hubo una (`deleteUserData` a las 16:43 UTC, la
+    prueba); los borrados desde la consola no quedan en esos logs.
+
 - [ ] 🟡 **Desplegar los triggers de Auth en `europe-west1`.**
   Código listo 2026-10-13: `provisionUserProfile` y `cleanupOnUserDeleted`
   pasan de `us-central1` (Iowa) a `europe-west1`, junto a las callables. Así

@@ -237,8 +237,12 @@ como "ya no está en el código". Procedimiento sin hueco:
    - crear un usuario de prueba y comprobar que tiene `users/{uid}`;
    - borrar ese usuario y comprobar que sus datos desaparecen;
    - revisar los logs: `npx firebase-tools functions:log --only provisionUserProfile,cleanupOnUserDeleted`.
-4. Borrar las de la región antigua:
+4. **Solo si en el paso 3 `functions:list` muestra la copia en la región
+   nueva**, borrar las de la antigua:
    `npx firebase-tools functions:delete provisionUserProfile cleanupOnUserDeleted --region <región-antigua>`.
+   Si se borran sin que exista la nueva, se quedan sin trigger: los
+   borrados de cuenta dejan datos huérfanos (pasó el 2026-10-13, ver
+   PLAN-LANZAMIENTO).
 
 Con callables el procedimiento es otro: el cliente lleva la región fija
 (`getFunctions(app, "europe-west1")` en los scripts) y la CSP `connect-src`
