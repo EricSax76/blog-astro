@@ -315,7 +315,7 @@ abiertos están actualizadas. Procedimientos (deploy, rollback, backups):
   Workload Identity Federation (sin tokens de larga vida).
 
 - [x] 🟡 **Corregir documentación obsoleta.**
-  ✅ Hecho 2026-10-13: nuevos
+  ✅ Hecho 2026-10-13: README reescrito contra el código; nuevos
   [`ARQUITECTURA.md`](ARQUITECTURA.md) y [`OPERACIONES.md`](OPERACIONES.md);
   `ANALISIS-Y-GAPS`, `AUDITORIA-GENERAL` y `PLAN-REDISENO-CONCEPTUAL-INDEX`
   movidos a `docs/historico/` con un aviso de qué está desfasado (M1 SSR,

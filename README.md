@@ -1,107 +1,123 @@
 # El Alma de las Flores — Blog
 
-Blog en **Astro 6** (SSR, adapter `@astrojs/node`) con backend **Firebase**
-(Auth, Firestore, Storage, Cloud Functions). Tailwind v4 para estilos.
+Blog y cuaderno de campo sobre las Flores de Bach: publicaciones de la
+comunidad y anuarios desde 2011.
 
-> Proyecto Firebase: `el-alma-de-las-flores-blog`. Estado: desarrollo local;
-> destino de despliegue previsto Firebase Hosting (aún no desplegado).
+**En producción:** <https://el-alma-de-las-flores-blog.web.app> (Firebase
+Hosting, proyecto `el-alma-de-las-flores-blog`). Pendientes de lanzamiento en
+[`docs/PLAN-LANZAMIENTO-2026-08-04.md`](docs/PLAN-LANZAMIENTO-2026-08-04.md).
 
-## Arquitectura
+## Stack
 
-- **Frontend:** Astro `output: "server"` + `@astrojs/node` (standalone). Las
-  páginas cargan el SDK de Firebase vía CDN (`gstatic 11.0.2`) con `import()`
-  dinámico. El paquete npm `firebase` está pinneado a `11.0.2` solo como fuente
-  de tipos (ver `src/types/firebase-cdn-modules.d.ts`).
-- **Auth:** Email/Password. El alta la hace el cliente con el SDK de Auth; el
-  servidor provisiona el perfil (`upsertUserProfile` callable + trigger de
-  respaldo `provisionUserProfile`). No se envían contraseñas a funciones propias.
-- **Firestore:** colecciones `users`, `posts`, `comments`, `likes`.
-- **Storage:** imágenes de posts (`blog/posts/{uid}/`, lectura pública) y
-  avatares (`users/{uid}/avatar/`, lectura pública, escritura solo dueño).
-- **Cloud Functions** (gen2, `europe-west1`, salvo triggers Auth gen1 en
-  `us-central1`): `upsertUserProfile`, `provisionUserProfile`, `publishPost`,
-  `addComment`, `deleteComment`, `toggleLike`, `deleteUserData`,
-  `exportUserData`, `cleanupOnUserDeleted`.
+- **Astro 7** con salida **estática** (`output: "static"`, sin SSR). Todo el
+  contenido dinámico se carga en el navegador contra Firebase.
+- **Firebase:** Auth (email/contraseña y Google), Firestore, Storage y Cloud
+  Functions (7 callables en `europe-west1` y 2 triggers de Auth en
+  `us-central1`). **App Check** (reCAPTCHA v3) obligatorio.
+- **Tailwind v4** (`@tailwindcss/vite`), fuentes autoalojadas con `@fontsource`.
+- **Three.js** (`CSS3DRenderer`), solo para el camino 3D de la portada; se
+  carga bajo demanda.
 
-### Rutas principales
-
-| Ruta | Función |
-| :--- | :--- |
-| `/` | Portada |
-| `/acceder`, `/registrate` | Login y registro (`scripts/auth/entry.js`) |
-| `/publicar` | Editor: sube imagen a Storage + `publishPost` |
-| `/mis-publicaciones` | Posts del autor actual (`authorUid`) |
-| `/mi-perfil` | Editar perfil/avatar + exportar/eliminar datos (RGPD) |
-| `/archivo/2011`–`/archivo/2017` | Histórico estático |
-| `/archivo/2026` y `/archivo/[year]` | Posts del año desde Firestore |
-
-Las 38 flores y la biografía de Edward Bach se extrajeron en agosto de 2026 al
-repositorio hermano `flores-de-bach` (sitio estático sin Firebase). El blog
-las enlaza solo si `PUBLIC_BACH_SITE_URL` está definida; al publicar ese
-sitio hay que añadir en `firebase.json` redirects 301 de `/flores-de-bach/**`
-y `/biografia` a su dominio.
-
-El **año de un post lo fija el servidor** (`publishPost`,
-`new Date().getFullYear()`); el archivo por año es dinámico (`[year].astro`)
-para años ≥ 2018 sin página propia.
+Regla de oro: el cliente **lee** de Firestore pero **no escribe** contenido.
+Toda escritura pasa por un callable que autentica, limita la frecuencia,
+valida y fija la autoría desde el token. Detalle en
+[`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md).
 
 ## Puesta en marcha
 
+Requisitos: Node 22.
+
 ```bash
-npm install            # deps del front
-cp .env.example .env   # rellena los valores PUBLIC_FIREBASE_*
+npm install
+cp .env.example .env   # ver abajo
 npm run dev            # http://localhost:4321
 ```
 
-Valores `PUBLIC_FIREBASE_*`: **Firebase Console > Project settings > Your apps >
-SDK setup and configuration**. Habilita **Authentication > Sign-in method >
-Email/Password**.
+Variables de `.env` (explicadas en [`.env.example`](.env.example)):
 
-### Comandos
+- `PUBLIC_FIREBASE_*`: Firebase Console > Project settings > Your apps.
+- `PUBLIC_APPCHECK_SITE_KEY`: clave pública de reCAPTCHA v3. **Obligatoria**:
+  sin ella el cliente no inicializa Firebase y el build de producción falla.
+- `APPCHECK_DEBUG_TOKEN`: token de depuración de App Check, **necesario en
+  local** (sin él, 403).
+- `PUBLIC_BACH_SITE_URL` (opcional): enlace al sitio hermano `flores-de-bach`.
+
+En Authentication > Sign-in method deben estar activos **Email/Password** y
+**Google**.
+
+> ⚠️ `npm run dev` trabaja contra **producción**: no hay emuladores
+> conectados al cliente. Lo que publiques o borres en local es real.
+
+## Comandos
 
 | Comando | Acción |
 | :--- | :--- |
-| `npm run dev` | Dev server en `localhost:4321` |
-| `npm run build` | Build de producción en `./dist/` |
-| `npm run preview` | Sirve el build local |
-| `npm run migrate:legacy:dry` | Simula migración de contenido legacy |
-| `npm run migrate:legacy` | Migración real (ver abajo) |
+| `npm run dev` | Servidor de desarrollo en `localhost:4321`. |
+| `npm run check` | Comprobación de tipos (`astro check`). |
+| `npm run build` | `astro check` + build de producción en `dist/`. Falla si falta alguna clave del `.env`. |
+| `npm run preview` | Sirve `dist/`. No inyecta el token de App Check: Firebase responderá 403 en local. |
+| `npm run migrate:legacy:dry` / `migrate:legacy` | Migración del histórico 2011–2017 a Firestore (hoy sin uso). |
 
-### Cloud Functions
+En `functions/`:
 
-```bash
-cd functions
-npm install
-npm run build          # tsc
+| Comando | Acción |
+| :--- | :--- |
+| `npm ci && npm run build` | Compila TypeScript a `functions/lib/`. |
+| `npm run lint` | ESLint. |
+| `npm run serve` | Build + emulador de functions. |
+| `npm run logs` | Logs de las funciones desplegadas. |
+| `npm run purge:author-email:dry` / `purge:author-email` | Quita `authorEmail` de los posts (RGPD). Usa estos y no los del root: llevan `--project-id`. |
+
+## Estructura
+
+```text
+src/
+  pages/          rutas (envoltorios finos) → pages/_views/ (vistas reales)
+  components/     home/, archive/, auth/, layout/
+  layouts/        Layout.astro: SEO, header/footer, config de Firebase
+  scripts/        JS/TS de cliente por área; core/firebase-client.ts es el único acceso al SDK
+  data/archive.ts años del anuario (fuente única)
+  styles/         global.css (Tailwind v4 + tokens @theme)
+functions/src/    Cloud Functions (functions/ y lib/)
+firebase.rules    reglas de Firestore     storage.rules   reglas de Storage
+firestore.indexes.json  índices + TTL de rateLimits
+firebase.json     hosting (cabeceras CSP y cache), emuladores
+scripts/setup-monitoring.sh  alertas de Cloud Monitoring
 ```
 
-## Despliegue de reglas y funciones
+## Despliegue
+
+Manual, con `firebase-tools`, en este orden:
 
 ```bash
-firebase deploy --only storage     # storage.rules
-firebase deploy --only firestore   # firebase.rules + firestore.indexes.json
-firebase deploy --only functions   # Cloud Functions
+npx firebase-tools deploy --only firestore:rules,firestore:indexes,storage
+cd functions && npm ci && npm run build && cd .. && npx firebase-tools deploy --only functions
+npx firebase-tools deploy --only hosting   # ejecuta npm run build con el .env real
 ```
 
-> Las credenciales de service account **no viven en el repo**. Referéncialas por
-> `GOOGLE_APPLICATION_CREDENTIALS` o por ruta absoluta (p.ej.
-> `~/.firebase-keys/<archivo>.json`).
+Smoke test, rollback, backups, monitorización y credenciales:
+[`docs/OPERACIONES.md`](docs/OPERACIONES.md). No hay claves de service
+account: los scripts locales usan ADC (`gcloud auth application-default login`).
 
-## Migración legacy (2011–2017)
+CI (`.github/workflows/ci.yml`), en cada push a `main` y en cada PR:
+`astro check` + build + `npm audit` en el front; lint + build + `npm audit`
+en `functions/`.
 
-Migra el histórico (`src/pages/archivo/2011..2017`) a Firestore y sube las
-imágenes a Storage:
+## Sitio hermano
 
-```bash
-npm run migrate:legacy:dry         # revisa qué se migraría
-npm run migrate:legacy             # ejecuta
-```
+Las 38 flores y la biografía de Edward Bach viven desde 2026-08 en el
+repositorio `flores-de-bach` (estático, sin Firebase). El blog lo enlaza
+solo si `PUBLIC_BACH_SITE_URL` está definida. Pendiente: redirects 301 en
+`firebase.json` cuando tenga dominio (ver `docs/OPERACIONES.md` §9).
 
-Opciones: `--overwrite`, `--years=2011,2012`,
-`--service-account=/ruta/abs/clave.json`, `--bucket=<storage-bucket>`,
-`--author-uid`, `--author-name`, `--author-email`.
+## Documentación
 
-## Más
+Índice: [`docs/README.md`](docs/README.md).
 
-- Índice de documentación: [`docs/README.md`](docs/README.md).
-- Docs de Astro: <https://docs.astro.build>.
+- [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md): rutas, modelo de datos,
+  funciones, flujos y seguridad.
+- [`docs/OPERACIONES.md`](docs/OPERACIONES.md): desarrollo, despliegue,
+  rollback, backups y monitorización.
+- [`docs/PLAN-LANZAMIENTO-2026-08-04.md`](docs/PLAN-LANZAMIENTO-2026-08-04.md):
+  checklist vivo de pendientes.
+- [`docs/APP-CHECK-ENFORCEMENT.md`](docs/APP-CHECK-ENFORCEMENT.md): App Check.
