@@ -62,8 +62,8 @@ Navegador ──(HTML/JS estático)──▶ Firebase Hosting (dist/)
 | `/404` | `pages/404.astro` (sin vista) | — |
 | `/sitemap.xml` | `pages/sitemap.xml.ts` | — |
 
-En todas las páginas: `layout/header/init.ts` (header, menú móvil, sesión),
-`ux/cookie-consent.js` (banner) y `core/app-init.js` (ver §7).
+En todas las páginas: `layout/header/init.ts` (header, menú móvil, sesión)
+y `ux/cookie-consent.js` (banner).
 
 ### Anuario por años
 
@@ -342,9 +342,6 @@ Lista de trabajo detallada en [`PLAN-LANZAMIENTO`](PLAN-LANZAMIENTO-2026-08-04.m
 - **No se exige `email_verified`** para publicar ni comentar.
 - **CSP con `script-src 'unsafe-inline'`**, necesario por el bloque
   `is:inline` de `Layout.astro`.
-- **`core/app-init.js`** se carga en todas las páginas, pero ninguno de sus
-  selectores (`.site-header`, `.has-dropdown`, `.read-more`) existe ya en el
-  markup: es código muerto.
 - **`tailwind.config.mjs` no se carga:** Tailwind v4 solo lo leería con
   `@config` en `global.css`. Las clases `prose` (plugin `typography`) no
   tienen efecto.
