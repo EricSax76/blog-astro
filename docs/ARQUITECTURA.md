@@ -25,6 +25,8 @@ Navegador ──(HTML/JS estático)──▶ Firebase Hosting (dist/)
   navegador contra Firebase. Tailwind v4 vía `@tailwindcss/vite`.
 - **Backend:** Firebase (proyecto `el-alma-de-las-flores-blog`, plan Blaze).
   No hay servidor propio: la lógica de servidor vive en Cloud Functions.
+- **Ubicación:** Firestore y Storage en `europe-southwest1` (Madrid); Cloud
+  Functions en `europe-west1` (Bélgica). Ver §3.
 - **Principio rector:** el cliente **lee** directamente de Firestore, pero
   **nunca escribe** contenido. Toda escritura pasa por un callable que
   autentica, limita la frecuencia, valida y fija la identidad desde el token.
@@ -155,11 +157,21 @@ Código en `functions/src/`. Punto de entrada `index.ts`:
 | `toggleLike` | callable | europe-west1 | 30/min | Activa/desactiva el like y ajusta `likeCount` en una transacción. |
 | `exportUserData` | callable | europe-west1 | 5/día | Devuelve en JSON perfil, posts, comentarios y likes (RGPD art. 20). |
 | `deleteUserData` | callable | europe-west1 | 3/día | Borra la cuenta de Auth; la limpieza la hace el trigger (RGPD art. 17). |
-| `provisionUserProfile` | Auth `onCreate` (gen1) | us-central1 | — | Red de seguridad: crea `users/{uid}` si el callable no llegó a hacerlo. |
-| `cleanupOnUserDeleted` | Auth `onDelete` (gen1) | us-central1 | — | Borra todos los datos del usuario; reintenta ante fallo (`failurePolicy`). |
+| `provisionUserProfile` | Auth `onCreate` (gen1) | europe-west1 | — | Red de seguridad: crea `users/{uid}` si el callable no llegó a hacerlo. |
+| `cleanupOnUserDeleted` | Auth `onDelete` (gen1) | europe-west1 | — | Borra todos los datos del usuario; reintenta ante fallo (`failurePolicy`). |
 
-Los triggers de Auth gen1 solo existen en `us-central1`; por eso son la
-excepción de región.
+**Regiones:**
+- Los dos triggers son gen1 porque gen2 no tiene `onCreate`/`onDelete` de
+  Auth: solo funciones de bloqueo, que exigen Identity Platform y no cubren
+  el borrado.
+- `setGlobalOptions` solo afecta a v2, así que la región de los triggers va
+  explícita en su `region(...)`.
+- Lo ideal sería colocalizar las funciones con los datos, en Madrid
+  (`europe-southwest1`), pero allí solo hay gen2. `europe-west1` admite las
+  dos generaciones y concentra todas las funciones en una sola región.
+- Antes del cambio del 2026-10-13 los triggers estaban en `us-central1`, por
+  la creencia, errónea, de que los triggers de Auth gen1 solo existían
+  allí. Estado del despliegue en `PLAN-LANZAMIENTO`.
 
 Utilidades compartidas (`functions/src/lib/`):
 

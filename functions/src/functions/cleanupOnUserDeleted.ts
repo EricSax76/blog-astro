@@ -8,6 +8,8 @@
  * failurePolicy es imprescindible: sin él, un trigger gen1 que lanza error
  * NO se reintenta — el rethrow sería solo un log. Con él, GCF reintenta la
  * limpieza (idempotente) hasta que complete.
+ *
+ * Región: ver provisionUserProfile (mismo motivo, europe-west1).
  */
 
 import {region} from "firebase-functions/v1";
@@ -23,7 +25,7 @@ async function deleteRateLimitDocs(uid: string): Promise<void> {
   await batch.commit();
 }
 
-export const cleanupOnUserDeleted = region("us-central1")
+export const cleanupOnUserDeleted = region("europe-west1")
   .runWith({failurePolicy: true, timeoutSeconds: 540})
   .auth.user()
   .onDelete(async (user) => {

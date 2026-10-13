@@ -10,7 +10,7 @@
 #
 # Crea:
 #   1. Canal de notificación por email.
-#   2. Alerta de errores en funciones gen1 (us-central1: provisionUserProfile,
+#   2. Alerta de errores en funciones gen1 (europe-west1: provisionUserProfile,
 #      cleanupOnUserDeleted) — métrica execution_count con status != "ok".
 #   3. Alerta de 5xx en callables gen2 (europe-west1, corren sobre Cloud Run).
 #   4. Uptime check del hosting + alerta si falla.
@@ -37,12 +37,12 @@ CHANNEL=$(gcloud beta monitoring channels create \
   --format="value(name)")
 echo "Canal creado: $CHANNEL"
 
-# --- 2. Errores en funciones gen1 (triggers de Auth, us-central1) -----------
+# --- 2. Errores en funciones gen1 (triggers de Auth, europe-west1) ----------
 cat > "$TMP/gen1-errors.json" <<EOF
 {
   "displayName": "Funciones gen1 con errores (Auth triggers)",
   "documentation": {
-    "content": "provisionUserProfile / cleanupOnUserDeleted (us-central1) están fallando. Afecta al alta de perfiles y a la limpieza GDPR. Revisar: firebase functions:log --only provisionUserProfile,cleanupOnUserDeleted",
+    "content": "provisionUserProfile / cleanupOnUserDeleted (gen1) están fallando. Afecta al alta de perfiles y a la limpieza GDPR. Revisar: firebase functions:log --only provisionUserProfile,cleanupOnUserDeleted",
     "mimeType": "text/markdown"
   },
   "combiner": "OR",

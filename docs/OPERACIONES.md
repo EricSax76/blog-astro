@@ -151,8 +151,8 @@ Referencia: <https://cloud.google.com/firestore/docs/backups>.
 ## 7. Monitorización y costes
 
 - **Alertas** (creadas con `scripts/setup-monitoring.sh`, aviso por email):
-  - errores en las funciones gen1 de `us-central1` (`provisionUserProfile`,
-    `cleanupOnUserDeleted`);
+  - errores en las funciones gen1 (`provisionUserProfile`,
+    `cleanupOnUserDeleted`); el filtro no depende de la región;
   - respuestas 5xx en los callables gen2 de `europe-west1`;
   - uptime check del hosting y alerta si falla.
 
@@ -219,11 +219,40 @@ añadir a `firebase.json` redirects 301 de `/flores-de-bach/**` y
 
 ---
 
+### Mover una función de evento a otra región
+
+Aplica a `provisionUserProfile` y `cleanupOnUserDeleted` (triggers de Auth).
+Firebase identifica cada función por nombre **y** región: al cambiar
+`region(...)`, el deploy crea la función en la región nueva y trata la vieja
+como "ya no está en el código". Procedimiento sin hueco:
+
+1. `npx firebase-tools deploy --only functions` en modo **interactivo**
+   (con `--non-interactive` y sin `--force` aborta). Cuando pregunte si
+   borra las funciones de la región antigua, responder **No**.
+2. Durante la convivencia, **las dos copias reciben cada evento**. Es seguro
+   porque ambas funciones son idempotentes: el perfil solo se crea si no
+   existe y la limpieza borra lo que encuentra.
+3. Verificar en la región nueva:
+   - `npx firebase-tools functions:list`: aparecen ambas copias;
+   - crear un usuario de prueba y comprobar que tiene `users/{uid}`;
+   - borrar ese usuario y comprobar que sus datos desaparecen;
+   - revisar los logs: `npx firebase-tools functions:log --only provisionUserProfile,cleanupOnUserDeleted`.
+4. Borrar las de la región antigua:
+   `npx firebase-tools functions:delete provisionUserProfile cleanupOnUserDeleted --region <región-antigua>`.
+
+Con callables el procedimiento es otro: el cliente lleva la región fija
+(`getFunctions(app, "europe-west1")` en los scripts) y la CSP `connect-src`
+nombra el dominio regional. Hay que desplegar primero en la región nueva,
+publicar el cliente apuntando a ella y borrar la antigua solo cuando ningún
+cliente la use.
+
 ## 10. Pendientes operativos
 
 Fuente de verdad: [`PLAN-LANZAMIENTO`](PLAN-LANZAMIENTO-2026-08-04.md).
 A fecha de este documento:
 
+- Desplegar functions: los triggers de Auth pasan de `us-central1` a
+  `europe-west1` (procedimiento en §9) y `firebase-admin` sube a 14.5.
 - Purga de `authorEmail` (requiere ADC con la cuenta owner).
 - Smoke test de las reglas endurecidas en la app real (§4).
 - Redirects 301 del sitio Bach (§9).

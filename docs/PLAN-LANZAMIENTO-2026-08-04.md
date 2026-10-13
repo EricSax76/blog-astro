@@ -327,6 +327,29 @@ abiertos están actualizadas. Procedimientos (deploy, rollback, backups):
   rollback de Hosting se hace desde la consola; `firebase-tools` 15 no tiene
   `hosting:rollback`.
 
+- [ ] 🟡 **Desplegar los triggers de Auth en `europe-west1`.**
+  Código listo 2026-10-13: `provisionUserProfile` y `cleanupOnUserDeleted`
+  pasan de `us-central1` (Iowa) a `europe-west1`, junto a las callables. Así
+  la limpieza RGPD deja de cruzar el Atlántico en cada operación contra
+  Firestore y Storage (Madrid) y los datos personales no se procesan en
+  EE. UU. por esta vía.
+  - Comentario del código y docs corregidos: la restricción a
+    `us-central1` no existe en la
+    [documentación oficial](https://firebase.google.com/docs/functions/locations).
+  - Procedimiento sin hueco en [`OPERACIONES.md`](OPERACIONES.md) §9:
+    deploy interactivo respondiendo **No** al borrado, verificar con un
+    usuario de prueba y después `functions:delete … --region us-central1`.
+  - El mismo deploy sube `firebase-admin` a 14.5 (ya en `main`).
+  - Opcional, solo descriptivo: el texto de la alerta "Funciones gen1 con
+    errores" en Cloud Monitoring aún dice `us-central1`. Su filtro no
+    depende de la región.
+
+- [ ] ⚪ **Valorar mover las callables a `europe-southwest1`.**
+  Están en Bélgica y los datos en Madrid, que admite gen2: cada callable
+  hace varias lecturas y escrituras seguidas a Firestore desde otra región.
+  Exige actualizar la región en los 5 scripts de cliente y la CSP, y
+  coordinar el deploy (ver OPERACIONES §9).
+
 - [ ] 🟡 **CD (despliegue automático).**
   Hoy el deploy es manual desde local. Valorar CD con GitHub Actions +
   Workload Identity Federation (sin tokens de larga vida).
@@ -377,7 +400,8 @@ abiertos están actualizadas. Procedimientos (deploy, rollback, backups):
   para que GCF reintente (ojo: sin `failurePolicy` el rethrow NO reintenta
   en gen1 — corregido 2026-08-04).
 - **Regiones coherentes**: `europe-west1` global, cliente y CSP `connect-src`
-  alineados; triggers Auth gen1 en `us-central1` (obligatorio).
+  alineados. Los triggers de Auth gen1 pasan también a `europe-west1`
+  (2026-10-13, pendiente de deploy): `us-central1` nunca fue obligatorio.
 - **`rateLimits` inaccesible desde cliente** (deny-all en `firebase.rules:82-85`).
 - **Sin supuestos de emulador en código shipped.**
 - **robots.txt, sitemap y legales** (aviso legal, privacidad, cookies) presentes.

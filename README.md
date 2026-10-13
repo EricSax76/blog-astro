@@ -11,9 +11,10 @@ Hosting, proyecto `el-alma-de-las-flores-blog`). Pendientes de lanzamiento en
 
 - **Astro 7** con salida **estática** (`output: "static"`, sin SSR). Todo el
   contenido dinámico se carga en el navegador contra Firebase.
-- **Firebase:** Auth (email/contraseña y Google), Firestore, Storage y Cloud
-  Functions (7 callables en `europe-west1` y 2 triggers de Auth en
-  `us-central1`). **App Check** (reCAPTCHA v3) obligatorio.
+- **Firebase:** Auth (email/contraseña y Google), Firestore y Storage (en
+  `europe-southwest1`, Madrid) y Cloud Functions (todas en `europe-west1`:
+  7 callables gen2 y 2 triggers de Auth gen1). **App Check** (reCAPTCHA v3)
+  obligatorio.
 - **Tailwind v4** (`@tailwindcss/vite`), fuentes autoalojadas con `@fontsource`.
 - **Three.js** (`CSS3DRenderer`), solo para el camino 3D de la portada; se
   carga bajo demanda.
