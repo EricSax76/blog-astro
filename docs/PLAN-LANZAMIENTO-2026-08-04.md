@@ -291,6 +291,17 @@ abiertos están actualizadas. Procedimientos (deploy, rollback, backups):
 
 - [ ] ⚪ **ESLint de functions EOL**: `eslint@8` (EOL oct-2024) +
   `@typescript-eslint@5` (no soporta TS 5.9). Subir a ESLint 9 + typescript-eslint 8.
+  Desde 2026-10 bloquea además el paso `npm audit` de CI en `functions/`:
+  sus dependencias de desarrollo suman 9 avisos altos (`braces`,
+  `micromatch`… vía `@typescript-eslint` v5). Producción: 0.
+
+- [ ] ⚪ **Retirar el override de `@grpc/grpc-js` en el `package.json` raíz.**
+  Añadido 2026-10-13 (`"@grpc/grpc-js": "^1.14.6"`): `@firebase/firestore`
+  fija `~1.9.0`, incluso en 4.18.0, y las versiones <1.13.6 tienen 2 avisos
+  altos (lado servidor de gRPC). En el navegador no se usa: el build
+  (`dist/`) sale idéntico con y sin el override. Quitarlo cuando
+  `@firebase/firestore` suba su rango; comprobar con
+  `npm view @firebase/firestore dependencies`.
 
 - [x] ⚪ **Revisar dependencia `three`.**
   ✅ Resuelto 2026-08-26: se mantiene. La usa el camino 3D de la portada
