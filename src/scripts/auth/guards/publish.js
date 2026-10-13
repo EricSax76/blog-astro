@@ -55,7 +55,7 @@ if (typeof window !== "undefined") {
 
     if (lockedMessage && !isAuthenticated) {
       lockedMessage.innerHTML =
-        'Inicia sesión para escribir y publicar en el cuaderno. <a href="/#login" class="font-semibold underline underline-offset-2">Acceder</a>';
+        'Inicia sesión para escribir y publicar en el cuaderno. <a href="/acceder" class="font-semibold underline underline-offset-2">Acceder</a>';
     }
 
     if (authEmail) {
@@ -103,7 +103,7 @@ if (typeof window !== "undefined") {
             await signOut(auth).catch((error) => {
               console.error("[publish/logout] failed", error);
             });
-            window.location.assign("/#login");
+            window.location.assign("/acceder");
           });
         }
 
@@ -129,7 +129,7 @@ if (typeof window !== "undefined") {
               setAuthState(false);
               if (lockedMessage) {
                 lockedMessage.innerHTML =
-                  'Tu sesión está activa, pero no se pudo validar tu perfil. Vuelve a intentar. <a href="/#login" class="underline font-semibold">Volver</a>';
+                  'Tu sesión está activa, pero no se pudo validar tu perfil. Vuelve a intentar. <a href="/acceder" class="underline font-semibold">Volver</a>';
               }
             });
         });
