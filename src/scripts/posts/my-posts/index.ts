@@ -1,3 +1,8 @@
+// /mis-publicaciones: orquesta sesión, carga paginada y estados de la UI.
+// firebase.ts consulta Firestore, mappers.ts normaliza los documentos y
+// ui.ts pinta tarjetas y estados (carga, vacío, error, sin sesión).
+// loadSequence descarta las respuestas de una carga anterior si la sesión
+// cambia mientras carga.
 import { fetchMyPosts, hasValidFirebaseConfig, observeMyPostsAuth } from "./firebase";
 import { createMyPostsUi } from "./ui";
 

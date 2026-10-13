@@ -1,3 +1,8 @@
+// Acceso a Firebase de /mis-publicaciones: sesión (onAuthStateChanged) y
+// posts del usuario (authorUid == uid, createdAt desc) en páginas de 20 con
+// cursor. Usa el índice compuesto posts (authorUid, createdAt desc) de
+// firestore.indexes.json; si faltara, degrada a una consulta sin orden ni
+// paginación.
 import { isMissingIndexError, mapSnapshotToPosts } from "./mappers";
 import type { LoadedPost } from "./types";
 import { getFirebaseApp, hasValidFirebaseConfig } from "../../core/firebase-client";

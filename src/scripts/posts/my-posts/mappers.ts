@@ -1,3 +1,6 @@
+// Normaliza documentos de posts a LoadedPost. La fecha sale de createdAt
+// (Timestamp) o, si falta, de createdAtMs. Ordenar en cliente cubre la
+// consulta degradada sin índice, que llega sin orden.
 import type { LoadedPost, SnapshotLike } from "./types";
 
 const resolvePostDate = (rawData: Record<string, unknown>): Date | null => {

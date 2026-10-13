@@ -1,3 +1,8 @@
+// Desplegable «Contenido» del header de escritorio (HeaderContentDropdown).
+// Patrón de menú ARIA: aria-expanded en el botón, flechas/Inicio/Fin para
+// moverse entre [role="menuitem"], Escape cierra y devuelve el foco, Tab
+// cierra sin devolverlo. También se abre al pasar el ratón por el contenedor
+// .group.
 const MENU_ITEM_SELECTOR = '[role="menuitem"]';
 
 export const initHeaderContentDropdown = (): void => {

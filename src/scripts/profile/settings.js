@@ -1,3 +1,17 @@
+// Mi perfil (/mi-perfil): datos de la cuenta, avatar y derechos RGPD.
+//
+// - Carga: lee users/{uid} (las reglas solo lo permiten al dueño) para
+//   nombre, rol y fecha de alta. Sin sesión redirige a /acceder.
+// - Guardar: sube el avatar a users/{uid}/avatar/{ts}-{nombre} (raster,
+//   < 5 MB, igual que storage.rules), actualiza displayName/photoURL en el
+//   perfil de Auth y sincroniza displayName con la callable
+//   upsertUserProfile. La foto vive en Auth, no en Firestore, y el avatar
+//   anterior no se borra.
+// - Exportar (art. 20): callable exportUserData → descarga
+//   mis-datos-{uid}.json.
+// - Eliminar cuenta (art. 17): callable deleteUserData, que solo borra la
+//   cuenta de Auth; el trigger cleanupOnUserDeleted elimina después todos
+//   los datos. Aquí solo se cierra sesión y se limpia el espejo de sesión.
 import { getFirebaseApp, hasValidFirebaseConfig } from "../core/firebase-client";
 
 if (typeof window !== "undefined") {

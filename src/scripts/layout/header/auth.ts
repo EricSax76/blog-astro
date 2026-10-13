@@ -1,3 +1,16 @@
+// Sesión en el header (escritorio y móvil): enlaces de invitado o menú de
+// perfil con avatar, y logout.
+//
+// Para pintar no carga Firebase: lee el espejo de sesión de la UI
+// (window.__BLOG_AUTH_STATE__, que Layout.astro inicializa desde
+// localStorage "blog-auth-state"), así el header sale correcto desde el
+// primer frame. Se actualiza con el evento "blog-auth-changed", que emiten
+// los scripts de página al cambiar la sesión, y con "storage" (otras
+// pestañas). El espejo no contiene tokens: es solo presentación; la sesión
+// real es la del SDK de Auth y cada callable verifica el token.
+//
+// El logout sí importa firebase/auth bajo demanda, cierra sesión, difunde el
+// estado vacío y redirige a /acceder.
 import { AUTH_CHANGED_EVENT, AUTH_STATE_STORAGE_KEY } from "./constants";
 import { getFirebaseApp, hasValidFirebaseConfig } from "../../core/firebase-client";
 

@@ -1,3 +1,12 @@
+// Anuario por año (/archivo/{año}): carga de Firestore los posts con
+// year == data-year de #posts-grid (createdAt desc, páginas de 20 con
+// «Ver más») y los pinta clonando #yearbook-entry-template de
+// YearbookEntry.astro. Cada entrada lleva <blog-social-interactions> (likes
+// y comentarios) y el ancla #post-{id} a la que enlaza la portada.
+//
+// Omite los posts que ya están en la página ([data-post-id]). En modo
+// supplement (data-mode="supplement": el anuario 2017, que añade posts de
+// Firestore a uno estático) tampoco muestra el estado vacío.
 import "../social/interactions.js";
 import { getFirebaseApp, hasValidFirebaseConfig } from "../../core/firebase-client";
 

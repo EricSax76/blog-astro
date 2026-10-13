@@ -1,3 +1,16 @@
+// Acceso y alta de cuentas (/acceder y /registrate).
+//
+// - Alta con email: createUserWithEmailAndPassword → updateProfile(nombre)
+//   → callable upsertUserProfile({ displayName, username }), que crea
+//   users/{uid} con rol y username. Si este último paso falla, el trigger
+//   provisionUserProfile crea el perfil igualmente.
+// - Login con email o Google (popup): autentica y llama a upsertUserProfile
+//   para resincronizar el perfil.
+// - Tras el éxito redirige a /publicar (1,5 s después, para que el lector de
+//   pantalla anuncie el mensaje).
+// - Publica la sesión en el espejo de UI (ver layout/header/auth.ts).
+//
+// Las contraseñas solo van al SDK de Auth, nunca a funciones propias.
 import { getFirebaseApp, hasValidFirebaseConfig } from "../core/firebase-client";
 
 if (typeof window !== "undefined") {

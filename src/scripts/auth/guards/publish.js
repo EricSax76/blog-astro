@@ -1,3 +1,11 @@
+// Guard del editor (/publicar). Los controles [data-publish-control] solo se
+// habilitan cuando hay sesión Y la callable upsertUserProfile responde bien,
+// para que el perfil del que publishPost toma el nombre de autor esté
+// sincronizado antes de publicar. Sin sesión, o si la sincronización falla,
+// el formulario queda deshabilitado con su aviso. También mantiene el espejo
+// de sesión de la UI (ver layout/header/auth.ts).
+//
+// La publicación en sí está en posts/publish/editor.ts.
 import { getFirebaseApp, hasValidFirebaseConfig } from "../../core/firebase-client";
 
 if (typeof window !== "undefined") {

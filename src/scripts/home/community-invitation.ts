@@ -1,3 +1,6 @@
+// CTA de la invitación de la portada: sin sesión lleva a /registrate y con
+// sesión a /publicar. Lee el espejo de sesión de la UI (ver
+// layout/header/auth.ts), sin cargar Firebase.
 import {
   AUTH_CHANGED_EVENT,
   AUTH_STATE_STORAGE_KEY,

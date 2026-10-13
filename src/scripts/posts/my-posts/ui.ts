@@ -1,3 +1,7 @@
+// Pintado de /mis-publicaciones: tarjetas de solo lectura (no hay edición
+// ni borrado de posts en la UI) y tarjetas de estado definidas en
+// _views/author/mis-publicaciones.astro. El texto de usuario va siempre por
+// textContent.
 import type { LoadedPost } from "./types";
 
 type UiElements = {

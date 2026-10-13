@@ -1,4 +1,14 @@
 
+// Editor de entradas (/publicar).
+//
+// Flujo: validación en cliente (mismos tipos y tamaño que storage.rules y
+// publishPost) → subida de la imagen a blog/posts/{uid}/{ts}-{nombre} →
+// callable publishPost({ title, content, imagePath }) → redirección al
+// anuario del año que devuelve el servidor.
+//
+// Solo se envía la RUTA de Storage: publishPost comprueba propiedad,
+// existencia y tipo, y deriva él la URL pública. Que el formulario esté
+// habilitado según la sesión lo decide auth/guards/publish.js.
 import { getFirebaseApp, hasValidFirebaseConfig } from "../../core/firebase-client";
 
 export {};
