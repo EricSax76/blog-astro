@@ -94,8 +94,7 @@ const createPostCard = (post: LoadedPost): HTMLElement => {
   }
 
   const content = document.createElement("div");
-  content.className =
-    "prose mt-5 max-w-none text-deep-green/80 prose-p:my-2 prose-p:leading-7";
+  content.className = "mt-5 space-y-2 leading-7 text-deep-green/80";
 
   const paragraphs = post.content
     .split(/\n+/)

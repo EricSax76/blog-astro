@@ -125,7 +125,10 @@ UI** de la sesión:
 ### Estilos y fuentes
 
 - Tailwind v4: tokens (colores papel/tinta/musgo/polen/pétalo, duraciones) en
-  el bloque `@theme` de `src/styles/global.css`.
+  el bloque `@theme` de `src/styles/global.css`. No hay `tailwind.config.*`:
+  v4 no lo carga salvo con `@config`, así que la configuración vive en CSS.
+  Tampoco hay plugin `typography`: los textos largos se maquetan con
+  utilidades.
 - Fuentes autoalojadas con `@fontsource` (Cormorant Garamond, Red Hat Text):
   ninguna petición a terceros, compatible con la CSP (`font-src 'self'`).
 
@@ -342,8 +345,5 @@ Lista de trabajo detallada en [`PLAN-LANZAMIENTO`](PLAN-LANZAMIENTO-2026-08-04.m
 - **No se exige `email_verified`** para publicar ni comentar.
 - **CSP con `script-src 'unsafe-inline'`**, necesario por el bloque
   `is:inline` de `Layout.astro`.
-- **`tailwind.config.mjs` no se carga:** Tailwind v4 solo lo leería con
-  `@config` en `global.css`. Las clases `prose` (plugin `typography`) no
-  tienen efecto.
 - **`maxInstances: 10`** global: tope de gasto, pero también techo de
   concurrencia por función.
