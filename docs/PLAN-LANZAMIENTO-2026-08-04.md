@@ -289,11 +289,17 @@ abiertos están actualizadas. Procedimientos (deploy, rollback, backups):
   de campos del atacante en el mensaje; `publishPost.ts:56-61` traga todos los errores
   de metadata como "imagen no existe" (enmascara fallos IAM/Storage en logs).
 
-- [ ] ⚪ **ESLint de functions EOL**: `eslint@8` (EOL oct-2024) +
+- [x] ⚪ **ESLint de functions EOL**: `eslint@8` (EOL oct-2024) +
   `@typescript-eslint@5` (no soporta TS 5.9). Subir a ESLint 9 + typescript-eslint 8.
-  Desde 2026-10 bloquea además el paso `npm audit` de CI en `functions/`:
-  sus dependencias de desarrollo suman 9 avisos altos (`braces`,
-  `micromatch`… vía `@typescript-eslint` v5). Producción: 0.
+  ✅ Hecho 2026-10-13:
+  - `functions/eslint.config.mjs` (flat config) sustituye a `.eslintrc.js` y
+    `tsconfig.dev.json`, con la misma política.
+  - Las reglas de `eslint-config-google` (sin mantenimiento) van copiadas en
+    línea; `require-jsdoc` pasa a `jsdoc/require-jsdoc`.
+  - `comma-dangle` en funciones queda en `ignore`, como se comportaba antes.
+  - `scripts/` sigue fuera del lint.
+  - `npm audit` de `functions/` pasa a 0 vulnerabilidades (antes 9 altas en
+    dependencias de desarrollo).
 
 - [ ] ⚪ **Retirar el override de `@grpc/grpc-js` en el `package.json` raíz.**
   Añadido 2026-10-13 (`"@grpc/grpc-js": "^1.14.6"`): `@firebase/firestore`
