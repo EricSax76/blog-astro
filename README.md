@@ -103,5 +103,5 @@ Opciones: `--overwrite`, `--years=2011,2012`,
 
 ## Más
 
-- Análisis y gaps pendientes: [`docs/ANALISIS-Y-GAPS.md`](docs/ANALISIS-Y-GAPS.md).
+- Índice de documentación: [`docs/README.md`](docs/README.md).
 - Docs de Astro: <https://docs.astro.build>.

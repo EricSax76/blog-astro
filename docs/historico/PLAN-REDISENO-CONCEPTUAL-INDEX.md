@@ -1,5 +1,14 @@
 # Plan de rediseño conceptual del index
 
+> 📜 **Documento histórico (2026-07-11, addendum 2026-08-26). No se actualiza.**
+> Las secciones 3–9 describen la portada «Herbario vivo» (brújula, atlas de
+> las 38 flores, biografía de Bach), que se extrajo el 2026-08-26 al
+> repositorio `flores-de-bach`. La conclusión «Three.js descartado y
+> desinstalado» de la Fase 2 ya no rige: `three` se reinstaló para el camino
+> 3D de la portada (ver el addendum final). `HomeLatestStories` y
+> `latest-stories.ts` pasaron a ser `HomeStoryPath` y `stories-feed.ts`.
+> Portada actual: [`ARQUITECTURA.md`](../ARQUITECTURA.md) § Portada.
+
 > Proyecto: **El Alma de las Flores**  
 > Fecha: 2026-07-11 · última actualización: 2026-07-11  
 > Estado: Fase 0 y Fase 1 implementadas; Fase 2 (spike 2.5D vs Three.js) cerrada — Three.js descartado, 2.5D es la implementación principal del hero.  

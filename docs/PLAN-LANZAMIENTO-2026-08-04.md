@@ -8,12 +8,17 @@ Firestore/Storage, cliente (XSS/auth), Cloud Functions e higiene de repo/operaci
 
 Leyenda severidad: 🔴 bloqueante · 🟠 alta · 🟡 media · ⚪ baja
 
+Última revisión contra el código: 2026-10-13. En los ítems cerrados, las
+referencias `fichero:línea` describen el código de su momento; en los
+abiertos están actualizadas. Procedimientos (deploy, rollback, backups):
+[`OPERACIONES.md`](OPERACIONES.md).
+
 ---
 
 ## Fase 0 — Bloqueantes de seguridad (antes de publicar)
 
 - [x] 🔴 **Rotar la clave de service account en GCP IAM.**
-  Pendiente desde 2026-06-16 (`docs/ANALISIS-Y-GAPS.md:49`, G1). La clave
+  Pendiente desde 2026-06-16 (`docs/historico/ANALISIS-Y-GAPS.md`, G1). La clave
   `el-alma-de-las-flores-blog-cdb7d0a9e656.json` vivió en el root del repo en disco
   (nunca commiteada); se movió a `~/.firebase-keys/` pero no se rotó.
   ✅ Hecho 2026-08-20: **revocadas sin reemplazo** las dos claves de usuario que
@@ -56,7 +61,8 @@ Leyenda severidad: 🔴 bloqueante · 🟠 alta · 🟡 media · ⚪ baja
     (`authorName` ya se calcula aparte, líneas 102-106 antes del cambio).
   - `functions/scripts/migrate-legacy-content.mjs` — quitado el campo, la opción
     y el flag `--author-email` del script de migración.
-  - `src/scripts/home/latest-stories.ts` y `src/scripts/posts/archive/yearbook.ts`
+  - `src/scripts/home/latest-stories.ts` (hoy `stories-feed.ts`) y
+    `src/scripts/posts/archive/yearbook.ts`
     — quitado el fallback a `authorEmail` en `resolveAuthorName` (redundante,
     `authorName` nunca viene vacío desde el servidor).
   - `functions/` compila limpio (`npm run build`).
@@ -131,7 +137,8 @@ Leyenda severidad: 🔴 bloqueante · 🟠 alta · 🟡 media · ⚪ baja
 - [x] 🟠 **Página 404.**
   ✅ Hecha 2026-08-04: `src/pages/404.astro` (Hosting sirve `404.html`
   automáticamente con salida estática). Enlaza a inicio y al anuario más
-  reciente (`NEWEST_ARCHIVE_YEAR` de `src/data/home-page.ts`).
+  reciente (`NEWEST_ARCHIVE_YEAR`, entonces en `src/data/home-page.ts`; hoy
+  en `src/data/archive.ts`).
   ✅ Desplegada 2026-08-04 (verificado: ruta inexistente devuelve HTTP 404).
 
 - [x] 🟠 **Guardar el deploy contra `.env` vacío.**
@@ -166,7 +173,7 @@ Leyenda severidad: 🔴 bloqueante · 🟠 alta · 🟡 media · ⚪ baja
   ✅ Hecho 2026-08-04: `functions/src/lib/callableOptions.ts` centraliza
   `CALLABLE_OPTIONS` (`enforceAppCheck` + `cors`) y los 7 callables lo usan.
   Origins: hosting `*.web.app` y `*.firebaseapp.com` + `localhost:*` (el dev
-  local llama a producción). **Pendiente: redeploy de functions.**
+  local llama a producción). ✅ Desplegado 2026-08-04 (~19:07 CEST).
 
 - [x] 🟠 **Operaciones sin límite en `exportUserData` / `deleteUserData`.**
   ✅ Hecho 2026-08-04:
@@ -187,7 +194,9 @@ Leyenda severidad: 🔴 bloqueante · 🟠 alta · 🟡 media · ⚪ baja
     2 comments + perfil; tras `deleteUserData`, el trigger dejó a cero
     Firestore (5 colecciones), Storage y la cuenta de Auth en <2 s.
     Script: dry-run reproducible, no versionado (scratchpad).
-  **Pendiente: redeploy de functions** (incluido en el redeploy ya pendiente).
+  ✅ Desplegado 2026-08-04 (verificado 2026-10-13 con `gcloud functions
+  describe`: `cleanupOnUserDeleted` con timeout 540 s y reintentos,
+  `exportUserData` con 120 s).
 
 - [x] 🟡 **CI: compilar y lintar `functions/`.**
   ✅ Hecho 2026-08-04: job `functions` en `.github/workflows/ci.yml`
@@ -203,18 +212,19 @@ Leyenda severidad: 🔴 bloqueante · 🟠 alta · 🟡 media · ⚪ baja
 ## Fase 2 — Calidad y pruebas (post-lanzamiento inmediato)
 
 - [ ] 🟠 **Tests: cobertura cero.**
-  Sin runner, sin archivos de test (`docs/ANALISIS-Y-GAPS.md:140-142`, G12).
-  `firebase-functions-test@^3.4.1` ya está en devDependencies sin usar.
+  Sin runner, sin archivos de test (`docs/historico/ANALISIS-Y-GAPS.md`, G12).
+  `firebase-functions-test` se desinstaló el 2026-08-04 (su peer exige
+  `firebase-admin` ≤13); reinstalarlo cuando soporte v14.
   Prioridad de cobertura: 1) reglas Firestore/Storage con emulador
   (`@firebase/rules-unit-testing`) — es la superficie de seguridad crítica;
   2) `publishPost` y `addComment` (validación, rate-limit); 3) sanitización cliente.
 
 - [ ] 🟠 **Sanitizar y validar campos de perfil.**
-  `upsertUserProfile.ts:39` (`displayName`) y `:48-56` (`username`) solo hacen
+  `upsertUserProfile.ts:39` (`displayName`) y `:49-57` (`username`) solo hacen
   `trim().substring(0,50)`: sin `stripHtml`, sin validación de charset, sin
   `requireAllowedKeys`. `provisionUserProfile.ts:33` copia `user.displayName`
   del Auth (controlado por cliente) **sin límite de longitud**. Ambos fluyen a
-  `authorName` de cada post/comment (`publishPost.ts:103`, `addComment.ts:85`).
+  `authorName` de cada post/comment (`publishPost.ts:106`, `addComment.ts:85`).
   Añadir también unicidad de `username`: hoy dos usuarios pueden reclamar la
   misma identidad visible (suplantación en UI).
 
@@ -226,19 +236,19 @@ Leyenda severidad: 🔴 bloqueante · 🟠 alta · 🟡 media · ⚪ baja
   email digest o SSR. Usar sanitizador real o escapar en el consumidor.
 
 - [ ] 🟡 **Validar IDs de documento contra `/^[A-Za-z0-9_-]{1,64}$/`.**
-  `postId` (`addComment.ts:57`, `toggleLike.ts:27`), `parentId`
-  (`addComment.ts:64-67`), `commentId` (`deleteComment.ts:27`) solo se comprueban
+  `postId` (`addComment.ts:38`, `toggleLike.ts:24`), `parentId`
+  (`addComment.ts:65-68`), `commentId` (`deleteComment.ts:24`) solo se comprueban
   no-vacíos. Un valor con `/` se interpreta como path en el Admin SDK
   (inyección de ruta; hoy sin fuga práctica, pero superficie sin manejar).
 
 - [ ] 🟡 **Datos huérfanos y moderación.**
   - Borrar un post no borra sus `comments`, `likes` ni la imagen de Storage;
-    `deleteComment.ts:38` borra un comentario padre sin sus replies;
+    `deleteComment.ts:39` borra un comentario padre sin sus replies;
     `deleteUserData`/`cleanupOnUserDeleted` no tocan comments/likes ajenos sobre
     posts borrados. Datos huérfanos públicos y coste acumulado.
   - No hay vía de moderación: el autor de un post no puede borrar comentarios
     abusivos en su propio post; no existe rol admin efectivo (el campo `role`
-    escrito en `upsertUserProfile.ts:45` nunca se lee).
+    escrito en `upsertUserProfile.ts:46` nunca se lee).
 
 - [ ] 🟡 **Exigir `email_verified` para publicar/comentar.**
   Ningún callable lo comprueba: una cuenta email/password sin verificar puede
@@ -251,15 +261,18 @@ Leyenda severidad: 🔴 bloqueante · 🟠 alta · 🟡 media · ⚪ baja
   defensa en profundidad barata: `new URL()` + allowlist `https:` en cliente y regla.
 
 - [ ] 🟡 **CSP: eliminar `script-src 'unsafe-inline'`.**
-  `firebase.json:33`. Lo exige el bloque `is:inline` de `Layout.astro:89`.
+  `firebase.json:33`. Lo exige el bloque `is:inline` de `Layout.astro:116`.
   Es el mejor backstop contra cualquier inyección futura. Opciones: mover el config
   a script procesado con hash/nonce, o `sha256-…` del bloque inline en la CSP.
 
-- [ ] 🟡 **Sitemap: años hardcodeados.**
-  `src/pages/sitemap.xml.ts:6` fija `[2026, 2017, …]` mientras `archivo/[year].astro`
-  genera años dinámicamente → 2027 quedará fuera y nadie lo recordará.
-  Derivar años de la misma fuente. Añadir `<lastmod>`. Unificar la constante `SITE`
-  (duplicada en `sitemap.xml.ts:4`, `astro.config.mjs:11`, `public/robots.txt:8`).
+- [~] 🟡 **Sitemap: años hardcodeados.**
+  Parcial (2026-08-26): sitemap, header, portada y 404 leen `ARCHIVE_YEARS`
+  de `src/data/archive.ts` (fuente única). Pero esa lista es manual, mientras
+  `archivo/[year].astro` genera 2018 → año del build + 1: 2027 no entrará en
+  el sitemap ni en el header hasta añadirlo a mano (tarea anual en
+  `OPERACIONES.md` §9). Falta: derivar los años de una sola fuente, añadir
+  `<lastmod>` y unificar la constante `SITE` (duplicada en `sitemap.xml.ts:4`,
+  `astro.config.mjs:11`, `public/robots.txt:8`).
 
 - [ ] ⚪ **Validar `result.data.year` antes de `window.location.href` en
   `src/scripts/posts/publish/editor.ts:260`** (tipado `number`, nunca comprobado).
@@ -269,37 +282,45 @@ Leyenda severidad: 🔴 bloqueante · 🟠 alta · 🟡 media · ⚪ baja
   se cobra cuota antes de validar el payload (cliente con bug agota su propia cuota);
   `likes` es de lectura pública y expone el grafo de likes por usuario.
 
-- [ ] ⚪ **Limitar profundidad de replies en `addComment`** (`addComment.ts:64-80`
+- [ ] ⚪ **Limitar profundidad de replies en `addComment`** (`addComment.ts:65-81`
   valida padre y post, no profundidad; la UI solo renderiza 2 niveles).
 
 - [ ] ⚪ **Detalles de manejo de errores**: `validation.ts:34-39` refleja nombres
-  de campos del atacante en el mensaje; `publishPost.ts:58` traga todos los errores
+  de campos del atacante en el mensaje; `publishPost.ts:56-61` traga todos los errores
   de metadata como "imagen no existe" (enmascara fallos IAM/Storage en logs).
 
 - [ ] ⚪ **ESLint de functions EOL**: `eslint@8` (EOL oct-2024) +
   `@typescript-eslint@5` (no soporta TS 5.9). Subir a ESLint 9 + typescript-eslint 8.
 
-- [ ] ⚪ **Revisar dependencia `three`.**
-  `package.json` mantiene `three` + `@types/three` aunque
-  `docs/PLAN-REDISENO-CONCEPTUAL-INDEX.md:330` la da por desinstalada.
-  Confirmar si `src/scripts/flowers/bach-garden.ts` la usa; si no, eliminar.
+- [x] ⚪ **Revisar dependencia `three`.**
+  ✅ Resuelto 2026-08-26: se mantiene. La usa el camino 3D de la portada
+  (`src/scripts/home/story-path.ts`, import dinámico de `three` +
+  `CSS3DRenderer`). `bach-garden.ts` se fue con el sitio Bach al repositorio
+  `flores-de-bach`.
 
 - [x] ⚪ **`functions/.gitignore`: cambiar `lib/**/*.js` por `lib/`.**
   ✅ Hecho 2026-08-04.
 
 ## Fase 3 — Proceso y documentación
 
-- [ ] 🟡 **Runbook de deploy y rollback.**
-  Hoy: deploy manual desde portátil (`README.md:76-78`), sin CD, sin checklist.
-  Documentar: orden de deploy (rules → functions → hosting), verificación post-deploy,
-  rollback (`firebase hosting:rollback`, redeploy de functions anterior).
-  Valorar CD con GitHub Actions + Workload Identity Federation (sin tokens de larga vida).
+- [x] 🟡 **Runbook de deploy y rollback.**
+  ✅ Hecho 2026-10-13: [`OPERACIONES.md`](OPERACIONES.md) documenta el orden
+  de deploy (reglas → functions → hosting), la verificación posterior (smoke
+  test), el rollback por pieza y la restauración de Firestore. Nota: el
+  rollback de Hosting se hace desde la consola; `firebase-tools` 15 no tiene
+  `hosting:rollback`.
 
-- [ ] 🟡 **Corregir documentación obsoleta:**
-  - `docs/AUDITORIA-GENERAL-2026-07-09.md:146-169` (M1, SSR) — resuelto por `astro.config.mjs:12`.
-  - `docs/AUDITORIA-GENERAL-2026-07-09.md:171-181` (M2, sin CSP) — resuelto por `firebase.json:32-41`.
-  - `docs/AUDITORIA-GENERAL-2026-07-09.md:130-142` (A5) — conteos de vulns desfasados.
-  - `docs/ANALISIS-Y-GAPS.md:182-192` — resumen de estado contradice el cuerpo (G11/G15/G16).
+- [ ] 🟡 **CD (despliegue automático).**
+  Hoy el deploy es manual desde local. Valorar CD con GitHub Actions +
+  Workload Identity Federation (sin tokens de larga vida).
+
+- [x] 🟡 **Corregir documentación obsoleta.**
+  ✅ Hecho 2026-10-13: nuevos
+  [`ARQUITECTURA.md`](ARQUITECTURA.md) y [`OPERACIONES.md`](OPERACIONES.md);
+  `ANALISIS-Y-GAPS`, `AUDITORIA-GENERAL` y `PLAN-REDISENO-CONCEPTUAL-INDEX`
+  movidos a `docs/historico/` con un aviso de qué está desfasado (M1 SSR,
+  M2 CSP, conteos de A5, resumen G11/G15/G16, Three.js). Índice en
+  [`docs/README.md`](README.md).
 
 - [ ] ⚪ **Dominio propio (si se adopta):** actualizar coordinadamente
   `astro.config.mjs:11`, `sitemap.xml.ts:4` y `robots.txt:8` (hoy `*.web.app`).
@@ -330,7 +351,7 @@ Leyenda severidad: 🔴 bloqueante · 🟠 alta · 🟡 media · ⚪ baja
   (título 120, contenido 10000, comentario 1000).
 - **Imagen de post bien resuelta**: path regex-pinned a `blog/posts/{uid}/`,
   verificación de existencia + contentType raster en bucket, URL derivada en
-  servidor (`publishPost.ts:37-69`).
+  servidor (`publishPost.ts:38-71`).
 - **Ownership en borrados**: `deleteComment` compara `authorId` con el token;
   like keyed `${postId}_${uid}` con contador en la misma transacción (sin drift).
 - **Errores sin fugas**: `HttpsError` con texto seguro en castellano; lo demás
@@ -340,7 +361,7 @@ Leyenda severidad: 🔴 bloqueante · 🟠 alta · 🟡 media · ⚪ baja
   en gen1 — corregido 2026-08-04).
 - **Regiones coherentes**: `europe-west1` global, cliente y CSP `connect-src`
   alineados; triggers Auth gen1 en `us-central1` (obligatorio).
-- **`rateLimits` inaccesible desde cliente** (deny-all en `firebase.rules:86-88`).
+- **`rateLimits` inaccesible desde cliente** (deny-all en `firebase.rules:82-85`).
 - **Sin supuestos de emulador en código shipped.**
 - **robots.txt, sitemap y legales** (aviso legal, privacidad, cookies) presentes.
 
@@ -352,10 +373,13 @@ Leyenda severidad: 🔴 bloqueante · 🟠 alta · 🟡 media · ⚪ baja
    desplegadas 2026-08-04. Falta smoke test en app real.
 2. Quitar `authorEmail` de posts (✅ código desplegado) + purga de documentos
    existentes (RGPD) — **pendiente, requiere confirmación**.
-3. ✅ Node 22 (desplegado) + `firebase-admin@14.2.0` + `npm audit fix` en ambos
-   package.json — crítica y altas resueltas; falta redeploy de functions.
+3. ✅ Node 22 + `firebase-admin@14.2.0` + `npm audit fix` en ambos
+   package.json — crítica y altas resueltas; desplegado 2026-08-04.
 4. ✅ Consola GCP: rotar clave SA · App Check enforce (Firestore+Storage)
    · PITR/backups · budget alert · TTL de `rateLimits` — todo hecho a 2026-08-20.
-5. Fase 1 código: ✅ 404 · ✅ guard de `.env` · ✅ CORS · ✅ CI functions+audit.
-   Falta: límites en export/delete (único 🟠 de código abierto en Fase 1).
-6. Fase 2 y 3 según ritmo, empezando por tests de reglas con emulador.
+5. ✅ Fase 1 completa y desplegada: 404 · guard de `.env` · CORS · límites en
+   export/delete · CI functions+audit.
+6. Fase 2 y CD (Fase 3) según ritmo, empezando por tests de reglas con
+   emulador. Al hacer el smoke test, confirmar que la consulta de
+   comentarios (`createdAt` descendente) funciona con el índice declarado
+   `comments (postId ↑, createdAt ↑)` (ver `ARQUITECTURA.md` §4).

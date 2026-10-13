@@ -1,5 +1,13 @@
 # El Alma de las Flores — Análisis del proyecto y gaps
 
+> 📜 **Documento histórico (2026-06-16). No se actualiza.**
+> Describe una arquitectura que ya no existe: SSR con `@astrojs/node`, SDK de
+> Firebase por CDN y la función `registerUser`. Hoy el sitio es estático
+> (Astro 7) y usa el paquete npm de `firebase`. El resumen de §3 «Estado»
+> contradice al cuerpo (G15 y G16 están hechos). Referencia vigente:
+> [`ARQUITECTURA.md`](../ARQUITECTURA.md) y
+> [`PLAN-LANZAMIENTO`](../PLAN-LANZAMIENTO-2026-08-04.md).
+
 > Documento de diagnóstico. Fecha: 2026-06-16. Estado: blog en Astro (SSR) + Firebase.
 > Objetivo: vista general de la arquitectura, inventario de gaps y plan de trabajo priorizado.
 > Actualización 2026-06-16: ejecutados G1–G3, G6–G10, G13/G14, G17/G18 (ver §3 Estado).

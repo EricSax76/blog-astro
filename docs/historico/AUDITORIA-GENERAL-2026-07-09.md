@@ -1,5 +1,12 @@
 # Auditoria general - Astro + Firebase
 
+> 📜 **Documento histórico (2026-07-09). No se actualiza.**
+> Fue la base del plan de fases. Los hallazgos de seguridad (A1–A5) y de
+> despliegue (M1 SSR, M2 CSP) están resueltos, y los conteos de
+> vulnerabilidades están desfasados. Estado vigente:
+> [`PLAN-LANZAMIENTO`](../PLAN-LANZAMIENTO-2026-08-04.md); referencia técnica:
+> [`ARQUITECTURA.md`](../ARQUITECTURA.md).
+
 Fecha: 2026-07-09  
 Alcance: rendimiento, UX/UI, reglas Firebase, Cloud Functions y dependencias.
 
