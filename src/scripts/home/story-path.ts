@@ -1,22 +1,26 @@
 // «El camino del cuaderno»: las últimas publicaciones dispuestas a lo largo
 // de un sendero en profundidad. Las tarjetas son DOM real (texto
 // seleccionable, enlaces, foco de teclado); Three.js solo las posiciona
-// con CSS3DRenderer. El scroll nativo de la página es la cámara: no se
-// secuestra la rueda ni se bloquea nada.
+// con CSS3DRenderer. El visor es un bloque de altura normal que se recorre
+// por paradas (botones, flechas, deslizar o gesto horizontal del
+// trackpad): el scroll vertical de la página nunca queda atrapado.
 //
 // Mejora progresiva:
 //  1. Las tarjetas se pintan siempre primero en una rejilla 2D.
 //  2. Si hay movimiento permitido, IntersectionObserver y al menos dos
 //     entradas, se cargan Three.js + CSS3DRenderer y las mismas tarjetas
 //     pasan a la escena. Cualquier fallo deja la rejilla tal cual.
+//
+// Las primeras entradas ya las enseña el hero: el camino empieza después.
 import {
+  HERO_STORY_COUNT,
+  HOME_STORY_COUNT,
   formatDate,
   loadLatestStories,
   storyHref,
   type LoadedStory,
 } from "./stories-feed";
 
-const STORY_COUNT = 12;
 const MIN_STORIES_FOR_PATH = 2;
 
 // Geometría relativa a la distancia focal. La distancia focal se fija igual
@@ -31,7 +35,9 @@ const FAR_END_RATIO = 2.8; // lado lejano: transparente
 const CARD_MAX_WIDTH = 400; // px, a escala 1
 const CARD_MARGIN = 24; // px, aire entre tarjeta y borde del visor
 const LATERAL_MAX = 300; // px, amplitud máxima del serpenteo
-const SCROLL_PER_STOP = 0.85; // alto del visor que hay que desplazar por parada
+const SWIPE_THRESHOLD = 48; // px de desplazamiento táctil para cambiar de parada
+const WHEEL_STEP = 60; // deltaX acumulado del trackpad por parada
+const WHEEL_COOLDOWN_MS = 450; // un gesto de inercia no salta varias paradas
 const PARALLAX = 46; // desplazamiento máximo de cámara con el puntero
 const EASE = 0.11;
 
@@ -42,8 +48,9 @@ const stage = document.getElementById("story-path-stage");
 const sceneHost = document.getElementById("story-path-scene");
 const counter = document.getElementById("story-path-counter");
 const hint = document.getElementById("story-path-hint");
+const prevButton = document.getElementById("story-path-prev") as HTMLButtonElement | null;
+const nextButton = document.getElementById("story-path-next") as HTMLButtonElement | null;
 const loadingState = document.getElementById("story-path-loading");
-const emptyState = document.getElementById("story-path-empty");
 
 const newestYear = Number(root?.dataset.newestYear) || new Date().getFullYear();
 
@@ -82,7 +89,8 @@ const buildStoryCard = (story: LoadedStory, index: number): HTMLElement => {
   meta.className =
     "flex items-baseline justify-between gap-3 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-moss-text";
   const number = document.createElement("span");
-  number.textContent = `Entrada ${String(index + 1).padStart(2, "0")}`;
+  // Numeración continua con el hero (01 destacada, 02–04 recientes).
+  number.textContent = `Entrada ${String(index + 1 + HERO_STORY_COUNT).padStart(2, "0")}`;
   const date = document.createElement("span");
   date.textContent = formatDate(story.createdAt);
   meta.append(number, date);
@@ -207,29 +215,8 @@ const activatePath = async (cards: HTMLElement[]): Promise<boolean> => {
   grid.classList.add("hidden");
   track.classList.remove("hidden");
 
-  // --- Geometría del scroll ------------------------------------------------
-  let trackTop = 0;
-  let scrollRange = 1;
-
-  const measure = () => {
-    const stageHeight = stage.clientHeight;
-    const stageWidth = stage.clientWidth;
-    focus = stageHeight / 2 / Math.tan((CAMERA_FOV / 2) * (Math.PI / 180));
-    spacing = focus * SPACING_RATIO;
-    track.style.height = `${stageHeight + lastIndex * stageHeight * SCROLL_PER_STOP}px`;
-    trackTop = track.getBoundingClientRect().top + window.scrollY;
-    scrollRange = Math.max(1, track.offsetHeight - stageHeight);
-    renderer.setSize(stageWidth, stageHeight);
-    camera.aspect = stageWidth / stageHeight;
-    camera.updateProjectionMatrix();
-    layout();
-    dirty = true;
-  };
-
-  const progressFromScroll = () =>
-    clamp01((window.scrollY - trackTop) / scrollRange);
-
   // --- Estado animado -------------------------------------------------------
+  let targetIndex = 0; // parada hacia la que viaja la cámara
   let currentZ = focus;
   let pointerX = 0;
   let pointerY = 0;
@@ -240,7 +227,22 @@ const activatePath = async (cards: HTMLElement[]): Promise<boolean> => {
   let frame = 0;
   let dirty = true; // hay que volver a pintar (cámara o puntero en movimiento)
 
-  const targetZ = () => focus - progressFromScroll() * lastIndex * spacing;
+  const targetZ = () => focus - targetIndex * spacing;
+
+  const measure = () => {
+    const stageHeight = stage.clientHeight;
+    const stageWidth = stage.clientWidth;
+    focus = stageHeight / 2 / Math.tan((CAMERA_FOV / 2) * (Math.PI / 180));
+    spacing = focus * SPACING_RATIO;
+    renderer.setSize(stageWidth, stageHeight);
+    camera.aspect = stageWidth / stageHeight;
+    camera.updateProjectionMatrix();
+    layout();
+    // La geometría cambia con el tamaño: la cámara salta a su parada en vez
+    // de viajar desde una posición que ya no significa nada.
+    currentZ = targetZ();
+    dirty = true;
+  };
 
   const applyDepth = () => {
     let nearest = -1;
@@ -272,7 +274,6 @@ const activatePath = async (cards: HTMLElement[]): Promise<boolean> => {
             ? `${cards.length} / ${cards.length}`
             : `${Math.min(nearest + 1, cards.length)} / ${cards.length}`;
       }
-      hint?.classList.toggle("opacity-0", nearest > 0);
     }
   };
 
@@ -312,6 +313,100 @@ const activatePath = async (cards: HTMLElement[]): Promise<boolean> => {
     frame = 0;
   };
 
+  // --- Navegación -----------------------------------------------------------
+  const updateControls = () => {
+    if (prevButton) prevButton.disabled = targetIndex === 0;
+    if (nextButton) nextButton.disabled = targetIndex === lastIndex;
+  };
+
+  const goTo = (index: number) => {
+    const next = Math.min(lastIndex, Math.max(0, index));
+    if (next === targetIndex) return;
+    targetIndex = next;
+    updateControls();
+    hint?.classList.add("opacity-0");
+    dirty = true;
+  };
+
+  prevButton?.addEventListener("click", () => goTo(targetIndex - 1));
+  nextButton?.addEventListener("click", () => goTo(targetIndex + 1));
+
+  // Flechas laterales con el foco dentro del visor. Las verticales no se
+  // tocan: siguen desplazando la página.
+  track.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowRight") goTo(targetIndex + 1);
+    else if (event.key === "ArrowLeft") goTo(targetIndex - 1);
+    else return;
+    event.preventDefault();
+  });
+
+  // Teclado: al enfocar una tarjeta, la cámara viaja hasta su parada.
+  stops.forEach((element, index) => {
+    element.addEventListener("focusin", () => goTo(index));
+  });
+
+  // Tras deslizar, el «clic» que genera el dedo al levantarse no cuenta.
+  let suppressClick = false;
+
+  // Una tarjeta del fondo no abre su entrada al primer clic: la acerca.
+  sceneHost.addEventListener(
+    "click",
+    (event) => {
+      if (suppressClick) {
+        suppressClick = false;
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+      const card = (event.target as HTMLElement).closest<HTMLElement>(".story-card");
+      const index = card ? stops.indexOf(card) : -1;
+      if (index >= 0 && index !== targetIndex) {
+        event.preventDefault();
+        goTo(index);
+      }
+    },
+    { capture: true }
+  );
+
+  // Deslizar en táctil (solo horizontal: el gesto vertical sigue siendo
+  // scroll de página gracias a touch-action: pan-y en el visor).
+  let swipeStart: { x: number; y: number } | null = null;
+  stage.addEventListener("pointerdown", (event) => {
+    swipeStart = event.pointerType === "touch" ? { x: event.clientX, y: event.clientY } : null;
+  });
+  stage.addEventListener("pointerup", (event) => {
+    if (!swipeStart) return;
+    const dx = event.clientX - swipeStart.x;
+    const dy = event.clientY - swipeStart.y;
+    swipeStart = null;
+    if (Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      suppressClick = true;
+      goTo(targetIndex + (dx < 0 ? 1 : -1));
+    }
+  });
+  stage.addEventListener("pointercancel", () => (swipeStart = null));
+
+  // Gesto horizontal del trackpad: avanza por paradas. La rueda vertical no
+  // se intercepta nunca, así que la página se recorre sin pasar por el camino.
+  let wheelAccum = 0;
+  let wheelLockedUntil = 0;
+  stage.addEventListener(
+    "wheel",
+    (event) => {
+      if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
+      event.preventDefault();
+      const now = performance.now();
+      if (now < wheelLockedUntil) return;
+      wheelAccum += event.deltaX;
+      if (Math.abs(wheelAccum) > WHEEL_STEP) {
+        goTo(targetIndex + Math.sign(wheelAccum));
+        wheelAccum = 0;
+        wheelLockedUntil = now + WHEEL_COOLDOWN_MS;
+      }
+    },
+    { passive: false }
+  );
+
   // Solo anima mientras el visor está en pantalla.
   const visibility = new IntersectionObserver(
     (entries) => {
@@ -335,20 +430,11 @@ const activatePath = async (cards: HTMLElement[]): Promise<boolean> => {
     });
   }
 
-  // Teclado: al enfocar una tarjeta, la página se desplaza hasta su parada.
-  stops.forEach((element, index) => {
-    element.addEventListener("focusin", () => {
-      const top = trackTop + (index / lastIndex) * scrollRange;
-      window.scrollTo({ top, behavior: "smooth" });
-    });
-  });
-
   window.addEventListener("resize", measure, { passive: true });
   window.addEventListener("load", measure, { once: true });
 
   measure();
-  currentZ = targetZ();
-  dirty = true;
+  updateControls();
   if (track.getBoundingClientRect().bottom > 0) start();
   else render();
 
@@ -359,9 +445,10 @@ const activatePath = async (cards: HTMLElement[]): Promise<boolean> => {
 // Arranque
 // ---------------------------------------------------------------------------
 
-const showEmptyState = () => {
-  loadingState?.remove();
-  emptyState?.classList.remove("hidden");
+// Sin entradas más allá del hero (o si falla la carga) la sección sobra:
+// el hero ya muestra lo último o su invitación al archivo.
+const hideSection = () => {
+  root?.classList.add("hidden");
 };
 
 const init = async () => {
@@ -369,17 +456,17 @@ const init = async () => {
 
   let stories: LoadedStory[];
   try {
-    stories = await loadLatestStories(STORY_COUNT);
+    stories = (await loadLatestStories(HOME_STORY_COUNT)).slice(HERO_STORY_COUNT);
   } catch (error) {
     console.error("[home] no se pudieron cargar las publicaciones", error);
-    showEmptyState();
+    hideSection();
     return;
   }
 
   loadingState?.remove();
 
   if (stories.length === 0) {
-    showEmptyState();
+    hideSection();
     return;
   }
 

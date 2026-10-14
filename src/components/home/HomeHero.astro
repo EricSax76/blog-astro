@@ -1,61 +1,151 @@
 ---
-// Umbral de la portada del blog. Sin fotografía: el elemento visual es el
-// arco de años del cuaderno (2011 → hoy), en el mismo lenguaje tipográfico
-// que la cabecera del anuario (numerales grandes en serif).
+// Umbral de la portada, a modo de portada de revista: el título a un lado y,
+// al otro, la última entrada del cuaderno como pieza destacada; debajo, las
+// siguientes entradas recientes en índice. Las tarjetas las pinta
+// scripts/home/home-hero.ts; mientras tanto se ven esqueletos del mismo
+// tamaño para que la maquetación no salte.
 import { NEWEST_ARCHIVE_YEAR, OLDEST_ARCHIVE_YEAR } from "../../data/archive";
+
+const RECENT_SKELETONS = 3;
 ---
 
-<section
-  class="relative flex min-h-[80svh] items-center overflow-hidden bg-paper md:min-h-[88svh]"
->
-  <p
-    aria-hidden="true"
-    class="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 select-none whitespace-nowrap text-center font-serif font-bold leading-none tracking-tighter text-ink/[0.05]"
-    style="font-size: clamp(6rem, 19vw, 17rem);"
-  >
-    {`${OLDEST_ARCHIVE_YEAR} — ${NEWEST_ARCHIVE_YEAR}`}
-  </p>
-
+<section class="relative overflow-hidden bg-paper">
+  <!-- Halos cálidos: polen tras la pieza destacada, pétalo al pie. -->
   <div
-    class="relative z-10 mx-auto flex max-w-3xl flex-col items-start gap-6 px-6 py-24 md:px-12"
-    data-reveal
+    aria-hidden="true"
+    class="pointer-events-none absolute -right-48 -top-48 h-[44rem] w-[44rem] rounded-full bg-[radial-gradient(circle,rgb(217_164_65/0.16),transparent_65%)]"
   >
-    <p
-      class="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.35em] text-moss-text"
-    >
-      <span class="inline-block h-px w-10 bg-pollen" aria-hidden="true"></span>
-      El Alma de las Flores · Cuaderno de campo
-    </p>
-    <h1 class="font-serif text-4xl font-bold leading-tight text-ink md:text-6xl">
-      Lo que las flores nos hacen escribir
-    </h1>
-    <p class="max-w-xl text-lg leading-relaxed text-ink/75">
-      Un cuaderno colectivo sobre las Flores de Bach: experiencias, lecturas
-      y voces de quienes recorren este jardín, año tras año, desde{" "}
-      {OLDEST_ARCHIVE_YEAR}.
-    </p>
+  </div>
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute -left-56 top-8 h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,rgb(201_138_138/0.12),transparent_65%)]"
+  >
+  </div>
 
-    <div class="flex flex-wrap gap-3 pt-2">
-      <a
-        href={`/archivo/${NEWEST_ARCHIVE_YEAR}`}
-        class="rounded-full bg-ink px-6 py-3 font-semibold text-cream transition-colors hover:bg-ink/90"
+  <div class="relative mx-auto max-w-6xl px-6 pb-16 pt-14 md:px-12 md:pt-20 lg:pb-20">
+    <div class="grid items-center gap-14 lg:grid-cols-12 lg:gap-16">
+      <div class="flex flex-col items-start gap-6 lg:col-span-6" data-reveal>
+        <h1
+          class="font-serif text-5xl font-bold leading-[1.05] text-ink md:text-6xl lg:text-7xl"
+        >
+          Lo que las flores nos hacen escribir
+        </h1>
+        <p class="max-w-xl text-lg leading-relaxed text-ink/75">
+          Un cuaderno colectivo sobre las Flores de Bach: experiencias, lecturas
+          y voces de quienes recorren este jardín, año tras año, desde{" "}
+          {OLDEST_ARCHIVE_YEAR}.
+        </p>
+
+        <div class="flex flex-wrap gap-3 pt-2">
+          <a
+            href={`/archivo/${NEWEST_ARCHIVE_YEAR}`}
+            class="rounded-full bg-ink px-6 py-3 font-semibold text-cream transition-colors hover:bg-ink/90"
+          >
+            Leer el anuario {NEWEST_ARCHIVE_YEAR}
+          </a>
+          <a
+            href="/publicar"
+            class="rounded-full border border-moss/40 px-6 py-3 font-semibold text-ink transition-colors hover:bg-moss/10"
+          >
+            Escribir una entrada
+          </a>
+        </div>
+      </div>
+
+      <div class="lg:col-span-6" data-reveal>
+        <div class="relative">
+          <!-- Hojas del cuaderno asomando bajo la pieza destacada. -->
+          <div
+            aria-hidden="true"
+            class="absolute inset-0 translate-x-3 translate-y-3 rotate-[2.5deg] rounded-[2rem] border border-moss/15 bg-paper-dim"
+          >
+          </div>
+          <div
+            aria-hidden="true"
+            class="absolute inset-0 -rotate-[1.5deg] rounded-[2rem] border border-moss/10 bg-paper-dim/70"
+          >
+          </div>
+
+          <div id="hero-featured" class="relative" aria-live="polite" aria-busy="true">
+            <div
+              aria-hidden="true"
+              class="flex min-h-[26rem] animate-pulse flex-col gap-5 rounded-[2rem] border border-moss/20 bg-paper p-8 shadow-xl shadow-ink/10 md:p-10"
+            >
+              <div class="h-3 w-40 rounded-full bg-ink/10"></div>
+              <div class="h-9 w-4/5 rounded-xl bg-ink/10"></div>
+              <div class="space-y-3 pt-2">
+                <div class="h-4 w-full rounded-full bg-ink/5"></div>
+                <div class="h-4 w-11/12 rounded-full bg-ink/5"></div>
+                <div class="h-4 w-3/4 rounded-full bg-ink/5"></div>
+              </div>
+              <div class="mt-auto flex items-center gap-3">
+                <div class="h-10 w-10 rounded-full bg-ink/10"></div>
+                <div class="h-3 w-32 rounded-full bg-ink/10"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="hero-recent-block" class="mt-16 lg:mt-20" data-reveal>
+      <div class="flex items-center gap-4">
+        <p class="text-xs font-semibold uppercase tracking-[0.3em] text-moss-text">
+          Recién escrito
+        </p>
+        <span class="h-px flex-1 bg-moss/20" aria-hidden="true"></span>
+        <a
+          href={`/archivo/${NEWEST_ARCHIVE_YEAR}`}
+          class="text-sm font-semibold text-ink/70 transition-colors hover:text-ink"
+        >
+          Todo el anuario →
+        </a>
+      </div>
+
+      <ol
+        id="hero-recent"
+        class="mt-6 grid divide-y divide-moss/15 md:grid-cols-3 md:divide-x md:divide-y-0"
+        aria-live="polite"
       >
-        Leer el anuario {NEWEST_ARCHIVE_YEAR}
-      </a>
-      <a
-        href="#cuaderno-vivo"
-        class="rounded-full border border-moss/40 px-6 py-3 font-semibold text-ink transition-colors hover:bg-moss/10"
-      >
-        Últimas entradas
-      </a>
+        {
+          Array.from({ length: RECENT_SKELETONS }, () => (
+            <li
+              aria-hidden="true"
+              class="animate-pulse space-y-3 py-5 md:px-8 md:py-0 md:first:pl-0 md:last:pr-0"
+            >
+              <div class="h-6 w-24 rounded-full bg-ink/10" />
+              <div class="h-5 w-11/12 rounded-full bg-ink/10" />
+              <div class="h-3 w-28 rounded-full bg-ink/5" />
+            </li>
+          ))
+        }
+      </ol>
     </div>
   </div>
 
-  <a
-    href="#cuaderno-vivo"
-    class="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-ink/60 transition-colors hover:text-ink"
-  >
-    Desciende para leer
-    <span aria-hidden="true" class="text-lg leading-none">↓</span>
-  </a>
+  <!-- Si no hay entradas (o falla la carga), la pieza destacada invita al archivo. -->
+  <template id="hero-featured-fallback">
+    <article
+      class="flex min-h-[26rem] flex-col justify-center gap-5 rounded-[2rem] border border-moss/20 bg-paper p-8 shadow-xl shadow-ink/10 md:p-10"
+    >
+      <p class="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-moss-text">
+        Desde el archivo
+      </p>
+      <h2 class="font-serif text-3xl font-bold leading-tight text-ink md:text-4xl">
+        Cada año, un cuaderno
+      </h2>
+      <p class="max-w-md leading-relaxed text-ink/75">
+        Mientras llegan nuevas entradas, recorre los anuarios: cada uno guarda
+        las voces que florecieron ese año.
+      </p>
+      <a
+        href={`/archivo/${NEWEST_ARCHIVE_YEAR}`}
+        class="self-start rounded-full bg-ink px-6 py-3 font-semibold text-cream transition-colors hover:bg-ink/90"
+      >
+        Abrir el anuario {NEWEST_ARCHIVE_YEAR}
+      </a>
+    </article>
+  </template>
 </section>
+
+<script src="../../scripts/home/home-hero.ts"></script>

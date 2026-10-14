@@ -3,30 +3,37 @@
 
 <section class="mx-auto mt-24 max-w-4xl px-6 md:px-12" data-reveal>
   <div
-    class="flex flex-col items-center gap-5 rounded-[2rem] border border-moss/20 bg-paper-dim/60 p-8 text-center md:p-12"
+    class="relative flex flex-col items-center gap-5 overflow-hidden rounded-[2rem] border border-pollen/40 bg-ink p-8 text-center text-cream shadow-xl shadow-ink/20 md:p-14"
   >
-    <p class="text-xs font-semibold uppercase tracking-[0.3em] text-moss-text">
+    <!-- Brillo suave de luz sobre la tinta: el bloque de más contraste de la portada. -->
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute -left-40 -top-40 h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,rgb(243_240_230/0.12),transparent_65%)]"
+    >
+    </div>
+
+    <p class="relative text-xs font-semibold uppercase tracking-[0.3em] text-pollen">
       Comunidad
     </p>
-    <h2 class="font-serif text-3xl font-bold text-ink md:text-4xl">
+    <h2 class="relative font-serif text-3xl font-bold md:text-5xl">
       Añade tu voz al cuaderno
     </h2>
-    <p class="max-w-xl text-ink/75 leading-relaxed">
+    <p class="relative max-w-xl leading-relaxed text-cream/80">
       Este jardín crece con cada persona que comparte su experiencia con las
       flores de Bach. Regístrate y comienza a escribir tus propias entradas.
     </p>
 
-    <div class="flex flex-wrap items-center justify-center gap-4 pt-2">
+    <div class="relative flex flex-wrap items-center justify-center gap-4 pt-2">
       <a
         id="community-cta"
         href="/registrate"
-        class="rounded-full bg-ink px-6 py-3 font-semibold text-cream transition-colors hover:bg-ink/90"
+        class="rounded-full bg-cream px-6 py-3 font-semibold text-ink transition-colors hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-pollen focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
       >
         <span id="community-cta-label">Añade tu voz al cuaderno</span>
       </a>
       <a
         href="/acceder"
-        class="text-sm font-semibold text-ink/70 underline-offset-4 transition-colors hover:text-ink hover:underline"
+        class="text-sm font-semibold text-cream/75 underline-offset-4 transition-colors hover:text-cream hover:underline"
       >
         Acceder
       </a>

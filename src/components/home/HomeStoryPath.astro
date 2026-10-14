@@ -1,8 +1,9 @@
 ---
-// Cuaderno vivo: las últimas publicaciones. Se pintan primero en rejilla
+// Cuaderno vivo: las publicaciones recientes que siguen a las del hero
+// (que ya muestra la última y las siguientes). Se pintan primero en rejilla
 // (fallback y estado sin JS/movimiento) y, si es posible, pasan al camino 3D
-// (scripts/home/story-path.ts). El visor es un marco fijo; el scroll de la
-// página mueve la cámara.
+// (scripts/home/story-path.ts). El visor tiene altura normal y se recorre
+// por paradas: el scroll de la página pasa de largo sin quedar atrapado.
 interface Props {
   newestArchiveYear: number;
 }
@@ -22,7 +23,7 @@ const { newestArchiveYear } = Astro.props;
         Cuaderno vivo
       </p>
       <h2 class="font-serif text-3xl font-bold text-ink md:text-4xl">
-        Lo último que se ha escrito en el jardín
+        Sigue el sendero del cuaderno
       </h2>
     </div>
     <a
@@ -37,23 +38,6 @@ const { newestArchiveYear } = Astro.props;
     Cargando publicaciones recientes…
   </p>
 
-  <div
-    id="story-path-empty"
-    class="mt-10 hidden rounded-3xl border border-moss/15 bg-paper-dim/60 p-8 text-center"
-  >
-    <p class="font-serif text-xl font-bold text-ink">Del herbario</p>
-    <p class="mt-2 text-sm leading-relaxed text-ink/70">
-      Todavía no hay publicaciones nuevas. Mientras tanto, recorre el
-      <a
-        href={`/archivo/${newestArchiveYear}`}
-        class="font-semibold text-moss-text hover:text-ink"
-      >
-        anuario {newestArchiveYear}
-      </a>
-      para descubrir entradas del archivo.
-    </p>
-  </div>
-
   <!-- Rejilla 2D: siempre se rellena; es el punto de partida y el fallback. -->
   <div
     id="story-path-grid"
@@ -63,10 +47,12 @@ const { newestArchiveYear } = Astro.props;
   </div>
 
   <!-- Camino 3D: oculto hasta que story-path.ts lo activa. -->
-  <div id="story-path-track" class="relative mt-10 hidden">
+  <div id="story-path-track" class="mt-10 hidden">
+    <!-- overflow-clip (no hidden): el foco de teclado no puede desplazar el
+         visor por dentro y descolocar la escena. -->
     <div
       id="story-path-stage"
-      class="sticky top-24 h-[calc(100svh-7rem)] overflow-hidden rounded-[2rem] border border-moss/15 bg-paper-dim/50"
+      class="relative h-[min(72svh,38rem)] min-h-[28rem] touch-pan-y overflow-clip overscroll-x-contain rounded-[2rem] border border-moss/15 bg-paper-dim/50"
     >
       <div
         aria-hidden="true"
@@ -74,17 +60,39 @@ const { newestArchiveYear } = Astro.props;
       ></div>
       <div id="story-path-scene" class="absolute inset-0"></div>
       <div
-        class="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between px-6 pb-5 text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-moss-text"
+        class="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-between gap-4 px-5 pb-4 text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-moss-text md:px-6 md:pb-5"
       >
         <p id="story-path-counter" class="shrink-0 whitespace-nowrap" aria-live="polite">
           1 / 1
         </p>
         <p
           id="story-path-hint"
-          class="whitespace-nowrap text-right transition-opacity duration-500"
+          class="hidden whitespace-nowrap transition-opacity duration-500 sm:block"
         >
-          Desplázate para avanzar
+          Desliza o usa las flechas
         </p>
+        <div class="pointer-events-auto flex shrink-0 gap-2">
+          <button
+            id="story-path-prev"
+            type="button"
+            aria-label="Entrada anterior"
+            class="story-path-nav"
+          >
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4" aria-hidden="true">
+              <path d="M12.5 4.5 7 10l5.5 5.5"></path>
+            </svg>
+          </button>
+          <button
+            id="story-path-next"
+            type="button"
+            aria-label="Entrada siguiente"
+            class="story-path-nav"
+          >
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4" aria-hidden="true">
+              <path d="M7.5 4.5 13 10l-5.5 5.5"></path>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -109,6 +117,35 @@ const { newestArchiveYear } = Astro.props;
   #story-path-scene .story-card.is-focal {
     border-color: color-mix(in srgb, var(--color-pollen) 70%, transparent);
     box-shadow: 0 32px 60px -24px rgb(44 85 48 / 0.35);
+  }
+
+  .story-path-nav {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in srgb, var(--color-moss) 35%, transparent);
+    background: color-mix(in srgb, var(--color-paper) 92%, transparent);
+    color: var(--color-ink);
+    box-shadow: 0 6px 16px -10px rgb(44 85 48 / 0.4);
+    transition:
+      background-color var(--duration-hover) var(--ease-garden),
+      opacity var(--duration-hover) var(--ease-garden);
+  }
+
+  .story-path-nav:hover:not(:disabled) {
+    background: var(--color-paper);
+  }
+
+  .story-path-nav:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .story-path-nav:focus-visible {
+    outline: 2px solid var(--color-pollen);
+    outline-offset: 2px;
   }
 
   #story-path-scene .story-card:focus-within {

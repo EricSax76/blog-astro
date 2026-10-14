@@ -1,7 +1,12 @@
 // Carga de las últimas publicaciones desde Firestore para la portada.
-// Compartido por la rejilla 2D (fallback) y el camino 3D: ambos pintan
-// exactamente las mismas tarjetas; solo cambia quién las posiciona.
+// Una sola consulta compartida: el hero se queda con las primeras
+// (HERO_STORY_COUNT) y el camino del cuaderno pinta el resto.
 import { getFirebaseApp, hasValidFirebaseConfig } from "../core/firebase-client";
+
+/** Entradas que se piden para toda la portada. */
+export const HOME_STORY_COUNT = 16;
+/** Entradas que muestra el hero: la destacada y las recientes bajo ella. */
+export const HERO_STORY_COUNT = 4;
 
 export type LoadedStory = {
   id: string;
@@ -79,11 +84,7 @@ const mapSnapshotToStories = (snapshot: {
 export const storyHref = (story: LoadedStory): string =>
   story.year ? `/archivo/${story.year}#post-${story.id}` : "/archivo/2026";
 
-/**
- * Devuelve las últimas `count` publicaciones ordenadas de más reciente a
- * más antigua. Lanza si Firebase no está configurado o falla la consulta.
- */
-export const loadLatestStories = async (count: number): Promise<LoadedStory[]> => {
+const fetchLatestStories = async (count: number): Promise<LoadedStory[]> => {
   if (!hasValidFirebaseConfig()) {
     throw new Error("Firebase no configurado");
   }
@@ -97,4 +98,21 @@ export const loadLatestStories = async (count: number): Promise<LoadedStory[]> =
   );
 
   return mapSnapshotToStories(snapshot);
+};
+
+// Varios scripts de la portada piden las mismas entradas: se comparte la
+// petición en curso (los módulos ES son únicos por página).
+const requests = new Map<number, Promise<LoadedStory[]>>();
+
+/**
+ * Devuelve las últimas `count` publicaciones ordenadas de más reciente a
+ * más antigua. Lanza si Firebase no está configurado o falla la consulta.
+ */
+export const loadLatestStories = (count: number): Promise<LoadedStory[]> => {
+  let request = requests.get(count);
+  if (!request) {
+    request = fetchLatestStories(count);
+    requests.set(count, request);
+  }
+  return request;
 };
